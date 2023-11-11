@@ -44,6 +44,7 @@
     document.documentElement.appendChild(link);
   }
 
+  // https://bbs.tampermonkey.net.cn/forum.php?mod=viewthread&tid=835&page=1#pid4661
   Element.prototype.matches = Element.prototype.matches || Element.prototype.matchesSelector || Element.prototype.webkitMatchesSelector || Element.prototype.msMatchesSelector || Element.prototype.mozMatchesSelector;
   function getElement(parent, selector, timeout = 0) {
     return new Promise(resolve => {
@@ -302,12 +303,15 @@
   log("[Wallhaven Like & Save] userscript is running...");
 
   vueInject();
+
   banAdd1(banInit())
   banAdd2(banInit())
   pigAdd()
   tagBlacklistHandle()
 
   window.onload = () => {
+    
+    Vue.config.productionTip = false
 
     tagsHandle()
 
@@ -322,7 +326,7 @@
       },
       methods: {
         save() {
-          log("Start saving");
+          log("Pig clicked");
           
           if (!/wallhaven.cc\/w\//.test(window.location.href)) {
             const Toast = Swal.mixin({
@@ -349,11 +353,14 @@
             img.src = static;
           }, 1500);
 
-          // Add to Favorites
-          this.add();
+          if (/wallhaven.cc\/w\//.test(window.location.href)) {
+            
+            // Add to Favorites
+            this.add();
 
-          // Download
-          this.download();
+            // Download
+            this.download();
+          }
         },
         add() {
           let add = document.querySelector(".add-fav");
