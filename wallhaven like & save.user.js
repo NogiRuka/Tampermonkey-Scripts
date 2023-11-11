@@ -299,7 +299,6 @@
     element.append(el);
   }
 
-
   log("[Wallhaven Like & Save] userscript is running...");
 
   vueInject();
@@ -389,5 +388,4 @@
     }).mount("#app");
   };
 
-  // Your code here...
 })();
