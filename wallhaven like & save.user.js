@@ -2,7 +2,7 @@
 // @name         Wallpaper Like & Save 壁纸一键下载
 // @namespace    http://tampermonkey.net/
 // @version      0.5
-// @description  Wallhaven壁纸一键收藏加下载
+// @description  Wallhaven壁纸一键下载，标签屏蔽
 // @author       乃木流架
 // @match        https://wallhaven.cc/*
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAADKElEQVR4nO2YTWgTQRTHt6CCgkW9iJ8XD5aePHhQBKvepb16sr30KnjwIMhs/MCIgopUiBYPVqrMbEmatmmy29T6QRpt0522gQoqoiLag1+tdWe32TzZTWtTmsY2nexa2D88CNl9s//fzNuZnREET548efLkyZMnT44LEK4GRM4CwmFAmIKIxwGRb4BwI8eHtO0EkRBAeAIQ7uXWrkjOASIZEAnMC0Qwb/Nf5xqfA4Dw4AamDNUyhd7TFKoyWf2syWqWKRQWi9x1ddxoffJ+gXHRbj8LCO/jB2D1vN047rJg7P9wep2mqI1MVr/km/NX1i4prHvNG10LzYv2c0a5mbfNWmVj90zOPIsP79UUdaxQ7y4HIOsPFQQw/e0KXwCR/JwZ2t1ajB7TFPqjWIksNcxrHQUBppt7skwePsUPAOGQ3bg/GNBk+p2HeSsMqR/AJy0EePDUfk90efgEJwCpCkTyQQ8PfORlfjb09heQaYpC9nIQ4LwE2asdoHenci+7QqcYTlZzgdBjqUu8zS9plFqfTa54RoJoeovdGw4aP3ySQE09AaaoYPqDJiDyCFDbgZIANFltcLrna+oJHKmX7N+ZQE/+O9JUAgANuVE+bLaMSCJ/hf5dygi8chNAD7+cN0uVAjDhJgCLDq0YYHJVAzCFvl7VJcQU2ucmgEH68z/0ppYPIFPkJkDmbt40ivCdZQMYcmq/mwDmlZC1PwiBTzoklCIAqLA3K27Uf1vCAJ90VFipWIwedwXgfrxB4CVNViOOAshqs8BT0DmymcnqGyfMawqlkEisF3iLRUeqmELfldm8OiWntgvl0q/uwW16eOBTWWo+mHwLz8c2CuUW+PCZzO0Y6F2DfIx3DIB5K2LN86fLbn4G4KC9sPgkMG9G7H2sHkqCHkkBk2eMxdSoFh/dY90/2TOylcm0N2dYtcGNYBKmW/rAvN45t1D5cI0zACi4qfCZTv4BVe4Y5m/OhYe7/plzEe9wCODxmuLmiVE4jxjF81oqnQEQoKK4EZwuDIDTRfMCgbWOANhmRBJf5GhwHJBUVxhAqrOvF87rd8y8J0+ehP9OfwDBJGLFiOaZxAAAAABJRU5ErkJggg==
