@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Wallhaven壁纸一键下载加标签屏蔽
 // @namespace    http://tampermonkey.net/
-// @version      0.5
+// @version      0.6
 // @description  Wallhaven壁纸一键下载，标签屏蔽
 // @author       乃木流架
 // @match        https://wallhaven.cc/*
@@ -34,7 +34,8 @@
   function vueInject() {
     let script = document.createElement("script");
     script.setAttribute("type", "text/javascript");
-    script.src = "https://unpkg.com/vue@3/dist/vue.global.js";
+    // script.src = "https://unpkg.com/vue@3/dist/vue.global.js";
+    script.src = "https://unpkg.com/vue@3.2.36/dist/vue.global.prod.js";
     document.documentElement.appendChild(script);
 
     let link = document.createElement("link");
@@ -300,7 +301,7 @@
     element.append(el);
   }
 
-  log("[Wallhaven Like & Save] userscript is running...");
+  log("[Wallhaven壁纸一键下载加标签屏蔽] userscript is running...");
 
   vueInject();
 
@@ -310,9 +311,6 @@
   tagBlacklistHandle()
 
   window.onload = () => {
-    
-    Vue.config.productionTip = false
-
     tagsHandle()
 
     const { createApp } = Vue;
