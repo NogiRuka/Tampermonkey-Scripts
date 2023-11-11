@@ -14,7 +14,6 @@
 // @run-at       document-start
 // @require      https://unpkg.com/sweetalert2/dist/sweetalert2.min.js
 // @require      https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js
-// @require      file:///D:\Tampermonkey Scripts\CSDN美化.user.js
 // @license      GPL-3.0 License
 // ==/UserScript==
 

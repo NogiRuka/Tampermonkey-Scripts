@@ -121,12 +121,11 @@
   function tagsHandle() {
     const tags = document.querySelectorAll('#tags a[rel="tag"]');
 
-    log('tags---->', tags)
+    // log('tags---->', tags)
 
     // 处理标签
     tags.forEach(t => {
 
-      var parent = t.parentNode;
       var tagName = t.innerText;
 
       let confirmStr = '你确定要把 <strong style="color:#ff80ab">' + t.innerText + '</strong> 标签\n加入屏蔽名单吗?'
@@ -134,10 +133,8 @@
       let banIcon = document.createElement("a");
       banIcon.setAttribute("class", 'jsAnchor tag-rm tag-ban')
       banIcon.setAttribute("original-title", 'Ban tag')
-      // banIcon.setAttribute("data-confirm", confirmStr)
       banIcon.innerHTML = `<i class="fal fa-ban"></i>`
 
-      // parentElement.insertBefore(banIcon, t.nextSibling);
       t.insertAdjacentElement('beforebegin', banIcon);
 
       // log(t);
@@ -168,7 +165,6 @@
 
             GM_setValue('storedTagsArr', JSON.stringify(storedTagsArr))
             log('storedTagsArr---->', storedTagsArr)
-            // log('storedTagsArr---->', JSON.stringify(storedTagsArr))
 
             const Toast = Swal.mixin({
               html: '<p style="font-weight: bold;">屏蔽名单：</p>' + GM_getValue('storedTagsArr') + '<p style="font-weight: bold;">屏蔽名单历史：</p>' + GM_getValue('storedTagsArrLast'),
@@ -191,13 +187,11 @@
 
       })
 
-
       t.addEventListener("mouseover", function (e) {
         log('Tag---->', e.target.innerText);
 
       });
-      // 
-
+      
       // 添加鼠标移出事件处理程序
       t.addEventListener("mouseout", function () {
 
