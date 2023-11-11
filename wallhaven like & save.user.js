@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Wallpaper Like & Save 壁纸一键下载
+// @name         Wallhaven壁纸一键下载加标签屏蔽
 // @namespace    http://tampermonkey.net/
 // @version      0.5
 // @description  Wallhaven壁纸一键下载，标签屏蔽
