@@ -95,7 +95,7 @@
 
     // 配置和常量
     const DEFAULT_CONFIG = {
-        apiKey: '',
+        apiKey: 'your-api-key',
         apiEndpoint: 'https://api.openai.com/v1/chat/completions',
         models: [
             'gpt-4',
