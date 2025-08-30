@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         微博超话图片下载
 // @namespace    http://tampermonkey.net/
-// @version      1.9
+// @version      2.1
 // @description  提供超话内原图下载，优化超话浏览体验
 // @author       乃木流架
 // @match        https://weibo.com/p/*
@@ -25,7 +25,8 @@
 
   //自定义用户主页背景图片
   //图床：https://jpg.dog/
-  const urlNew = "https://i.jpg.dog/f5651b662ec09801fdd4a54285038ee1.jpeg";
+  // const urlNew = "https://i.jpg.dog/f5651b662ec09801fdd4a54285038ee1.jpeg";
+  const urlNew = "https://tva1.sinaimg.cn/mw690/005Ant5dgy1hjzgdh531cj335s1s0kjl.jpg";
 
   //默认主页背景图片
   const urlDefault1 =
@@ -703,6 +704,12 @@
     let qr = document.getElementById("Pl_Core_PicText__263");
     if (qr) {
       qr.remove();
+    }
+    
+    //去除超话内微博聊天
+    let chat = document.getElementById("WB_webchat");
+    if (chat) {
+      chat.remove();
     }
 
     //清除背景图片监视
