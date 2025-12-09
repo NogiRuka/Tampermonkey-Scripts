@@ -370,12 +370,16 @@
   }
 
   /** ====== 主入口 ====== */
-  if (host === "www.google.com" || host === "www.gaytor.rent") {
+  // 特定网站功能
+  if (host.includes("google.com") || host.includes("gaytor.rent") || host.includes("gay-torrents.net")) {
     fixLinks();
-  } else if (host === "member.bilibili.com") {
-    initBilibiliSearchHistory();
-  } else {
-    scrollBtns();
   }
+
+  if (host === "member.bilibili.com") {
+    initBilibiliSearchHistory();
+  }
+
+  // 通用功能（所有网站适用）
+  scrollBtns();
 
 })();
