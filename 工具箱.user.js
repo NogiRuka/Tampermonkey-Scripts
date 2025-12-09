@@ -371,7 +371,7 @@
 
   /** ====== 主入口 ====== */
   // 特定网站功能
-  if (host.includes("google.com") || host.includes("gaytor.rent") || host.includes("gay-torrents.net")) {
+  if (host.includes("google.com") || host.includes("gaytor.rent")) {
     fixLinks();
   }
 
