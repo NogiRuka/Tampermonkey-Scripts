@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         工具箱
 // @namespace    http://tampermonkey.net/
-// @version      2025-08-30
-// @description  链接新窗口打开，鼠标到右下角显示滚动按钮，炫酷光标特效 + 可通过油猴菜单切换光标样式
+// @version      2025-12-09
+// @description  链接新窗口打开，鼠标到右下角显示滚动按钮
 // @author       乃木流架
 // @icon         https://youke1.picui.cn/s1/2025/08/30/68b1f11b8db08.png
 // @match        *://*/*
@@ -98,14 +98,21 @@
     document.addEventListener("mousemove", e => {
       const fromRight = window.innerWidth - e.clientX;
       const fromBottom = window.innerHeight - e.clientY;
-      container.classList.toggle("active", fromRight < 300 && fromBottom < 300);
+      
+      // 检查是否在弹出框内
+      const isInModal = e.target.closest('.modal, .popup, .dialog, .overlay, .lightbox, [role="dialog"], [aria-modal="true"]');
+      const isInFixedElement = e.target.closest('[style*="position: fixed"], [style*="position:fixed"]');
+      
+      // 只有在主页面且鼠标在右下角时才显示
+      const shouldShow = !isInModal && !isInFixedElement && fromRight < 300 && fromBottom < 300;
+      container.classList.toggle("active", shouldShow);
     });
 
     log("右下角触发显示滚动按钮已启用", "Scroll");
   }
 
-  /** ====== 修复 Google 搜索链接（新窗口打开） ====== */
-  function fixGoogleLinks() {
+  /** ====== 修复链接（新窗口打开） ====== */
+  function fixLinks() {
     const update = () => {
       let count = 0;
       document.querySelectorAll("a:not([data-nogiruka-fixed])").forEach(a => {
@@ -114,74 +121,261 @@
         a.dataset.nogirukaFixed = "true";
         count++;
       });
-      if (count) log(`已更新 ${count} 个链接`, "Google");
+      if (count) log(`已更新 ${count} 个链接`, "Links");
     };
     requestIdleCallback(update);
     new MutationObserver(() => requestIdleCallback(update))
       .observe(document.body, { childList: true, subtree: true });
   }
 
-  /** ====== 光标特效配置 ====== */
-  const cursorConfig = {
-    enabled: true, // 是否开启光标特效
-    type: "rainbowCursor",
-    options: {
-      length: 20,
-      colors: [
-        "#FE0000",
-        "#FD8C00",
-        "#FFE500",
-        "#119F0B",
-        "#0644B3",
-        "#C22EDC",
-      ],
-      size: 3
-    }
-  };
 
-  let _nogirukaCursorInstance = null;
 
-  /** ====== 应用光标特效 ====== */
-  async function applyCursorEffect() {
-    try {
-      const module = await import("https://unpkg.com/cursor-effects@latest/dist/esm.js");
-      if (_nogirukaCursorInstance?.destroy) _nogirukaCursorInstance.destroy();
-      if (cursorConfig.enabled && module[cursorConfig.type]) {
-        _nogirukaCursorInstance = new module[cursorConfig.type](cursorConfig.options);
-        log(`光标已启用: ${cursorConfig.type}`, "Cursor");
-      } else {
-        _nogirukaCursorInstance = null;
-        log("光标特效已关闭", "Cursor");
+  /** ====== Bilibili 创作中心搜索历史 ====== */
+  function initBilibiliSearchHistory() {
+    log("初始化 Bilibili 搜索历史功能", "Bilibili");
+
+    // 样式
+    GM_addStyle(`
+      .nogiruka-search-history {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #e7e7e7;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 9999;
+        max-height: 300px;
+        overflow-y: auto;
+        display: none;
       }
-    } catch (e) {
-      log("光标特效加载失败: " + e, "Cursor");
-    }
-  }
+      .nogiruka-search-history.active {
+        display: block;
+      }
+      .nogiruka-history-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #333;
+        font-size: 14px;
+        transition: background-color 0.2s;
+      }
+      .nogiruka-history-item:hover {
+        background-color: #f4f4f4;
+      }
+      .nogiruka-history-delete {
+        color: #999;
+        font-size: 16px;
+        padding: 0 4px;
+        line-height: 1;
+        opacity: 0.6;
+        transition: opacity 0.2s, color 0.2s;
+      }
+      .nogiruka-history-delete:hover {
+        color: #ff4d4f;
+        opacity: 1;
+      }
+      .nogiruka-history-clear {
+        padding: 8px 12px;
+        text-align: center;
+        color: #999;
+        border-top: 1px solid #eee;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background-color 0.2s;
+      }
+      .nogiruka-history-clear:hover {
+        color: #666;
+        background-color: #f9f9f9;
+      }
+    `);
 
-  /** ====== 注册油猴菜单命令切换光标 ====== */
-  function registerCursorMenu() {
-    GM_registerMenuCommand(`${cursorConfig.enabled ? "关闭" : "开启"}光标特效`, () => {
-      cursorConfig.enabled = !cursorConfig.enabled;
-      applyCursorEffect();
-      registerCursorMenu(); // 更新菜单显示文字
-    });
+    const STORAGE_KEY = 'nogiruka_bili_search_history';
+    
+    // 获取历史记录
+    const getHistory = () => {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    };
 
-    const types = ["rainbowCursor", "fairyDustCursor", "ghostCursor", "bubbleCursor", "emojiCursor"];
-    types.forEach(type => {
-      GM_registerMenuCommand(`切换光标: ${type}`, () => {
-        cursorConfig.type = type;
-        applyCursorEffect();
+    // 保存历史记录
+    const saveHistory = (keyword) => {
+      if (!keyword || !keyword.trim()) return;
+      keyword = keyword.trim();
+      let history = getHistory();
+      // 移除已存在的相同关键词
+      history = history.filter(k => k !== keyword);
+      // 添加到头部
+      history.unshift(keyword);
+      // 限制数量
+      if (history.length > 20) history.pop();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    };
+
+    // 删除单条历史
+    const deleteHistory = (keyword) => {
+      let history = getHistory();
+      history = history.filter(k => k !== keyword);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    };
+
+    // 清空历史
+    const clearHistory = () => {
+      localStorage.removeItem(STORAGE_KEY);
+    };
+
+    // 渲染历史记录列表
+    const renderHistory = (container, inputElement) => {
+      const history = getHistory();
+      container.innerHTML = '';
+      
+      if (history.length === 0) {
+        container.classList.remove('active');
+        return;
+      }
+
+      // 更新位置
+      const updatePosition = () => {
+        const rect = inputElement.parentElement.getBoundingClientRect();
+        container.style.top = `${rect.bottom + window.scrollY}px`;
+        container.style.left = `${rect.left + window.scrollX}px`;
+        container.style.width = `${rect.width}px`;
+      };
+      updatePosition();
+
+      history.forEach(keyword => {
+        const item = document.createElement('div');
+        item.className = 'nogiruka-history-item';
+        
+        const text = document.createElement('span');
+        text.textContent = keyword;
+        
+        const delBtn = document.createElement('span');
+        delBtn.className = 'nogiruka-history-delete';
+        delBtn.innerHTML = '×';
+        delBtn.title = '删除';
+        delBtn.onclick = (e) => {
+          e.stopPropagation();
+          deleteHistory(keyword);
+          renderHistory(container, inputElement);
+          inputElement.focus();
+        };
+
+        item.onclick = () => {
+          inputElement.value = keyword;
+          // 触发 Vue 的 input 事件更新 v-model
+          inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+          // 触发搜索 (模拟回车)
+          inputElement.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, keyCode: 13 }));
+          // 尝试点击搜索按钮
+          const searchBtn = inputElement.parentElement.querySelector('.search-input');
+          if (searchBtn) searchBtn.click();
+          
+          container.classList.remove('active');
+        };
+
+        item.appendChild(text);
+        item.appendChild(delBtn);
+        container.appendChild(item);
       });
-    });
+
+      // 清空按钮
+      if (history.length > 0) {
+        const clearBtn = document.createElement('div');
+        clearBtn.className = 'nogiruka-history-clear';
+        clearBtn.textContent = '清空历史记录';
+        clearBtn.onclick = (e) => {
+            e.stopPropagation();
+            if(confirm('确定要清空所有搜索历史吗？')) {
+                clearHistory();
+                renderHistory(container, inputElement);
+                inputElement.focus();
+            }
+        };
+        container.appendChild(clearBtn);
+      }
+      
+      container.classList.add('active');
+    };
+
+    // 查找并处理搜索框
+    const observeSearchInput = () => {
+      const observer = new MutationObserver(() => {
+        const wrapper = document.querySelector('.bcc-search-input-wrapper');
+        const input = document.querySelector('.bcc-search-input-wrapper input.bcc-search-input');
+        
+        if (wrapper && input && !wrapper.dataset.historyInited) {
+          wrapper.dataset.historyInited = 'true';
+          // wrapper.style.position = 'relative'; // 移除这行，避免影响布局
+
+          // 创建下拉框容器，挂载到 body
+          const historyContainer = document.createElement('div');
+          historyContainer.className = 'nogiruka-search-history';
+          document.body.appendChild(historyContainer);
+
+          // 监听输入框事件
+          input.addEventListener('focus', () => {
+            renderHistory(historyContainer, input);
+          });
+          
+          input.addEventListener('input', () => {
+             // 输入时隐藏历史
+             historyContainer.classList.remove('active');
+          });
+          
+          // 滚动时隐藏
+          window.addEventListener('scroll', () => {
+             historyContainer.classList.remove('active');
+          }, true);
+          window.addEventListener('resize', () => {
+             historyContainer.classList.remove('active');
+          });
+
+          // 延迟隐藏，以便点击
+          input.addEventListener('blur', () => {
+            setTimeout(() => {
+              historyContainer.classList.remove('active');
+            }, 200);
+          });
+
+          // 监听回车保存
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              saveHistory(input.value);
+            }
+          });
+
+          // 监听搜索按钮点击
+          const searchIcon = wrapper.querySelector('i.search-input');
+          if (searchIcon) {
+            searchIcon.addEventListener('click', () => {
+              saveHistory(input.value);
+            });
+          }
+          
+          log("已注入搜索历史功能", "Bilibili");
+        }
+      });
+
+      observer.observe(document.body, { childList: true, subtree: true });
+    };
+
+    observeSearchInput();
   }
 
   /** ====== 主入口 ====== */
-  if (host === "www.google.com") {
-    fixGoogleLinks();
+  if (host === "www.google.com" || host === "www.gaytor.rent") {
+    fixLinks();
+  } else if (host === "member.bilibili.com") {
+    initBilibiliSearchHistory();
   } else {
     scrollBtns();
-    applyCursorEffect();
-    registerCursorMenu();
   }
 
 })();
