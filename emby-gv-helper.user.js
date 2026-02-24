@@ -905,9 +905,11 @@
     const tds = document.querySelectorAll('td');
     let targetTd = null;
     for (const td of tds) {
-      if (td.textContent.includes('カテゴリー：')) {
+      if (td.textContent.trim().startsWith('カテゴリー：')) {
         const links = td.querySelectorAll('a');
-        meta.genres = Array.from(links).map(a => a.textContent.trim());
+        meta.genres = Array.from(links)
+          .map(a => a.textContent.trim())
+          .filter(text => text.length > 0);
         targetTd = td;
         break;
       }
