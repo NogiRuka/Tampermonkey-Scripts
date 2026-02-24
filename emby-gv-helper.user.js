@@ -8,7 +8,7 @@
 // @match        https://pornolab.net/forum/viewtopic.php*
 // @match        https://www.iafd.com/title.rme/*
 // @match        https://lustfulboy.com/web/index.html*
-// @match        https://www.games-video.co.jp/dvd_detail.php*
+// @match        https://www.games-video.co.jp/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -872,9 +872,8 @@
 
   function initGamesVideo() {
     if (!location.host.includes('games-video.co.jp')) return;
-    if (!location.pathname.includes('dvd_detail.php')) return;
 
-    // Unlock copy
+    // Unlock copy for all pages
     const style = document.createElement('style');
     style.textContent = 'body, * { user-select: text !important; -webkit-user-select: text !important; }';
     document.head.appendChild(style);
@@ -883,6 +882,9 @@
         e.stopPropagation();
       }, true);
     });
+
+    // Metadata parsing only for detail page
+    if (!location.pathname.includes('dvd_detail.php')) return;
 
     const titleEl = document.querySelector('.titlebar h2');
     const title = titleEl ? titleEl.textContent.trim() : '';
