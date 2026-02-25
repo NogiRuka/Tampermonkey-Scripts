@@ -896,8 +896,8 @@
         if (mainItemId && embyApiUrl && embyApiToken) {
           if (!peopleFetchStatus[mainItemId]) {
             peopleFetchStatus[mainItemId] = 'pending';
-            // Use the endpoint that returns People directly if possible, or handle Items wrapper
-            const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${mainItemId}/People`;
+            // Use the endpoint that returns Item details including People
+            const url = `${embyApiUrl.replace(/\/+$/, '')}/Items?Ids=${mainItemId}&Fields=People`;
             GM_xmlhttpRequest({
               method: 'GET',
               url: url,
@@ -907,12 +907,14 @@
                   try {
                     let data = JSON.parse(resp.responseText);
                     let people = [];
-                    // Normalize: data can be Array or { Items: [...] } or { People: [...] }
-                    if (Array.isArray(data)) {
+                    // Normalize: Expecting { Items: [ { People: [...] } ] }
+                    if (data && data.Items && data.Items.length > 0 && data.Items[0].People) {
+                       people = data.Items[0].People;
+                    } else if (Array.isArray(data)) {
+                       // Fallback for direct array return (unlikely for this endpoint but safe to keep)
                        people = data;
-                    } else if (data && Array.isArray(data.Items)) {
-                       people = data.Items;
                     } else if (data && Array.isArray(data.People)) {
+                       // Fallback for direct object return
                        people = data.People;
                     }
                     
