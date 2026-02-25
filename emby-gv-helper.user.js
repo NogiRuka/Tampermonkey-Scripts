@@ -888,7 +888,7 @@
         if (mainItemId && embyApiUrl && embyApiToken) {
           if (!peopleFetchStatus[mainItemId]) {
             peopleFetchStatus[mainItemId] = 'pending';
-            const url = `${embyApiUrl.replace(//+$/, '')}/Items/${mainItemId}/People`;
+            const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${mainItemId}/People`;
             GM_xmlhttpRequest({
               method: 'GET',
               url: url,
