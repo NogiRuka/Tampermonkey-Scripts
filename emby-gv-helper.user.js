@@ -782,6 +782,17 @@
       return;
     }
 
+    // Inject styles for hover effect
+    if (!document.getElementById('dan-emby-styles')) {
+       const style = document.createElement('style');
+       style.id = 'dan-emby-styles';
+       style.textContent = `
+         .cardBox .dan-hover-reveal { opacity: 0; transition: opacity 0.2s ease-in-out; }
+         .cardBox:hover .dan-hover-reveal, .cardBox:focus-within .dan-hover-reveal { opacity: 1; }
+       `;
+       document.head.appendChild(style);
+    }
+
     // Helper for image upload
     const uploadImage = (itemId, file) => {
       if (!embyApiUrl || !embyApiToken) {
@@ -1097,7 +1108,7 @@
 
           // Create button container for top-right
           const btnContainer = document.createElement('div');
-          btnContainer.className = 'cardOverlayButton-tr'; // Custom class
+          btnContainer.className = 'cardOverlayButton-tr dan-hover-reveal'; // Custom class with hover effect
           // Position absolute top-right. Ensure z-index is higher than overlays (usually 1-10)
           btnContainer.style.cssText = 'position:absolute;top:0;right:0;z-index:9999;pointer-events:auto;';
           
