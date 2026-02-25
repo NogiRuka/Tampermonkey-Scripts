@@ -883,6 +883,12 @@
         let mainItemId = null;
         const mainItemElem = view.querySelector('.detailImageContainerCard[data-id]') || view.querySelector('.btnPlaystate[data-id]');
         if (mainItemElem) mainItemId = mainItemElem.getAttribute('data-id');
+        
+        // Fallback: Try to get ID from URL params (e.g. ?id=12345)
+        if (!mainItemId) {
+           const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+           if (urlParams.has('id')) mainItemId = urlParams.get('id');
+        }
 
         // --- Fetch People if needed ---
         if (mainItemId && embyApiUrl && embyApiToken) {
@@ -1062,29 +1068,18 @@
 
           if (!actorId) return;
 
-          let overlay = card.querySelector('.cardOverlayContainer');
-          if (!overlay) {
-             // Create overlay if missing (e.g. for placeholder images)
-             overlay = document.createElement('div');
-             overlay.className = 'cardOverlayContainer itemAction';
-             // Try to insert after image container
-             const imgContainer = card.querySelector('.cardImageContainer') || card.querySelector('.cardBox');
-             if (imgContainer) {
-                if (imgContainer.classList.contains('cardBox')) {
-                   imgContainer.appendChild(overlay);
-                } else {
-                   imgContainer.parentNode.insertBefore(overlay, imgContainer.nextSibling);
-                }
-             } else {
-                card.appendChild(overlay);
-             }
-          }
+          // Strategy: Append to cardBox to avoid overlay interference
+          // The cardBox is usually the relative parent.
+          const cardBox = card.querySelector('.cardBox') || card;
+          
+          // Check if button already exists in cardBox (or card if cardBox missing)
+          if (cardBox.querySelector('.cardOverlayButton-tr')) return;
 
           // Create button container for top-right
           const btnContainer = document.createElement('div');
           btnContainer.className = 'cardOverlayButton-tr'; // Custom class
-          // Adjusted position: closer to corner (0px) and higher z-index
-          btnContainer.style.cssText = 'position:absolute;top:0;right:0;z-index:100;';
+          // Position absolute top-right. Ensure z-index is higher than overlays (usually 1-10)
+          btnContainer.style.cssText = 'position:absolute;top:0;right:0;z-index:9999;pointer-events:auto;';
           
           const uploadBtn = document.createElement('button');
           uploadBtn.type = 'button';
@@ -1102,7 +1097,14 @@
           };
 
           btnContainer.appendChild(uploadBtn);
-          overlay.appendChild(btnContainer);
+          
+          // Make sure cardBox is positioned so absolute child works
+          const computedStyle = window.getComputedStyle(cardBox);
+          if (computedStyle.position === 'static') {
+             cardBox.style.position = 'relative';
+          }
+          
+          cardBox.appendChild(btnContainer);
         });
 
       });
