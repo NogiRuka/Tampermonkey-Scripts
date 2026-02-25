@@ -743,17 +743,15 @@
       tries += 1;
       if (tries > maxTries) {
         console.log(debugPrefix, 'maxTries exceeded, stop timer');
+        clearInterval(embyItemTimer);
+        embyItemTimer = null;
+        return;
       }
 
       const itemViews = document.querySelectorAll('.view-item-item');
-      const currentView = itemViews[itemViews.length - 1] || null;
-      if (!currentView) {
+      if (itemViews.length === 0) {
         if (tries === 1 || tries === maxTries) {
           console.log(debugPrefix, 'no .view-item-item found, try', tries, '/', maxTries);
-        }
-        if (tries >= maxTries) {
-          clearInterval(embyItemTimer);
-          embyItemTimer = null;
         }
         return;
       }
@@ -762,111 +760,63 @@
         console.log(debugPrefix, 'found itemViews count', itemViews.length);
       }
 
-      const sectionTitle = currentView.querySelector('.mediaSources .sectionTitle');
-      if (!sectionTitle) {
-        if (tries === 1 || tries === maxTries) {
-          console.log(debugPrefix, 'no .mediaSources .sectionTitle in currentView, try', tries, '/', maxTries);
+      // Iterate all views to ensure stacked views get buttons
+      itemViews.forEach((view, index) => {
+        // Skip if button already exists and we are just polling (unless we want to update it)
+        const existing = view.querySelector('[data-dan-resource-link="1"]');
+        if (existing) {
+          // Optional: update onclick if needed, but usually not necessary for static views
+          // console.log(debugPrefix, `view ${index} already has button`);
+          return;
         }
-        if (tries >= maxTries) {
-          clearInterval(embyItemTimer);
-          embyItemTimer = null;
-        }
-        return;
-      }
 
-      const pathDiv = sectionTitle.querySelector('div:not(.mediaInfoItems)');
-      if (!pathDiv) {
-        console.log(debugPrefix, 'sectionTitle found but no pathDiv');
-        if (tries >= maxTries) {
-          clearInterval(embyItemTimer);
-          embyItemTimer = null;
-        }
-        return;
-      }
+        const sectionTitle = view.querySelector('.mediaSources .sectionTitle');
+        if (!sectionTitle) return;
 
-      const rawPath = pathDiv.textContent.trim();
-      if (!rawPath) {
-        console.log(debugPrefix, 'pathDiv exists but rawPath is empty');
-        if (tries >= maxTries) {
-          clearInterval(embyItemTimer);
-          embyItemTimer = null;
-        }
-        return;
-      }
+        const pathDiv = sectionTitle.querySelector('div:not(.mediaInfoItems)');
+        if (!pathDiv) return;
 
-      const marker = '/media/lustfulboy/';
-      const idx = rawPath.indexOf(marker);
-      if (idx === -1) {
-        console.log(debugPrefix, 'marker not found in rawPath', { rawPath, marker });
-        clearInterval(embyItemTimer);
-        embyItemTimer = null;
-        return;
-      }
+        const rawPath = pathDiv.textContent.trim();
+        if (!rawPath) return;
 
-      const afterMarker = rawPath.slice(idx + marker.length);
-      if (!afterMarker) {
-        console.log(debugPrefix, 'afterMarker empty', { rawPath, marker });
-        clearInterval(embyItemTimer);
-        embyItemTimer = null;
-        return;
-      }
+        const marker = '/media/lustfulboy/';
+        const idx = rawPath.indexOf(marker);
+        if (idx === -1) return;
 
-      const dirPart = afterMarker.replace(/[^/]+$/, '');
-      if (!dirPart) {
-        console.log(debugPrefix, 'dirPart empty after stripping filename', { afterMarker });
-        clearInterval(embyItemTimer);
-        embyItemTimer = null;
-        return;
-      }
+        const afterMarker = rawPath.slice(idx + marker.length);
+        if (!afterMarker) return;
 
-      const segments = dirPart.split('/').filter(Boolean).map(encodeURIComponent);
-      const relative = segments.join('/');
-      console.log(debugPrefix, 'parsed path', { rawPath, dirPart, segments, relative });
+        const dirPart = afterMarker.replace(/[^/]+$/, '');
+        if (!dirPart) return;
 
-      const moreBtn = currentView.querySelector('.btnMoreCommands.detailButton');
-      if (!moreBtn) {
-        if (tries === 1 || tries === maxTries) {
-          console.log(debugPrefix, 'no .btnMoreCommands.detailButton found in currentView, try', tries, '/', maxTries);
-        }
-        if (tries >= maxTries) {
-          clearInterval(embyItemTimer);
-          embyItemTimer = null;
-        }
-        return;
-      }
+        const segments = dirPart.split('/').filter(Boolean).map(encodeURIComponent);
+        const relative = segments.join('/');
+        
+        const moreBtn = view.querySelector('.btnMoreCommands.detailButton');
+        if (!moreBtn) return;
 
-      const base = resourceBaseUrl.replace(/\/+$/, '');
-      const url = relative ? base + '/' + relative : base;
-      console.log(debugPrefix, 'final resource url', { base, url });
+        const base = resourceBaseUrl.replace(/\/+$/, '');
+        const url = relative ? base + '/' + relative : base;
+        
+        console.log(debugPrefix, `adding button to view ${index}`, { url });
 
-      const existing = currentView.querySelector('[data-dan-resource-link="1"]');
-      if (existing) {
-        console.log(debugPrefix, 'button already exists in currentView, update onclick only');
-        existing.onclick = () => {
+        const linkBtn = document.createElement('button');
+        linkBtn.type = 'button';
+        linkBtn.setAttribute('is', 'emby-button');
+        linkBtn.className = 'btnMainPlay raised detailButton emby-button';
+        linkBtn.dataset.danResourceLink = '1';
+        linkBtn.textContent = t.resourceOpenButton;
+        linkBtn.style.cssText = 'margin-left:.5em;background:' + themeColor + ';border-color:' + themeColor + ';';
+        linkBtn.onclick = () => {
           window.open(url, '_blank', 'noopener');
         };
-        clearInterval(embyItemTimer);
-        embyItemTimer = null;
-        return;
-      }
 
-      const linkBtn = document.createElement('button');
-      linkBtn.type = 'button';
-      linkBtn.setAttribute('is', 'emby-button');
-      linkBtn.className = 'btnMainPlay raised detailButton emby-button';
-      linkBtn.dataset.danResourceLink = '1';
-      linkBtn.textContent = t.resourceOpenButton;
-      linkBtn.style.cssText = 'margin-left:.5em;background:' + themeColor + ';border-color:' + themeColor + ';';
-      linkBtn.onclick = () => {
-        window.open(url, '_blank', 'noopener');
-      };
-
-      if (moreBtn.parentNode) {
-        console.log(debugPrefix, 'insert new button after moreBtn');
-        moreBtn.parentNode.insertBefore(linkBtn, moreBtn.nextSibling);
-      }
-      clearInterval(embyItemTimer);
-      embyItemTimer = null;
+        if (moreBtn.parentNode) {
+          moreBtn.parentNode.insertBefore(linkBtn, moreBtn.nextSibling);
+        }
+      });
+      
+      // Do NOT clear interval here, keep polling until maxTries to catch late-loading views
     }, 500);
   }
 
