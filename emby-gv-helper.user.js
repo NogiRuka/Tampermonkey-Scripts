@@ -880,9 +880,11 @@
       // Iterate all views to ensure stacked views get buttons
       itemViews.forEach((view, index) => {
         // --- 0. Get Main Item ID for API calls ---
-        let mainItemId = null;
-        const mainItemElem = view.querySelector('.detailImageContainerCard[data-id]') || view.querySelector('.btnPlaystate[data-id]');
-        if (mainItemElem) mainItemId = mainItemElem.getAttribute('data-id');
+        let mainItemId = view.getAttribute('data-id'); // Try view itself first
+        if (!mainItemId) {
+           const mainItemElem = view.querySelector('.detailImageContainerCard[data-id]') || view.querySelector('.btnPlaystate[data-id]');
+           if (mainItemElem) mainItemId = mainItemElem.getAttribute('data-id');
+        }
         
         // Fallback: Try to get ID from URL params (e.g. ?id=12345)
         if (!mainItemId) {
@@ -894,6 +896,7 @@
         if (mainItemId && embyApiUrl && embyApiToken) {
           if (!peopleFetchStatus[mainItemId]) {
             peopleFetchStatus[mainItemId] = 'pending';
+            // Use the endpoint that returns People directly if possible, or handle Items wrapper
             const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${mainItemId}/People`;
             GM_xmlhttpRequest({
               method: 'GET',
@@ -902,21 +905,36 @@
               onload: (resp) => {
                 if (resp.status === 200) {
                   try {
-                    const people = JSON.parse(resp.responseText);
+                    let data = JSON.parse(resp.responseText);
+                    let people = [];
+                    // Normalize: data can be Array or { Items: [...] } or { People: [...] }
+                    if (Array.isArray(data)) {
+                       people = data;
+                    } else if (data && Array.isArray(data.Items)) {
+                       people = data.Items;
+                    } else if (data && Array.isArray(data.People)) {
+                       people = data.People;
+                    }
+                    
                     peopleCacheMap[mainItemId] = {};
                     people.forEach(p => {
                       if (p.Name && p.Id) peopleCacheMap[mainItemId][p.Name] = p.Id;
                     });
+                    console.log(debugPrefix, 'Fetched people for', mainItemId, 'count:', Object.keys(peopleCacheMap[mainItemId]).length);
                     peopleFetchStatus[mainItemId] = 'done';
                   } catch (e) {
                     console.error(debugPrefix, 'Error parsing people', e);
                     peopleFetchStatus[mainItemId] = 'failed';
                   }
                 } else {
+                  console.error(debugPrefix, 'API Error', resp.status);
                   peopleFetchStatus[mainItemId] = 'failed';
                 }
               },
-              onerror: () => { peopleFetchStatus[mainItemId] = 'failed'; }
+              onerror: (err) => { 
+                 console.error(debugPrefix, 'Request Error', err);
+                 peopleFetchStatus[mainItemId] = 'failed'; 
+              }
             });
           }
         }
