@@ -12,6 +12,9 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
+// @grant        GM_xmlhttpRequest
+// @connect      lustfulboy.com
+// @connect      self
 // @require      file://D:\Projects\Tampermonkey Scripts\emby-gv-helper.user.js
 // ==/UserScript==
 
@@ -46,6 +49,8 @@
 
   const metadataConfigs = GM_getValue('metadataConfigs', defaultMetadataConfigs);
   const resourceBaseUrl = GM_getValue('resourceBaseUrl', '');
+  const embyApiUrl = GM_getValue('embyApiUrl', 'https://lustfulboy.com/emby');
+  const embyApiToken = GM_getValue('embyApiToken', '');
 
   const t = {
     zh: {
@@ -71,7 +76,13 @@
       themeColorLabel: '主题色（影响按钮、边框等高亮）',
       resourceBaseLabel: '资源站基址（例如：https://example.com/filebrowser/files/media/lustfulboy）',
       resourceBasePlaceholder: '请输入资源站根路径',
-      resourceOpenButton: '打开资源目录'
+      resourceOpenButton: '打开资源目录',
+      embyApiSettings: 'Emby API 设置',
+      embyApiUrlLabel: 'Emby 服务器地址 (例如 https://lustfulboy.com/emby)',
+      embyApiTokenLabel: 'Emby API 密钥 (X-Emby-Token)',
+      uploadImage: '修改图片',
+      uploadSuccess: '图片上传成功，请手动刷新页面',
+      uploadFailed: '图片上传失败'
     },
     en: {
       settings: '⚙️ Settings',
@@ -96,7 +107,13 @@
       themeColorLabel: 'Theme color (buttons, borders and highlights)',
       resourceBaseLabel: 'Resource base URL (e.g. https://example.com/filebrowser/files/media/lustfulboy)',
       resourceBasePlaceholder: 'Enter resource root URL',
-      resourceOpenButton: 'Open resource folder'
+      resourceOpenButton: 'Open resource folder',
+      embyApiSettings: 'Emby API Settings',
+      embyApiUrlLabel: 'Emby Server URL (e.g. https://lustfulboy.com/emby)',
+      embyApiTokenLabel: 'Emby API Key (X-Emby-Token)',
+      uploadImage: 'Upload Image',
+      uploadSuccess: 'Image uploaded successfully, please refresh manually',
+      uploadFailed: 'Image upload failed'
     }
   }[lang];
 
@@ -371,6 +388,41 @@
 
     content.appendChild(resourceBlock);
 
+    // Emby API Settings Block
+    const apiBlock = document.createElement('div');
+    apiBlock.style.cssText = 'margin-top:14px;padding:10px 12px;background:#1c1c1c;border-radius:6px;border:1px solid #333;';
+    
+    const apiTitle = document.createElement('div');
+    apiTitle.textContent = t.embyApiSettings;
+    apiTitle.style.cssText = 'font-size:12px;color:' + themeColor + ';margin-bottom:8px;font-weight:600;';
+    apiBlock.appendChild(apiTitle);
+
+    // API URL
+    const apiUrlLabel = document.createElement('div');
+    apiUrlLabel.textContent = t.embyApiUrlLabel;
+    apiUrlLabel.style.cssText = 'font-size:11px;color:#ccc;margin-bottom:4px;';
+    apiBlock.appendChild(apiUrlLabel);
+
+    const apiUrlInput = document.createElement('input');
+    apiUrlInput.type = 'text';
+    apiUrlInput.value = embyApiUrl || '';
+    apiUrlInput.style.cssText = 'width:100%;padding:6px 8px;border-radius:4px;border:1px solid #3a3a3a;background:#111;color:#eee;font-size:12px;margin-bottom:10px;';
+    apiBlock.appendChild(apiUrlInput);
+
+    // API Token
+    const apiTokenLabel = document.createElement('div');
+    apiTokenLabel.textContent = t.embyApiTokenLabel;
+    apiTokenLabel.style.cssText = 'font-size:11px;color:#ccc;margin-bottom:4px;';
+    apiBlock.appendChild(apiTokenLabel);
+
+    const apiTokenInput = document.createElement('input');
+    apiTokenInput.type = 'text';
+    apiTokenInput.value = embyApiToken || '';
+    apiTokenInput.style.cssText = 'width:100%;padding:6px 8px;border-radius:4px;border:1px solid #3a3a3a;background:#111;color:#eee;font-size:12px;';
+    apiBlock.appendChild(apiTokenInput);
+
+    content.appendChild(apiBlock);
+
     const metaSaveBtn = document.createElement('button');
     metaSaveBtn.textContent = t.saveAndReload;
     metaSaveBtn.style.cssText = 'padding:6px 12px;background:' + themeColor + ';color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-top:8px;';
@@ -386,6 +438,8 @@
       });
       GM_setValue('metadataConfigs', nextConfigs);
       GM_setValue('resourceBaseUrl', resourceInput.value.trim());
+      GM_setValue('embyApiUrl', apiUrlInput.value.trim());
+      GM_setValue('embyApiToken', apiTokenInput.value.trim());
       const nextTheme = themeText.value.trim();
       if (/^#[0-9a-fA-F]{6}$/.test(nextTheme)) {
         GM_setValue('themeColor', nextTheme);
@@ -723,6 +777,65 @@
       console.log(debugPrefix, 'exit: hash does not contain item?id=');
       return;
     }
+
+    // Helper for image upload
+    const uploadImage = (itemId, file) => {
+      if (!embyApiUrl || !embyApiToken) {
+        alert(t.embyApiSettings + ' ' + t.clickToSet);
+        openSettings();
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64Data = e.target.result.split(',')[1];
+        if (!base64Data) {
+          showToast(t.uploadFailed);
+          return;
+        }
+
+        const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${itemId}/Images/Primary`;
+        GM_xmlhttpRequest({
+          method: 'POST',
+          url: url,
+          headers: {
+            'X-Emby-Token': embyApiToken,
+            'Content-Type': file.type || 'image/jpeg'
+          },
+          data: base64Data,
+          onload: (resp) => {
+            if (resp.status >= 200 && resp.status < 300) {
+              showToast(t.uploadSuccess);
+            } else {
+              console.error(debugPrefix, 'upload failed', resp);
+              showToast(t.uploadFailed + ': ' + resp.status);
+            }
+          },
+          onerror: (err) => {
+            console.error(debugPrefix, 'upload error', err);
+            showToast(t.uploadFailed);
+          }
+        });
+      };
+      reader.readAsDataURL(file);
+    };
+
+    const triggerUpload = (itemId) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.style.display = 'none';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          uploadImage(itemId, file);
+        }
+      };
+      document.body.appendChild(input);
+      input.click();
+      setTimeout(() => input.remove(), 1000); // Cleanup
+    };
+
     if (!resourceBaseUrl) {
       console.log(debugPrefix, 'exit: resourceBaseUrl is empty');
       return;
@@ -762,58 +875,179 @@
 
       // Iterate all views to ensure stacked views get buttons
       itemViews.forEach((view, index) => {
-        // Skip if button already exists and we are just polling (unless we want to update it)
-        const existing = view.querySelector('[data-dan-resource-link="1"]');
-        if (existing) {
-          // Optional: update onclick if needed, but usually not necessary for static views
-          // console.log(debugPrefix, `view ${index} already has button`);
-          return;
-        }
-
+        // --- 1. Resource Button Logic ---
         const sectionTitle = view.querySelector('.mediaSources .sectionTitle');
-        if (!sectionTitle) return;
-
-        const pathDiv = sectionTitle.querySelector('div:not(.mediaInfoItems)');
-        if (!pathDiv) return;
-
-        const rawPath = pathDiv.textContent.trim();
-        if (!rawPath) return;
-
-        const marker = '/media/lustfulboy/';
-        const idx = rawPath.indexOf(marker);
-        if (idx === -1) return;
-
-        const afterMarker = rawPath.slice(idx + marker.length);
-        if (!afterMarker) return;
-
-        const dirPart = afterMarker.replace(/[^/]+$/, '');
-        if (!dirPart) return;
-
-        const segments = dirPart.split('/').filter(Boolean).map(encodeURIComponent);
-        const relative = segments.join('/');
-        
         const moreBtn = view.querySelector('.btnMoreCommands.detailButton');
-        if (!moreBtn) return;
-
-        const base = resourceBaseUrl.replace(/\/+$/, '');
-        const url = relative ? base + '/' + relative : base;
         
-        console.log(debugPrefix, `adding button to view ${index}`, { url });
-
-        const linkBtn = document.createElement('button');
-        linkBtn.type = 'button';
-        linkBtn.setAttribute('is', 'emby-button');
-        linkBtn.className = 'btnMainPlay raised detailButton emby-button';
-        linkBtn.dataset.danResourceLink = '1';
-        linkBtn.textContent = t.resourceOpenButton;
-        linkBtn.style.cssText = 'margin-left:.5em;background:' + themeColor + ';border-color:' + themeColor + ';';
-        linkBtn.onclick = () => {
-          window.open(url, '_blank', 'noopener');
-        };
-
-        if (moreBtn.parentNode) {
-          moreBtn.parentNode.insertBefore(linkBtn, moreBtn.nextSibling);
+        if (sectionTitle && moreBtn) {
+           const existing = view.querySelector('[data-dan-resource-link="1"]');
+           if (!existing) {
+             const pathDiv = sectionTitle.querySelector('div:not(.mediaInfoItems)');
+             if (pathDiv) {
+               const rawPath = pathDiv.textContent.trim();
+               const marker = '/media/lustfulboy/';
+               const idx = rawPath.indexOf(marker);
+               if (idx !== -1) {
+                 const afterMarker = rawPath.slice(idx + marker.length);
+                 const dirPart = afterMarker.replace(/[^/]+$/, '');
+                 if (dirPart) {
+                    const segments = dirPart.split('/').filter(Boolean).map(encodeURIComponent);
+                    const relative = segments.join('/');
+                    const base = resourceBaseUrl.replace(/\/+$/, '');
+                    const url = relative ? base + '/' + relative : base;
+                    
+                    console.log(debugPrefix, `adding button to view ${index}`, { url });
+            
+                    const linkBtn = document.createElement('button');
+                    linkBtn.type = 'button';
+                    linkBtn.setAttribute('is', 'emby-button');
+                    linkBtn.className = 'btnMainPlay raised detailButton emby-button';
+                    linkBtn.dataset.danResourceLink = '1';
+                    linkBtn.textContent = t.resourceOpenButton;
+                    linkBtn.style.cssText = 'margin-left:.5em;background:' + themeColor + ';border-color:' + themeColor + ';';
+                    linkBtn.onclick = () => {
+                      window.open(url, '_blank', 'noopener');
+                    };
+            
+                    if (moreBtn.parentNode) {
+                      moreBtn.parentNode.insertBefore(linkBtn, moreBtn.nextSibling);
+                    }
+                 }
+               }
+             }
+           }
         }
+
+        // --- 2. Main Title Image Button Logic ---
+        const titleContainer = view.querySelector('.itemPrimaryNameContainer');
+        if (titleContainer) {
+          const existingImgBtn = titleContainer.querySelector('[data-dan-img-upload="1"]');
+          if (!existingImgBtn) {
+            const imgBtn = document.createElement('button');
+            imgBtn.setAttribute('is', 'paper-icon-button-light');
+            imgBtn.className = 'btnDetailEdit btnEditImages secondaryText flex-shrink-zero paper-icon-button-light';
+            imgBtn.title = t.uploadImage;
+            imgBtn.ariaLabel = t.uploadImage;
+            imgBtn.dataset.danImgUpload = '1';
+            imgBtn.innerHTML = '<i class="md-icon" style="color:' + themeColor + '">add_a_photo</i>';
+            imgBtn.onclick = () => {
+              // Extract ItemId from URL hash
+              const match = location.hash.match(/id=(\d+)/);
+              const itemId = match ? match[1] : null;
+              if (itemId) {
+                triggerUpload(itemId);
+              } else {
+                console.error(debugPrefix, 'Could not find ItemId in hash');
+              }
+            };
+            titleContainer.appendChild(imgBtn);
+          }
+        }
+
+        // --- 3. Actor Card Image Button Logic ---
+        // Since actor cards can be many and virtualized, we check them in every tick
+        const actorCards = view.querySelectorAll('.peopleItemsContainer .virtualScrollItem');
+        actorCards.forEach(card => {
+          // Check if already has button
+          if (card.querySelector('[data-dan-actor-upload="1"]')) return;
+
+          // Try to get Item ID from multiple sources
+          let actorId = null;
+          
+          // 1. Try image src (common case)
+          const img = card.querySelector('img.cardImage');
+          if (img && img.src) {
+            const idMatch = img.src.match(/\/Items\/(\d+)\/Images/);
+            if (idMatch) actorId = idMatch[1];
+          }
+
+          // 2. Try background-image style (sometimes used for covers)
+          if (!actorId) {
+             const bgDiv = card.querySelector('.cardImageContainer');
+             if (bgDiv && bgDiv.style.backgroundImage) {
+                const idMatch = bgDiv.style.backgroundImage.match(/\/Items\/(\d+)\/Images/);
+                if (idMatch) actorId = idMatch[1];
+             }
+          }
+
+          // 3. Try data attributes on card or any descendant
+          if (!actorId) {
+             // Check card itself
+             if (card.getAttribute('data-id')) actorId = card.getAttribute('data-id');
+             if (card.getAttribute('data-itemid')) actorId = card.getAttribute('data-itemid');
+             
+             // Check descendants
+             if (!actorId) {
+                const idElem = card.querySelector('[data-id], [data-itemid]');
+                if (idElem) {
+                   actorId = idElem.getAttribute('data-id') || idElem.getAttribute('data-itemid');
+                }
+             }
+          }
+
+          // 4. Try link hrefs
+          if (!actorId) {
+             const links = card.querySelectorAll('a[href*="id="]');
+             for (const link of links) {
+               const hrefMatch = link.href && link.href.match(/id=(\d+)/);
+               if (hrefMatch) { actorId = hrefMatch[1]; break; }
+             }
+          }
+          
+          // 5. Last resort: Try to find ID in onclick handler string (risky but possible)
+          if (!actorId) {
+             const clickable = card.querySelector('[onclick*="Item"]');
+             if (clickable) {
+                const match = clickable.getAttribute('onclick').match(/Item.*['"](\d+)['"]/);
+                if (match) actorId = match[1];
+             }
+          }
+
+          if (!actorId) return;
+
+          let overlay = card.querySelector('.cardOverlayContainer');
+          if (!overlay) {
+             // Create overlay if missing (e.g. for placeholder images)
+             overlay = document.createElement('div');
+             overlay.className = 'cardOverlayContainer itemAction';
+             // Try to insert after image container
+             const imgContainer = card.querySelector('.cardImageContainer') || card.querySelector('.cardBox');
+             if (imgContainer) {
+                if (imgContainer.classList.contains('cardBox')) {
+                   imgContainer.appendChild(overlay);
+                } else {
+                   imgContainer.parentNode.insertBefore(overlay, imgContainer.nextSibling);
+                }
+             } else {
+                card.appendChild(overlay);
+             }
+          }
+
+          // Create button container for top-right
+          const btnContainer = document.createElement('div');
+          btnContainer.className = 'cardOverlayButton-tr'; // Custom class
+          // Adjusted position: closer to corner (0px) and higher z-index
+          btnContainer.style.cssText = 'position:absolute;top:0;right:0;z-index:100;';
+          
+          const uploadBtn = document.createElement('button');
+          uploadBtn.type = 'button';
+          uploadBtn.setAttribute('is', 'paper-icon-button-light');
+          uploadBtn.className = 'paper-icon-button-light cardOverlayButton cardOverlayButton-hover itemAction md-icon cardOverlayButtonIcon cardOverlayButtonIcon-hover';
+          uploadBtn.dataset.danActorUpload = '1';
+          uploadBtn.title = t.uploadImage;
+          // Smaller button size (28px), smaller icon (1em), adjusted padding
+          uploadBtn.style.cssText = 'width:28px;height:28px;padding:0;min-width:28px;margin:2px;';
+          uploadBtn.innerHTML = '<i class="md-icon" style="font-size:1.0em;color:' + themeColor + ';background:rgba(0,0,0,0.6);border-radius:50%;padding:4px;display:flex;align-items:center;justify-content:center;">add_a_photo</i>';
+          uploadBtn.onclick = (e) => {
+             e.preventDefault();
+             e.stopPropagation();
+             triggerUpload(actorId);
+          };
+
+          btnContainer.appendChild(uploadBtn);
+          overlay.appendChild(btnContainer);
+        });
+
       });
       
       // Do NOT clear interval here, keep polling until maxTries to catch late-loading views
