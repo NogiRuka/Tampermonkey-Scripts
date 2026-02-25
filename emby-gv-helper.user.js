@@ -757,6 +757,10 @@
   let embyItemTimer = null;
   let embyItemInterval = null;
 
+  // Cache for people data: MainItemId -> { Name: ActorId }
+  const peopleCacheMap = {};
+  const peopleFetchStatus = {}; // MainItemId -> 'pending' | 'done' | 'failed'
+
   function initEmbyItem() {
     console.log(debugPrefix, 'initEmbyItem called', {
       host: location.host,
@@ -875,6 +879,42 @@
 
       // Iterate all views to ensure stacked views get buttons
       itemViews.forEach((view, index) => {
+        // --- 0. Get Main Item ID for API calls ---
+        let mainItemId = null;
+        const mainItemElem = view.querySelector('.detailImageContainerCard[data-id]') || view.querySelector('.btnPlaystate[data-id]');
+        if (mainItemElem) mainItemId = mainItemElem.getAttribute('data-id');
+
+        // --- Fetch People if needed ---
+        if (mainItemId && embyApiUrl && embyApiToken) {
+          if (!peopleFetchStatus[mainItemId]) {
+            peopleFetchStatus[mainItemId] = 'pending';
+            const url = `${embyApiUrl.replace(//+$/, '')}/Items/${mainItemId}/People`;
+            GM_xmlhttpRequest({
+              method: 'GET',
+              url: url,
+              headers: { 'X-Emby-Token': embyApiToken, 'Accept': 'application/json' },
+              onload: (resp) => {
+                if (resp.status === 200) {
+                  try {
+                    const people = JSON.parse(resp.responseText);
+                    peopleCacheMap[mainItemId] = {};
+                    people.forEach(p => {
+                      if (p.Name && p.Id) peopleCacheMap[mainItemId][p.Name] = p.Id;
+                    });
+                    peopleFetchStatus[mainItemId] = 'done';
+                  } catch (e) {
+                    console.error(debugPrefix, 'Error parsing people', e);
+                    peopleFetchStatus[mainItemId] = 'failed';
+                  }
+                } else {
+                  peopleFetchStatus[mainItemId] = 'failed';
+                }
+              },
+              onerror: () => { peopleFetchStatus[mainItemId] = 'failed'; }
+            });
+          }
+        }
+
         // --- 1. Resource Button Logic ---
         const sectionTitle = view.querySelector('.mediaSources .sectionTitle');
         const moreBtn = view.querySelector('.btnMoreCommands.detailButton');
@@ -1003,6 +1043,23 @@
              }
           }
 
+          // 6. Try People Cache (API Fallback)
+          if (!actorId && mainItemId && peopleCacheMap[mainItemId]) {
+             // Find name
+             let name = null;
+             const nameBtn = card.querySelector('.cardTextActionButton');
+             if (nameBtn && nameBtn.textContent) {
+                name = nameBtn.textContent.trim();
+             } else {
+                // Try title attribute on name button
+                if (nameBtn && nameBtn.title) name = nameBtn.title;
+             }
+             
+             if (name && peopleCacheMap[mainItemId][name]) {
+                actorId = peopleCacheMap[mainItemId][name];
+             }
+          }
+
           if (!actorId) return;
 
           let overlay = card.querySelector('.cardOverlayContainer');
@@ -1035,9 +1092,9 @@
           uploadBtn.className = 'paper-icon-button-light cardOverlayButton cardOverlayButton-hover itemAction md-icon cardOverlayButtonIcon cardOverlayButtonIcon-hover';
           uploadBtn.dataset.danActorUpload = '1';
           uploadBtn.title = t.uploadImage;
-          // Smaller button size (28px), smaller icon (1em), adjusted padding
+          // Smaller button size (28px), smaller icon (0.9em), adjusted padding
           uploadBtn.style.cssText = 'width:28px;height:28px;padding:0;min-width:28px;margin:2px;';
-          uploadBtn.innerHTML = '<i class="md-icon" style="font-size:1.0em;color:' + themeColor + ';background:rgba(0,0,0,0.6);border-radius:50%;padding:4px;display:flex;align-items:center;justify-content:center;">add_a_photo</i>';
+          uploadBtn.innerHTML = '<i class="md-icon" style="font-size:0.9em;color:' + themeColor + ';background:rgba(0,0,0,0.6);border-radius:50%;padding:5px;display:flex;align-items:center;justify-content:center;">add_a_photo</i>';
           uploadBtn.onclick = (e) => {
              e.preventDefault();
              e.stopPropagation();
