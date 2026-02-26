@@ -10,6 +10,7 @@
 // @match        https://lustfulboy.com/web/index.html*
 // @match        https://www.games-video.co.jp/*
 // @match        https://fratx.com/*
+// @match        https://www.fratx.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -88,7 +89,11 @@
       itemIdPlaceholder: '输入 Item ID',
       tagsAdded: '标签添加成功',
       tagsAddFailed: '标签添加失败',
-      missingItemId: '请输入 Item ID'
+      missingItemId: '请输入 Item ID',
+      jsonPreview: 'JSON 预览',
+      send: '发送',
+      cancel: '取消',
+      invalidJson: 'JSON 格式错误'
     },
     en: {
       settings: '⚙️ Settings',
@@ -124,7 +129,11 @@
       itemIdPlaceholder: 'Enter Item ID',
       tagsAdded: 'Tags added successfully',
       tagsAddFailed: 'Failed to add tags',
-      missingItemId: 'Please enter Item ID'
+      missingItemId: 'Please enter Item ID',
+      jsonPreview: 'JSON Preview',
+      send: 'Send',
+      cancel: 'Cancel',
+      invalidJson: 'Invalid JSON'
     }
   }[lang];
 
@@ -551,6 +560,61 @@
     return result.trim();
   }
 
+  function showJsonEditor(initialData, onConfirm) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100000;display:flex;align-items:center;justify-content:center;';
+    
+    const panel = document.createElement('div');
+    panel.style.cssText = 'background:#181818;color:#f5f5f5;border-radius:8px;padding:16px;width:500px;max-width:90vw;display:flex;flex-direction:column;gap:12px;border:1px solid #333;box-shadow:0 10px 40px rgba(0,0,0,0.5);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;';
+    
+    const title = document.createElement('h3');
+    title.textContent = t.jsonPreview;
+    title.style.cssText = 'margin:0;font-size:16px;font-weight:600;color:' + themeColor + ';';
+    
+    const textarea = document.createElement('textarea');
+    textarea.value = JSON.stringify(initialData, null, 2);
+    textarea.style.cssText = 'width:100%;height:300px;background:#111;color:#eee;border:1px solid #333;border-radius:4px;padding:8px;font-family:monospace;font-size:12px;resize:vertical;outline:none;';
+    textarea.onfocus = () => { textarea.style.borderColor = themeColor; };
+    textarea.onblur = () => { textarea.style.borderColor = '#333'; };
+    
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;justify-content:flex-end;gap:8px;';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = t.cancel;
+    cancelBtn.style.cssText = 'padding:6px 12px;border-radius:4px;border:1px solid #444;background:transparent;color:#ccc;cursor:pointer;font-size:13px;transition:all 0.2s;';
+    cancelBtn.onmouseover = () => { cancelBtn.style.borderColor = '#666'; cancelBtn.style.color = '#fff'; };
+    cancelBtn.onmouseout = () => { cancelBtn.style.borderColor = '#444'; cancelBtn.style.color = '#ccc'; };
+    cancelBtn.onclick = () => {
+        document.body.removeChild(overlay);
+    };
+    
+    const sendBtn = document.createElement('button');
+    sendBtn.textContent = t.send;
+    sendBtn.style.cssText = `padding:6px 16px;border-radius:4px;border:none;background:${themeColor};color:white;cursor:pointer;font-weight:600;font-size:13px;box-shadow:0 2px 4px rgba(0,0,0,0.2);transition:transform 0.1s;`;
+    sendBtn.onmousedown = () => { sendBtn.style.transform = 'scale(0.96)'; };
+    sendBtn.onmouseup = () => { sendBtn.style.transform = 'scale(1)'; };
+    sendBtn.onclick = () => {
+        try {
+            const parsed = JSON.parse(textarea.value);
+            document.body.removeChild(overlay);
+            onConfirm(parsed);
+        } catch (e) {
+            alert(t.invalidJson + ': ' + e.message);
+        }
+    };
+    
+    btnRow.appendChild(cancelBtn);
+    btnRow.appendChild(sendBtn);
+    
+    panel.appendChild(title);
+    panel.appendChild(textarea);
+    panel.appendChild(btnRow);
+    overlay.appendChild(panel);
+    
+    document.body.appendChild(overlay);
+  }
+
   function addTagsToEmby(itemId, tags) {
     if (!embyApiUrl || !embyApiToken) {
       alert(t.embyApiSettings + ' ' + t.clickToSet);
@@ -564,30 +628,32 @@
     }
 
     const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${itemId}/Tags/Add`;
-    const data = {
+    const initialData = {
       Tags: tags.map(tag => ({ Name: tag }))
     };
 
-    GM_xmlhttpRequest({
-      method: 'POST',
-      url: url,
-      headers: {
-        'X-Emby-Token': embyApiToken,
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify(data),
-      onload: (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          showToast(t.tagsAdded);
-        } else {
-          console.error(debugPrefix, 'add tags failed', resp);
-          showToast(t.tagsAddFailed + ': ' + resp.status);
+    showJsonEditor(initialData, (data) => {
+      GM_xmlhttpRequest({
+        method: 'POST',
+        url: url,
+        headers: {
+          'X-Emby-Token': embyApiToken,
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(data),
+        onload: (resp) => {
+          if (resp.status >= 200 && resp.status < 300) {
+            showToast(t.tagsAdded);
+          } else {
+            console.error(debugPrefix, 'add tags failed', resp);
+            showToast(t.tagsAddFailed + ': ' + resp.status);
+          }
+        },
+        onerror: (err) => {
+          console.error(debugPrefix, 'add tags error', err);
+          showToast(t.tagsAddFailed);
         }
-      },
-      onerror: (err) => {
-        console.error(debugPrefix, 'add tags error', err);
-        showToast(t.tagsAddFailed);
-      }
+      });
     });
   }
 
