@@ -9,6 +9,7 @@
 // @match        https://www.iafd.com/title.rme/*
 // @match        https://lustfulboy.com/web/index.html*
 // @match        https://www.games-video.co.jp/*
+// @match        https://fratx.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -82,7 +83,12 @@
       embyApiTokenLabel: 'Emby API 密钥 (X-Emby-Token)',
       uploadImage: '修改图片',
       uploadSuccess: '图片上传成功，请手动刷新页面',
-      uploadFailed: '图片上传失败'
+      uploadFailed: '图片上传失败',
+      addToEmby: '添加标签到 Emby',
+      itemIdPlaceholder: '输入 Item ID',
+      tagsAdded: '标签添加成功',
+      tagsAddFailed: '标签添加失败',
+      missingItemId: '请输入 Item ID'
     },
     en: {
       settings: '⚙️ Settings',
@@ -113,7 +119,12 @@
       embyApiTokenLabel: 'Emby API Key (X-Emby-Token)',
       uploadImage: 'Upload Image',
       uploadSuccess: 'Image uploaded successfully, please refresh manually',
-      uploadFailed: 'Image upload failed'
+      uploadFailed: 'Image upload failed',
+      addToEmby: 'Add Tags to Emby',
+      itemIdPlaceholder: 'Enter Item ID',
+      tagsAdded: 'Tags added successfully',
+      tagsAddFailed: 'Failed to add tags',
+      missingItemId: 'Please enter Item ID'
     }
   }[lang];
 
@@ -540,6 +551,102 @@
     return result.trim();
   }
 
+  function addTagsToEmby(itemId, tags) {
+    if (!embyApiUrl || !embyApiToken) {
+      alert(t.embyApiSettings + ' ' + t.clickToSet);
+      openSettings();
+      return;
+    }
+
+    if (!itemId) {
+      showToast(t.missingItemId);
+      return;
+    }
+
+    const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${itemId}/Tags/Add`;
+    const data = {
+      Tags: tags.map(tag => ({ Name: tag }))
+    };
+
+    GM_xmlhttpRequest({
+      method: 'POST',
+      url: url,
+      headers: {
+        'X-Emby-Token': embyApiToken,
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify(data),
+      onload: (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          showToast(t.tagsAdded);
+        } else {
+          console.error(debugPrefix, 'add tags failed', resp);
+          showToast(t.tagsAddFailed + ': ' + resp.status);
+        }
+      },
+      onerror: (err) => {
+        console.error(debugPrefix, 'add tags error', err);
+        showToast(t.tagsAddFailed);
+      }
+    });
+  }
+
+  function createMetadataControls(type, meta, conf) {
+    const container = document.createElement('span');
+    container.style.cssText = 'display:inline-flex;align-items:center;gap:4px;margin-left:6px;vertical-align:middle;';
+
+    const copyBtn = document.createElement('button');
+    const copyText = {
+      actors: t.metadataActorsCopy,
+      genres: t.metadataGenresCopy,
+      description: t.metadataDescriptionCopy
+    }[type] || 'Copy';
+    
+    copyBtn.textContent = copyText;
+    copyBtn.style.cssText = 'padding:2px 6px;border-radius:4px;background-color:' + themeColor + ';color:white;border:none;font-size:11px;cursor:pointer;line-height:1.5;';
+    copyBtn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      copyToClipboard(renderWithTemplate(meta, conf.template, type))
+        .then(() => showToast(t.metadataCopied))
+        .catch(err => {
+          console.error(err);
+          showToast(t.metadataCopyFailed);
+        });
+    };
+    container.appendChild(copyBtn);
+
+    if (type === 'genres') {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'Item ID';
+      input.style.cssText = 'width:60px;padding:1px 4px;font-size:11px;border:1px solid #666;border-radius:4px;background:#222;color:#fff;margin-left:4px;height:20px;';
+      input.onclick = (e) => e.stopPropagation();
+      input.onkeydown = (e) => e.stopPropagation();
+
+      const addBtn = document.createElement('button');
+      addBtn.textContent = '+';
+      addBtn.title = t.addToEmby;
+      addBtn.style.cssText = 'padding:0 6px;border-radius:4px;background-color:#4CAF50;color:white;border:none;font-size:14px;cursor:pointer;margin-left:2px;line-height:20px;height:20px;vertical-align:top;';
+      addBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const val = input.value.trim();
+        if (val) {
+          addTagsToEmby(val, meta.genres);
+        } else {
+          showToast(t.missingItemId);
+          input.focus();
+        }
+      };
+
+      container.appendChild(input);
+      container.appendChild(addBtn);
+    }
+
+    return container;
+  }
+
   function initPornolab() {
     if (!location.host.includes('pornolab.net')) return;
     if (!location.pathname.includes('/forum/viewtopic.php')) return;
@@ -620,12 +727,6 @@
       description: 'Описание'
     };
 
-    const typeToButtonText = {
-      actors: t.metadataActorsCopy,
-      genres: t.metadataGenresCopy,
-      description: t.metadataDescriptionCopy
-    };
-
     ['actors', 'genres', 'description'].forEach(type => {
       const conf = (config && config[type]) || defaultMetadataConfigs[type];
       if (!conf || !conf.enabled) return;
@@ -635,17 +736,7 @@
       const text = renderWithTemplate(meta, conf.template, type);
       if (!text) return;
 
-      const btn = document.createElement('button');
-      btn.textContent = typeToButtonText[type];
-      btn.style.cssText = 'display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;background-color:#ff69b4;color:white;border:none;font-size:11px;cursor:pointer;';
-      btn.onclick = () => {
-        copyToClipboard(renderWithTemplate(meta, conf.template, type))
-          .then(() => showToast(t.metadataCopied))
-          .catch(err => {
-            console.error(err);
-            showToast(t.metadataCopyFailed);
-          });
-      };
+      const controls = createMetadataControls(type, meta, conf);
 
       let insertAfter = span;
       let node = span.nextSibling;
@@ -660,9 +751,9 @@
       }
 
       if (insertAfter && insertAfter.parentNode) {
-        insertAfter.parentNode.insertBefore(btn, insertAfter.nextSibling);
+        insertAfter.parentNode.insertBefore(controls, insertAfter.nextSibling);
       } else if (span.parentNode) {
-        span.parentNode.insertBefore(btn, span.nextSibling);
+        span.parentNode.insertBefore(controls, span.nextSibling);
       }
     });
   }
@@ -724,29 +815,15 @@
     const container = document.createElement('div');
     container.style.cssText = 'margin:6px 0 4px 0;display:flex;flex-wrap:wrap;gap:6px;';
 
-    const typeToButtonText = {
-      actors: t.metadataActorsCopy,
-      genres: t.metadataGenresCopy,
-      description: t.metadataDescriptionCopy
-    };
-
     ['actors', 'genres', 'description'].forEach(type => {
       const conf = (config && config[type]) || defaultMetadataConfigs[type];
       if (!conf || !conf.enabled) return;
       const text = renderWithTemplate(meta, conf.template, type);
       if (!text) return;
-      const btn = document.createElement('button');
-      btn.textContent = typeToButtonText[type];
-      btn.style.cssText = 'padding:2px 8px;border-radius:6px;background-color:' + themeColor + ';color:white;border:none;font-size:11px;cursor:pointer;';
-      btn.onclick = () => {
-        copyToClipboard(renderWithTemplate(meta, conf.template, type))
-          .then(() => showToast(t.metadataCopied))
-          .catch(err => {
-            console.error(err);
-            showToast(t.metadataCopyFailed);
-          });
-      };
-      container.appendChild(btn);
+      
+      const controls = createMetadataControls(type, meta, conf);
+      controls.style.marginLeft = '0'; // Reset margin as flex gap handles it
+      container.appendChild(controls);
     });
 
     if (!container.hasChildNodes()) return;
@@ -1023,7 +1100,7 @@
 
         // --- 3. Actor Card Image Button Logic ---
         // Since actor cards can be many and virtualized, we check them in every tick
-        const actorCards = view.querySelectorAll('.peopleItemsContainer .virtualScrollItem');
+        const actorCards = view.querySelectorAll('.peopleItemsContainer .virtualScrollItem, .peopleItemsContainer .card');
         actorCards.forEach(card => {
           // Check if already has button
           if (card.querySelector('[data-dan-actor-upload="1"]')) return;
@@ -1031,11 +1108,43 @@
           // Try to get Item ID from multiple sources
           let actorId = null;
           
+          // 0. Try People Cache (API Source - Most Reliable for missing images)
+          if (mainItemId && peopleCacheMap[mainItemId]) {
+             // Find name element
+             let name = null;
+             const nameBtn = card.querySelector('.cardTextActionButton') || card.querySelector('[data-action="link"]');
+             if (nameBtn && nameBtn.textContent) {
+                name = nameBtn.textContent.trim();
+             } else {
+                // Try title attribute on name button or card content
+                if (nameBtn && nameBtn.title) name = nameBtn.title;
+                // Try finding any text node that might be the name
+                else {
+                    const textNode = card.querySelector('.cardText');
+                    if (textNode) name = textNode.textContent.trim();
+                }
+             }
+             
+             if (name) {
+                // Exact match
+                if (peopleCacheMap[mainItemId][name]) {
+                   actorId = peopleCacheMap[mainItemId][name];
+                } else {
+                   // Case-insensitive match
+                   const lowerName = name.toLowerCase();
+                   const foundKey = Object.keys(peopleCacheMap[mainItemId]).find(k => k.toLowerCase() === lowerName);
+                   if (foundKey) actorId = peopleCacheMap[mainItemId][foundKey];
+                }
+             }
+          }
+          
           // 1. Try image src (common case)
-          const img = card.querySelector('img.cardImage');
-          if (img && img.src) {
-            const idMatch = img.src.match(/\/Items\/(\d+)\/Images/);
-            if (idMatch) actorId = idMatch[1];
+          if (!actorId) {
+            const img = card.querySelector('img.cardImage');
+            if (img && img.src && !img.src.includes('default')) {
+              const idMatch = img.src.match(/\/Items\/(\d+)\/Images/);
+              if (idMatch) actorId = idMatch[1];
+            }
           }
 
           // 2. Try background-image style (sometimes used for covers)
@@ -1080,23 +1189,6 @@
              }
           }
 
-          // 6. Try People Cache (API Fallback)
-          if (!actorId && mainItemId && peopleCacheMap[mainItemId]) {
-             // Find name
-             let name = null;
-             const nameBtn = card.querySelector('.cardTextActionButton');
-             if (nameBtn && nameBtn.textContent) {
-                name = nameBtn.textContent.trim();
-             } else {
-                // Try title attribute on name button
-                if (nameBtn && nameBtn.title) name = nameBtn.title;
-             }
-             
-             if (name && peopleCacheMap[mainItemId][name]) {
-                actorId = peopleCacheMap[mainItemId][name];
-             }
-          }
-
           if (!actorId) return;
 
           // Strategy: Append to cardBox to avoid overlay interference
@@ -1110,7 +1202,8 @@
           const btnContainer = document.createElement('div');
           btnContainer.className = 'cardOverlayButton-tr dan-hover-reveal'; // Custom class with hover effect
           // Position absolute top-right. Ensure z-index is higher than overlays (usually 1-10)
-          btnContainer.style.cssText = 'position:absolute;top:0;right:0;z-index:9999;pointer-events:auto;';
+          // Adjusted position to be more top-right
+          btnContainer.style.cssText = 'position:absolute;top:2px;right:2px;z-index:9999;pointer-events:auto;';
           
           const uploadBtn = document.createElement('button');
           uploadBtn.type = 'button';
@@ -1118,9 +1211,10 @@
           uploadBtn.className = 'paper-icon-button-light cardOverlayButton cardOverlayButton-hover itemAction md-icon cardOverlayButtonIcon cardOverlayButtonIcon-hover';
           uploadBtn.dataset.danActorUpload = '1';
           uploadBtn.title = t.uploadImage;
-          // Smaller button size (28px), smaller icon (0.9em), adjusted padding
-          uploadBtn.style.cssText = 'width:28px;height:28px;padding:0;min-width:28px;margin:2px;';
-          uploadBtn.innerHTML = '<i class="md-icon" style="font-size:0.9em;color:' + themeColor + ';background:rgba(0,0,0,0.6);border-radius:50%;padding:5px;display:flex;align-items:center;justify-content:center;">add_a_photo</i>';
+          // Smaller button size (24px), smaller icon, no margin needed due to absolute positioning
+          uploadBtn.style.cssText = 'width:24px;height:24px;padding:0;min-width:24px;margin:0;border-radius:50%;overflow:hidden;';
+          // Adjusted icon size and background
+          uploadBtn.innerHTML = '<i class="md-icon" style="font-size:1.1rem;color:' + themeColor + ';background:rgba(0,0,0,0.7);width:100%;height:100%;display:flex;align-items:center;justify-content:center;">add_a_photo</i>';
           uploadBtn.onclick = (e) => {
              e.preventDefault();
              e.stopPropagation();
@@ -1142,6 +1236,33 @@
       
       // Do NOT clear interval here, keep polling until maxTries to catch late-loading views
     }, 500);
+  }
+
+  function initFratx() {
+    if (!location.host.includes('fratx.com')) return;
+    
+    const tagsWrap = document.querySelector('.VideoTagsWrap');
+    if (!tagsWrap) return;
+
+    const meta = {
+        genres: []
+    };
+
+    const tags = tagsWrap.querySelectorAll('a.tag .tag-text');
+    tags.forEach(span => {
+        meta.genres.push(span.textContent.trim());
+    });
+
+    if (meta.genres.length === 0) return;
+
+    const conf = (metadataConfigs && metadataConfigs.genres) || defaultMetadataConfigs.genres;
+    if (!conf || !conf.enabled) return;
+    
+    const controls = createMetadataControls('genres', meta, conf);
+    controls.style.marginTop = '10px';
+    controls.style.display = 'block';
+    
+    tagsWrap.appendChild(controls);
   }
 
   function initGamesVideo() {
@@ -1193,25 +1314,14 @@
       const conf = (metadataConfigs && metadataConfigs.genres) || defaultMetadataConfigs.genres;
       
       if (conf && conf.enabled) {
-        const btn = document.createElement('button');
-        btn.textContent = t.metadataGenresCopy;
-        btn.style.cssText = 'display:inline-block;margin-left:6px;padding:1px 6px;border-radius:6px;background-color:' + themeColor + ';color:white;border:none;font-size:11px;cursor:pointer;';
-        btn.onclick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          copyToClipboard(renderWithTemplate(meta, conf.template, 'genres'))
-            .then(() => showToast(t.metadataCopied))
-            .catch(err => {
-              console.error(err);
-              showToast(t.metadataCopyFailed);
-            });
-        };
-        targetTd.appendChild(btn);
+        const controls = createMetadataControls('genres', meta, conf);
+        targetTd.appendChild(controls);
       }
     }
   }
 
   initGamesVideo();
+  initFratx();
   initPornolab();
   initIafd();
   initEmbyItem();
