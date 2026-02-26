@@ -9,7 +9,6 @@
 // @match        https://www.iafd.com/title.rme/*
 // @match        https://lustfulboy.com/web/index.html*
 // @match        https://www.games-video.co.jp/*
-// @match        https://fratx.com/*
 // @match        https://www.fratx.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
