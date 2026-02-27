@@ -1558,12 +1558,14 @@
       meta.title = titleEl.textContent.trim();
     }
 
+    let introP = null;
     const storyImg = document.querySelector('div.detail_title.new img[title="ストーリー"]');
     if (storyImg) {
       const titleDiv = storyImg.closest('div.detail_title.new');
       if (titleDiv) {
         const p = titleDiv.nextElementSibling;
         if (p && p.tagName === 'P') {
+           introP = p;
            let descHtml = p.innerHTML;
            descHtml = descHtml.replace(/<br\s*\/?>/gi, '\n');
            const tempDiv = document.createElement('div');
@@ -1601,7 +1603,8 @@
     
     const config = (metadataConfigs && typeof metadataConfigs === 'object') ? metadataConfigs : defaultMetadataConfigs;
 
-    if (dataDiv) {
+    const targetEl = introP || dataDiv;
+    if (targetEl) {
         const container = document.createElement('div');
         container.style.marginTop = '10px';
         container.style.display = 'flex';
@@ -1620,7 +1623,7 @@
         });
         
         if (container.hasChildNodes()) {
-            dataDiv.parentNode.insertBefore(container, dataDiv.nextSibling);
+            targetEl.parentNode.insertBefore(container, targetEl.nextSibling);
         }
     }
   }
