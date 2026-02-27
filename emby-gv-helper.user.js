@@ -615,46 +615,63 @@
     document.body.appendChild(overlay);
   }
 
-  function addTagsToEmby(itemId, tags) {
+  function addTagsToEmby(itemId, tags, skipPreview = false) {
     if (!embyApiUrl || !embyApiToken) {
       alert(t.embyApiSettings + ' ' + t.clickToSet);
       openSettings();
       return;
     }
 
-    if (!itemId) {
-      showToast(t.missingItemId);
-      return;
-    }
+    const performRequest = (id, data) => {
+        if (!id) {
+            showToast(t.missingItemId);
+            return;
+        }
+        const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${id}/Tags/Add`;
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: url,
+            headers: {
+            'X-Emby-Token': embyApiToken,
+            'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(data),
+            onload: (resp) => {
+            if (resp.status >= 200 && resp.status < 300) {
+                showToast(t.tagsAdded);
+            } else {
+                console.error(debugPrefix, 'add tags failed', resp);
+                showToast(t.tagsAddFailed + ': ' + resp.status);
+            }
+            },
+            onerror: (err) => {
+            console.error(debugPrefix, 'add tags error', err);
+            showToast(t.tagsAddFailed);
+            }
+        });
+    };
 
-    const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${itemId}/Tags/Add`;
     const initialData = {
       Tags: tags.map(tag => ({ Name: tag }))
     };
 
-    showJsonEditor(initialData, (data) => {
-      GM_xmlhttpRequest({
-        method: 'POST',
-        url: url,
-        headers: {
-          'X-Emby-Token': embyApiToken,
-          'Content-Type': 'application/json'
-        },
-        data: JSON.stringify(data),
-        onload: (resp) => {
-          if (resp.status >= 200 && resp.status < 300) {
-            showToast(t.tagsAdded);
-          } else {
-            console.error(debugPrefix, 'add tags failed', resp);
-            showToast(t.tagsAddFailed + ': ' + resp.status);
-          }
-        },
-        onerror: (err) => {
-          console.error(debugPrefix, 'add tags error', err);
-          showToast(t.tagsAddFailed);
-        }
-      });
-    });
+    if (skipPreview && itemId) {
+        performRequest(itemId, initialData);
+    } else {
+        showJsonEditor(initialData, (data) => {
+            // If itemId was passed originally, use it. Otherwise, we might need to ask the user or check the input field.
+            // But since this function is generic, we assume the caller handles the itemId retrieval if needed.
+            // In our specific case, we'll pass the itemId to the callback or rely on the caller to provide it.
+            // Wait, showJsonEditor callback only returns data.
+            // Let's modify the flow: performRequest needs an ID.
+            // If itemId is missing here, we can't send.
+            // But the user said: "click JSON button -> see JSON -> click send -> execute".
+            // If itemId is empty, we should prompt or fail.
+            // Let's assume the itemId is provided or we prompt for it?
+            // Actually, we can just try to use the passed itemId. If it's empty, we show toast.
+            performRequest(itemId, data);
+        });
+    }
   }
 
   function createMetadataControls(type, meta, conf) {
@@ -690,6 +707,17 @@
       input.onclick = (e) => e.stopPropagation();
       input.onkeydown = (e) => e.stopPropagation();
 
+      const jsonBtn = document.createElement('button');
+      jsonBtn.textContent = '{}';
+      jsonBtn.title = t.jsonPreview;
+      jsonBtn.style.cssText = 'padding:0 6px;border-radius:4px;background-color:#2196F3;color:white;border:none;font-size:12px;cursor:pointer;margin-left:2px;line-height:20px;height:20px;vertical-align:top;font-family:monospace;';
+      jsonBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // Pass current input value as itemId, but don't skip preview
+        addTagsToEmby(input.value.trim(), meta.genres, false);
+      };
+
       const addBtn = document.createElement('button');
       addBtn.textContent = '+';
       addBtn.title = t.addToEmby;
@@ -699,7 +727,8 @@
         e.stopPropagation();
         const val = input.value.trim();
         if (val) {
-          addTagsToEmby(val, meta.genres);
+          // Skip preview if we have an ID
+          addTagsToEmby(val, meta.genres, true);
         } else {
           showToast(t.missingItemId);
           input.focus();
@@ -707,6 +736,7 @@
       };
 
       container.appendChild(input);
+      container.appendChild(jsonBtn);
       container.appendChild(addBtn);
     }
 
