@@ -654,8 +654,9 @@
     };
 
     const initialData = {
-      Tags: Array.isArray(tags) ? tags.map(tag => ({ Name: tag })) : []
+      Tags: Array.isArray(tags) ? tags.map(tag => ({ Name: String(tag) })) : []
     };
+    console.log(debugPrefix, 'Preview Tags Data:', initialData);
 
     if (skipPreview && itemId) {
         performRequest(itemId, initialData);
@@ -712,7 +713,7 @@
       const jsonBtn = document.createElement('button');
       jsonBtn.textContent = '{}';
       jsonBtn.title = t.jsonPreview;
-      jsonBtn.style.cssText = 'padding:0 6px;border-radius:4px;background-color:#2196F3;color:white;border:none;font-size:12px;cursor:pointer;margin-left:2px;line-height:20px;height:20px;vertical-align:top;font-family:monospace;';
+      jsonBtn.style.cssText = 'padding:0 6px;border-radius:4px;background-color:#2196F3;color:white;border:none;font-size:12px;cursor:pointer;margin-left:2px;line-height:20px;height:20px;vertical-align:middle;font-family:monospace;';
       jsonBtn.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -723,7 +724,7 @@
       const addBtn = document.createElement('button');
       addBtn.textContent = '+';
       addBtn.title = t.addToEmby;
-      addBtn.style.cssText = 'padding:0 6px;border-radius:4px;background-color:#4CAF50;color:white;border:none;font-size:14px;cursor:pointer;margin-left:2px;line-height:20px;height:20px;vertical-align:top;';
+      addBtn.style.cssText = 'padding:0 6px;border-radius:4px;background-color:#4CAF50;color:white;border:none;font-size:14px;cursor:pointer;margin-left:2px;line-height:20px;height:20px;vertical-align:middle;';
       addBtn.onclick = (e) => {
         e.preventDefault();
         e.stopPropagation();
