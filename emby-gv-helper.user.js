@@ -6,10 +6,11 @@
 // @author       乃木流架
 // @icon         https://github.com/NogiRuka/Tampermonkey-Scripts/blob/main/favicons/lustfulboy.png?raw=true
 // @match        https://pornolab.net/forum/viewtopic.php*
-// @match        https://www.iafd.com/title.rme/*
-// @match        https://lustfulboy.com/web/index.html*
-// @match        https://www.games-video.co.jp/*
-// @match        https://www.fratx.com/*
+// @match        https://*.iafd.com/title.rme/*
+// @match        https://*.lustfulboy.com/web/index.html*
+// @match        https://*.games-video.co.jp/*
+// @match        https://*.fratx.com/*
+// @match        https://*.daiichisouko.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -1385,8 +1386,69 @@
     }
   }
 
+  function initDaiichisouko() {
+    if (!location.host.includes('daiichisouko.com')) return;
+
+    // 1. Description
+    // The description is inside <p class="clear">...</p>
+    const descP = document.querySelector('p.clear');
+    if (descP) {
+        // Replace <br> with newlines
+        let text = descP.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+        // Remove HTML tags
+        text = text.replace(/<[^>]+>/g, '').trim();
+
+        const meta = { description: text };
+        const conf = (metadataConfigs && metadataConfigs.description) || defaultMetadataConfigs.description;
+        
+        if (conf && conf.enabled && text) {
+            const controls = createMetadataControls('description', meta, conf);
+            // Insert after the p.clear element
+            descP.parentNode.insertBefore(controls, descP.nextSibling);
+            controls.style.marginBottom = '10px';
+            controls.style.display = 'block';
+        }
+    }
+
+    // 2. Genres (Type + Genre)
+    // "Type" is category_id=6, 5, 8 etc.
+    // "Genre" is play_id=4, 9 etc.
+    // They are in <dl><dt><p>タイプ</p></dt><dd>...</dd></dl> and <dl><dt><p>ジャンル</p></dt><dd>...</dd></dl>
+    const genreSet = new Set();
+    const dls = document.querySelectorAll('div.stc dl');
+    
+    dls.forEach(dl => {
+        const dt = dl.querySelector('dt p');
+        if (!dt) return;
+        const label = dt.textContent.trim();
+        if (label === 'タイプ' || label === 'ジャンル') {
+            const anchors = dl.querySelectorAll('dd a');
+            anchors.forEach(a => {
+                genreSet.add(a.textContent.trim());
+            });
+        }
+    });
+
+    if (genreSet.size > 0) {
+        const meta = { genres: Array.from(genreSet) };
+        const conf = (metadataConfigs && metadataConfigs.genres) || defaultMetadataConfigs.genres;
+        
+        if (conf && conf.enabled) {
+            const controls = createMetadataControls('genres', meta, conf);
+            // Insert after the last dl
+            const lastDl = dls[dls.length - 1];
+            if (lastDl) {
+                lastDl.parentNode.appendChild(controls);
+                controls.style.marginTop = '10px';
+                controls.style.display = 'block';
+            }
+        }
+    }
+  }
+
   initGamesVideo();
   initFratx();
+  initDaiichisouko();
   initPornolab();
   initIafd();
   initEmbyItem();
