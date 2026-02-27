@@ -12,6 +12,7 @@
 // @match        https://*.fratx.com/*
 // @match        https://*.daiichisouko.com/*
 // @match        https://*.trance-video.com/*
+// @match        https://*.hunk-ch.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -1535,6 +1536,96 @@
     }
   }
 
+  function initHunkCh() {
+    if (!location.host.includes('hunk-ch.com')) return;
+    if (!location.pathname.includes('movie_detail.php')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'Japan',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: '',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    const titleEl = document.querySelector('div.product_detail_centre h2');
+    if (titleEl) {
+      meta.title = titleEl.textContent.trim();
+    }
+
+    const storyImg = document.querySelector('div.detail_title.new img[title="ストーリー"]');
+    if (storyImg) {
+      const titleDiv = storyImg.closest('div.detail_title.new');
+      if (titleDiv) {
+        const p = titleDiv.nextElementSibling;
+        if (p && p.tagName === 'P') {
+           let descHtml = p.innerHTML;
+           descHtml = descHtml.replace(/<br\s*\/?>/gi, '\n');
+           const tempDiv = document.createElement('div');
+           tempDiv.innerHTML = descHtml;
+           meta.description = tempDiv.textContent.trim();
+        }
+      }
+    }
+
+    const dataDiv = document.querySelector('div.data');
+    if (dataDiv) {
+      const text = dataDiv.textContent;
+      
+      const studioLink = dataDiv.querySelector('a[href*="b="]');
+      if (studioLink) {
+        meta.studio = studioLink.textContent.trim();
+      }
+
+      const dateMatch = text.match(/発売日：(\d{4}-\d{2}-\d{2})/);
+      if (dateMatch) {
+        meta.year = dateMatch[1].substring(0, 4);
+        meta.extra += `Release Date: ${dateMatch[1]}\n`;
+      }
+
+      const durationMatch = text.match(/収録時間：(\d+分?)/);
+      if (durationMatch) {
+        meta.duration = durationMatch[1];
+      }
+
+      const genreLinks = dataDiv.querySelectorAll('a[href*="c="]');
+      genreLinks.forEach(a => {
+        meta.genres.push(a.textContent.trim());
+      });
+    }
+    
+    const config = (metadataConfigs && typeof metadataConfigs === 'object') ? metadataConfigs : defaultMetadataConfigs;
+
+    if (dataDiv) {
+        const container = document.createElement('div');
+        container.style.marginTop = '10px';
+        container.style.display = 'flex';
+        container.style.gap = '10px';
+        container.style.flexWrap = 'wrap';
+        
+        ['actors', 'genres', 'description'].forEach(type => {
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (!conf || !conf.enabled) return;
+            
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (!text || !text.trim()) return;
+
+            const controls = createMetadataControls(type, meta, conf);
+            container.appendChild(controls);
+        });
+        
+        if (container.hasChildNodes()) {
+            dataDiv.parentNode.insertBefore(container, dataDiv.nextSibling);
+        }
+    }
+  }
+
+  initHunkCh();
   initGamesVideo();
   initFratx();
   initDaiichisouko();
