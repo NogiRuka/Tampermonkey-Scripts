@@ -654,7 +654,7 @@
     };
 
     const initialData = {
-      Tags: tags.map(tag => ({ Name: tag }))
+      Tags: Array.isArray(tags) ? tags.map(tag => ({ Name: tag })) : []
     };
 
     if (skipPreview && itemId) {
@@ -1576,6 +1576,7 @@
     }
 
     const dataDiv = document.querySelector('div.data');
+    let lastGenreLink = null;
     if (dataDiv) {
       const text = dataDiv.textContent;
       
@@ -1599,31 +1600,47 @@
       genreLinks.forEach(a => {
         meta.genres.push(a.textContent.trim());
       });
+      if (genreLinks.length > 0) {
+        lastGenreLink = genreLinks[genreLinks.length - 1];
+      }
     }
     
     const config = (metadataConfigs && typeof metadataConfigs === 'object') ? metadataConfigs : defaultMetadataConfigs;
 
-    const targetEl = introP || dataDiv;
-    if (targetEl) {
-        const container = document.createElement('div');
-        container.style.marginTop = '10px';
-        container.style.display = 'flex';
-        container.style.gap = '10px';
-        container.style.flexWrap = 'wrap';
-        
-        ['actors', 'genres', 'description'].forEach(type => {
-            const conf = (config && config[type]) || defaultMetadataConfigs[type];
-            if (!conf || !conf.enabled) return;
-            
-            const text = renderWithTemplate(meta, conf.template, type);
-            if (!text || !text.trim()) return;
+    // 1. Description Controls
+    if (introP) {
+        const type = 'description';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled && meta.description) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 if (introP.parentNode) {
+                     introP.parentNode.insertBefore(controls, introP.nextSibling);
+                 }
+             }
+        }
+    }
 
-            const controls = createMetadataControls(type, meta, conf);
-            container.appendChild(controls);
-        });
-        
-        if (container.hasChildNodes()) {
-            targetEl.parentNode.insertBefore(container, targetEl.nextSibling);
+    // 2. Genres Controls
+    if (meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.display = 'inline-flex';
+                 controls.style.marginLeft = '10px';
+                 
+                 if (lastGenreLink && lastGenreLink.parentNode) {
+                     lastGenreLink.parentNode.insertBefore(controls, lastGenreLink.nextSibling);
+                 } else if (dataDiv) {
+                     dataDiv.appendChild(controls);
+                 }
+             }
         }
     }
   }
