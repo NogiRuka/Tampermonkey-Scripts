@@ -11,6 +11,7 @@
 // @match        https://*.games-video.co.jp/*
 // @match        https://*.fratx.com/*
 // @match        https://*.daiichisouko.com/*
+// @match        https://*.trance-video.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -1476,9 +1477,68 @@
     }
   }
 
+  function initTranceVideo() {
+    if (!location.host.includes('trance-video.com')) return;
+
+    // 1. Description
+    const descDiv = document.querySelector('div.intro_text');
+    if (descDiv) {
+        // Replace <br> with newlines and remove HTML tags
+        let text = descDiv.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+        text = text.replace(/<[^>]+>/g, '').trim();
+
+        const meta = { description: text };
+        const conf = (metadataConfigs && metadataConfigs.description) || defaultMetadataConfigs.description;
+        
+        if (conf && conf.enabled && text) {
+            const controls = createMetadataControls('description', meta, conf);
+            descDiv.parentNode.insertBefore(controls, descDiv.nextSibling);
+            controls.style.marginBottom = '10px';
+            controls.style.display = 'block';
+        }
+    }
+
+    // 2. Genres (Label + Category)
+    const genreSet = new Set();
+    // Locate the product category list
+    const prodCat = document.querySelector('div.prod_category ul');
+    if (prodCat) {
+        const lis = prodCat.querySelectorAll('li');
+        lis.forEach(li => {
+            const strong = li.querySelector('strong');
+            if (!strong) return;
+            const label = strong.textContent.trim();
+            // Check for "レーベル" (Label) or "カテゴリ" (Category)
+            if (label === 'レーベル' || label === 'カテゴリ') {
+                const items = li.querySelectorAll('div.item a');
+                items.forEach(a => {
+                    genreSet.add(a.textContent.trim());
+                });
+            }
+        });
+    }
+
+    if (genreSet.size > 0) {
+        const meta = { genres: Array.from(genreSet) };
+        const conf = (metadataConfigs && metadataConfigs.genres) || defaultMetadataConfigs.genres;
+        
+        if (conf && conf.enabled) {
+            const controls = createMetadataControls('genres', meta, conf);
+            // Append after the prod_category div
+            const prodCatDiv = document.querySelector('div.prod_category');
+            if (prodCatDiv) {
+                prodCatDiv.parentNode.insertBefore(controls, prodCatDiv.nextSibling);
+                controls.style.marginTop = '10px';
+                controls.style.display = 'block';
+            }
+        }
+    }
+  }
+
   initGamesVideo();
   initFratx();
   initDaiichisouko();
+  initTranceVideo();
   initPornolab();
   initIafd();
   initEmbyItem();
