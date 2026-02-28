@@ -626,6 +626,13 @@
       return;
     }
 
+    // Fix: Remove Array.prototype.toJSON if present, as it causes double-serialization 
+    // on sites using old libraries (e.g. hunk-ch.com)
+    if (Array.prototype.toJSON) {
+        console.warn(debugPrefix, 'Removing non-standard Array.prototype.toJSON to fix JSON serialization');
+        delete Array.prototype.toJSON;
+    }
+
     const performRequest = (id, data) => {
         if (!id) {
             showToast(t.missingItemId);
