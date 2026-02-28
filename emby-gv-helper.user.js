@@ -14,6 +14,7 @@
 // @match        https://*.trance-video.com/*
 // @match        https://*.hunk-ch.com/*
 // @match        https://*.sayuncle.com/*
+// @match        https://*.boy-studio.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -1854,7 +1855,138 @@
     }
   }
 
+  function initBoyStudio() {
+    if (!location.host.includes('boy-studio.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'Japan',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'Boy Studio',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title
+    const titleEl = document.querySelector('.item__title span') || document.querySelector('h2.item__title');
+    if (titleEl) meta.title = titleEl.textContent.trim();
+
+    // 2. Table Metadata
+    const table = document.querySelector('table.table--item-data');
+    let genresTd = null;
+    let actorsTd = null;
+
+    if (table) {
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(row => {
+        const th = row.querySelector('th');
+        const td = row.querySelector('td');
+        if (!th || !td) return;
+
+        const headerText = th.textContent.trim();
+        const valueText = td.textContent.trim();
+
+        if (headerText.includes('品番')) {
+          meta.extra += `Code: ${valueText}\n`;
+        } else if (headerText.includes('レーベル')) {
+          const a = td.querySelector('a');
+          meta.studio = a ? a.textContent.trim() : valueText;
+        } else if (headerText.includes('シリーズ')) {
+          if (valueText) meta.extra += `Series: ${valueText}\n`;
+        } else if (headerText.includes('ジャンル')) {
+          genresTd = td;
+          const links = td.querySelectorAll('a');
+          links.forEach(a => {
+            meta.genres.push(a.textContent.trim());
+          });
+        } else if (headerText.includes('出演モデル')) {
+          actorsTd = td;
+          const links = td.querySelectorAll('a');
+          links.forEach(a => {
+            meta.actors.push({ name: a.textContent.trim() });
+          });
+        } else if (headerText.includes('配信開始日')) {
+          meta.extra += `Release Date: ${valueText}\n`;
+          const match = valueText.match(/(\d{4})/);
+          if (match) meta.year = match[1];
+        } else if (headerText.includes('収録時間')) {
+          meta.duration = valueText;
+        }
+      });
+    }
+
+    // 3. Description
+    const descDetails = Array.from(document.querySelectorAll('details')).find(d => {
+      const s = d.querySelector('summary');
+      return s && s.textContent.includes('商品説明を読む');
+    });
+
+    let descP = null;
+    if (descDetails) {
+      descP = descDetails.querySelector('div > p');
+      if (descP) {
+        meta.description = descP.textContent.trim();
+      }
+    }
+
+    const config = (metadataConfigs && typeof metadataConfigs === 'object') ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+
+    // Description Controls
+    if (descP && meta.description) {
+      const type = 'description';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (conf && conf.enabled) {
+        const text = renderWithTemplate(meta, conf.template, type);
+        if (text && text.trim()) {
+          const controls = createMetadataControls(type, meta, conf);
+          controls.style.marginTop = '10px';
+          controls.style.display = 'block';
+          if (descP.parentNode) {
+            descP.parentNode.insertBefore(controls, descP.nextSibling);
+          }
+        }
+      }
+    }
+
+    // Genres Controls
+    if (genresTd && meta.genres.length > 0) {
+      const type = 'genres';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (conf && conf.enabled) {
+        const text = renderWithTemplate(meta, conf.template, type);
+        if (text && text.trim()) {
+          const controls = createMetadataControls(type, meta, conf);
+          controls.style.marginTop = '5px';
+          controls.style.display = 'block';
+          genresTd.appendChild(controls);
+        }
+      }
+    }
+
+    // Actors Controls
+    if (actorsTd && meta.actors.length > 0) {
+      const type = 'actors';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (conf && conf.enabled) {
+        const text = renderWithTemplate(meta, conf.template, type);
+        if (text && text.trim()) {
+          const controls = createMetadataControls(type, meta, conf);
+          controls.style.marginLeft = '10px';
+          controls.style.display = 'inline-flex';
+          actorsTd.appendChild(controls);
+        }
+      }
+    }
+  }
+
   initSayUncle();
+  initBoyStudio();
   initHunkCh();
   initGamesVideo();
   initFratx();
