@@ -632,6 +632,13 @@
             return;
         }
         const url = `${embyApiUrl.replace(/\/+$/, '')}/Items/${id}/Tags/Add`;
+        
+        console.log(debugPrefix, 'Sending AddTags Request:', {
+            url: url,
+            method: 'POST',
+            body: data
+        });
+
         GM_xmlhttpRequest({
             method: 'POST',
             url: url,
@@ -641,16 +648,23 @@
             },
             data: JSON.stringify(data),
             onload: (resp) => {
-            if (resp.status >= 200 && resp.status < 300) {
-                showToast(t.tagsAdded);
-            } else {
-                console.error(debugPrefix, 'add tags failed', resp);
-                showToast(t.tagsAddFailed + ': ' + resp.status);
-            }
+                console.log(debugPrefix, 'AddTags Response:', {
+                    status: resp.status,
+                    statusText: resp.statusText,
+                    responseText: resp.responseText,
+                    responseHeaders: resp.responseHeaders
+                });
+
+                if (resp.status >= 200 && resp.status < 300) {
+                    showToast(t.tagsAdded);
+                } else {
+                    console.error(debugPrefix, 'add tags failed', resp);
+                    showToast(t.tagsAddFailed + ': ' + resp.status);
+                }
             },
             onerror: (err) => {
-            console.error(debugPrefix, 'add tags error', err);
-            showToast(t.tagsAddFailed);
+                console.error(debugPrefix, 'add tags error', err);
+                showToast(t.tagsAddFailed);
             }
         });
     };
