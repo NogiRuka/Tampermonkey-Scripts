@@ -1,15 +1,16 @@
 // ==UserScript==
 // @name         工具箱
 // @namespace    http://tampermonkey.net/
-// @version      2025-12-09
+// @version      2026-02-01
 // @description  链接新窗口打开，鼠标到右下角显示滚动按钮
 // @author       乃木流架
-// @icon         https://youke1.picui.cn/s1/2025/08/30/68b1f11b8db08.png
+// @icon         https://github.com/NogiRuka/Tampermonkey-Scripts/blob/main/favicons/icons8-code-blocks-480.png?raw=true
 // @match        *://*/*
 // @grant        GM_addStyle
 // @grant        GM_registerMenuCommand
 // @run-at       document-end
 // @license      GPL-3.0 License
+// @require      file://D:\Projects\Tampermonkey Scripts\工具箱.user.js
 // ==/UserScript==
 
 (function () {
@@ -369,6 +370,132 @@
     observeSearchInput();
   }
 
+  /** ====== KO-VIDEO 解锁文字选择 ====== */
+  function unlockKoVideoSelection() {
+    if (host !== "ko-video.com") return;
+
+    GM_addStyle(`
+      * {
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
+        user-select: text !important;
+      }
+    `);
+
+    const events = ["copy", "cut", "paste", "contextmenu", "selectstart", "dragstart"];
+    events.forEach(type => {
+      document.addEventListener(
+        type,
+        e => {
+          e.stopPropagation();
+        },
+        true
+      );
+    });
+
+    const clearInlineBlockers = () => {
+      const targets = [document, document.body];
+      targets.forEach(t => {
+        if (!t) return;
+        t.oncopy =
+          t.oncut =
+          t.onpaste =
+          t.oncontextmenu =
+          t.onselectstart =
+          t.ondragstart =
+            null;
+      });
+    };
+
+    clearInlineBlockers();
+    new MutationObserver(clearInlineBlockers).observe(document.documentElement, {
+      childList: true,
+      subtree: true,
+    });
+
+    log("KO-VIDEO 文字选择已解锁", "KO-VIDEO");
+  }
+
+  /** ====== KO-VIDEO 商品简介复制 ====== */
+  function initKoVideoCopy() {
+    if (!location.pathname.startsWith("/products/detail.php")) {
+      return;
+    }
+
+    const detail = document.querySelector("p.deitail_txt");
+    if (!detail) {
+      log("未找到商品简介元素 .deitail_txt", "KO-VIDEO");
+      return;
+    }
+
+    detail.style.userSelect = "text";
+    detail.style.webkitUserSelect = "text";
+    detail.style.msUserSelect = "text";
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "复制商品简介";
+    btn.style.cssText = [
+      "margin-top: 8px",
+      "padding: 6px 10px",
+      "font-size: 12px",
+      "border-radius: 4px",
+      "border: none",
+      "background: #a5b7ff",
+      "color: #fff",
+      "cursor: pointer"
+    ].join(";");
+
+    btn.addEventListener("click", () => {
+      const text = detail.innerText.replace(/\r?\n/g, "\n").trim();
+      if (!text) {
+        alert("未获取到商品简介内容");
+        return;
+      }
+
+      const doCopy = () => {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          return navigator.clipboard.writeText(text);
+        }
+
+        return new Promise((resolve, reject) => {
+          try {
+            const ta = document.createElement("textarea");
+            ta.value = text;
+            ta.style.position = "fixed";
+            ta.style.left = "-9999px";
+            document.body.appendChild(ta);
+            ta.focus();
+            ta.select();
+            const ok = document.execCommand("copy");
+            document.body.removeChild(ta);
+            if (!ok) {
+              reject(new Error("execCommand 复制失败"));
+            } else {
+              resolve();
+            }
+          } catch (e) {
+            reject(e);
+          }
+        });
+      };
+
+      doCopy()
+        .then(() => {
+          alert("商品简介已复制到剪贴板");
+        })
+        .catch(err => {
+          console.error(err);
+          alert("复制失败，可以尝试手动选中后复制");
+        });
+    });
+
+    detail.parentNode.insertBefore(btn, detail.nextSibling);
+
+    log("KO-VIDEO 商品简介复制按钮已注入", "KO-VIDEO");
+  }
+
   /** ====== 主入口 ====== */
   // 特定网站功能
   if (host.includes("google.com") || host.includes("gaytor.rent")) {
@@ -377,6 +504,11 @@
 
   if (host === "member.bilibili.com") {
     initBilibiliSearchHistory();
+  }
+
+  if (host === "ko-video.com") {
+    unlockKoVideoSelection();
+    initKoVideoCopy();
   }
 
   // 通用功能（所有网站适用）

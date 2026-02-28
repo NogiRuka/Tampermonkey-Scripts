@@ -655,32 +655,57 @@
         });
     };
 
+    console.log(debugPrefix, 'addTagsToEmby input tags:', tags);
+
+    let finalTags = [];
+    
+    // Normalize input to an array
+    let rawArray = [];
+    if (Array.isArray(tags)) {
+        rawArray = tags;
+    } else if (typeof tags === 'string') {
+        const trimmed = tags.trim();
+        if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
+            try {
+                const parsed = JSON.parse(trimmed);
+                if (Array.isArray(parsed)) {
+                    rawArray = parsed;
+                } else {
+                    rawArray = [trimmed];
+                }
+            } catch (e) {
+                console.warn(debugPrefix, 'JSON parse error for tags string:', e);
+                rawArray = [trimmed];
+            }
+        } else {
+            rawArray = [trimmed];
+        }
+    } else if (tags) {
+        // Handle array-like objects or single values
+        rawArray = Array.from(tags).length > 0 ? Array.from(tags) : [tags];
+    }
+
+    // Normalize each item to { Name: string }
+    finalTags = rawArray.map(item => {
+        if (item === null || item === undefined) return null;
+        // If item is already an object with Name, use it
+        if (typeof item === 'object' && item.Name) {
+            return { Name: String(item.Name) };
+        }
+        // Otherwise treat as string
+        return { Name: String(item) };
+    }).filter(item => item !== null);
+
     const initialData = {
-      Tags: []
+      Tags: finalTags
     };
     
-    if (Array.isArray(tags)) {
-        initialData.Tags = tags.map(tag => ({ Name: String(tag) }));
-    } else {
-        console.warn(debugPrefix, 'Tags is not an array:', tags);
-    }
-    
-    console.log(debugPrefix, 'Preview Tags Data (Fixed):', JSON.stringify(initialData));
+    console.log(debugPrefix, 'Preview Tags Data (Normalized):', initialData);
 
     if (skipPreview && itemId) {
         performRequest(itemId, initialData);
     } else {
         showJsonEditor(initialData, (data) => {
-            // If itemId was passed originally, use it. Otherwise, we might need to ask the user or check the input field.
-            // But since this function is generic, we assume the caller handles the itemId retrieval if needed.
-            // In our specific case, we'll pass the itemId to the callback or rely on the caller to provide it.
-            // Wait, showJsonEditor callback only returns data.
-            // Let's modify the flow: performRequest needs an ID.
-            // If itemId is missing here, we can't send.
-            // But the user said: "click JSON button -> see JSON -> click send -> execute".
-            // If itemId is empty, we should prompt or fail.
-            // Let's assume the itemId is provided or we prompt for it?
-            // Actually, we can just try to use the passed itemId. If it's empty, we show toast.
             performRequest(itemId, data);
         });
     }

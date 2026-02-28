@@ -1,0 +1,990 @@
+<body style=""><noscript><p>JavaScript を有効にしてご利用下さい.</p></noscript><link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script type="text/javascript">
+	$(function(){
+		$(".search_keyword").autocomplete({
+			source: function(req, resp){
+				var post = {};
+				post['mode'] = 'autocomplete';
+				post['word'] = req.term;
+				post['transactionid'] = 'edaab6e63f23cf11876fba798634d38be8a76b26';
+				$.ajax({
+					url: "/frontparts/bloc/autocomplete.php",
+					type: "POST",
+					cache: false,
+					dataType: "json",
+					data: post,
+					success: function(o){
+						resp(o);
+					},
+					error: function(xhr, ts, err){
+					}
+				});
+			},
+			minLength: 2
+		});
+	});
+</script>
+<!--[if lt IE 7]>
+<p class="ie_fuck">お使いのブラウザは<strong>古い</strong>ため、表示が崩れることがあります。
+<a href="http://browsehappy.com/">他のブラウザ</a>を使うか、<a href="http://www.google.com/chromeframe/?redirect=true">Google Chrome Frame</a>をインストールすることで正しく表示することができます。</p>
+<![endif]-->
+<div class="head" style="top: 0px;">
+	<header class="header">
+		<div class="header_inr">
+			<h1><a href="https://www.daiichisouko.com/">ゲイ業界最大規模のゲイビデオ中古販売･アウトレット･中古買取サイト「第壱倉庫」</a></h1>
+						<div class="cart">
+				<section>
+					<a href="https://www.daiichisouko.com/cart/">
+					<h2>ショッピングカート</h2>
+					<p id="cart_pc_wide"><span class="tx_bld">0点</span>：<span class="tx_bld">¥0(税込)</span></p>
+					</a>
+				</section>
+			</div>
+					</div>
+
+		<div class="nav_main">
+			<div class="header_inr clearfix">
+				<nav>
+					<ul class="clearfix">
+						<li class="home"><a href="https://www.daiichisouko.com/">ホーム│HOME</a></li>
+						<li class="video"><a href="https://www.daiichisouko.com/products/list.php?class_id=1">DVD･Blu-ray│DVD･Blu-ray LIST</a></li>
+						<li class="goods"><a href="https://www.daiichisouko.com/products/list.php?class_id=2">グッズ│GOODS LIST</a></li>
+						<li class="sell"><a href="https://www.daiichisouko.com/sellorder/">中古買取│SELL ORDER</a></li>
+						<li class="present"><a href="https://www.daiichisouko.com/present/">プレゼント│PRESENT</a></li>
+					</ul>
+				</nav>
+				<form name="search_form_word" method="GET" action="/products/list.php">
+					<input type="hidden" name="mode" value="search">
+					<input type="text" name="name" value="" maxlength="50" class="search_keyword ui-autocomplete-input" placeholder="キーワード検索" autocomplete="off">
+					<input type="submit" name="">
+				</form>
+			</div>
+		</div>
+
+		<div class="nav_sub">
+			<div class="header_inr">
+				<nav>
+				<ul class="clearfix">
+										<li class="my"><a href="https://www.daiichisouko.com/mypage/login.php#signup">会員登録</a></li>
+					<li class="sign"><a href="https://www.daiichisouko.com/mypage/login.php">ログイン</a></li>
+															<li class="tel"><p>電話受付時間 10:00～18:00(月～土) どんなことでもお気軽にお電話ください</p></li>
+				</ul>
+				</nav>
+				<div class="notice-disclaimer">
+					<p style="text-align: center; background-color: #f5f5f5; padding: 4px; margin: 0; font-size: 11px; color: #666;">
+						当サイトに掲載されている作品は全て創作表現です
+					</p>
+				</div>
+			</div>
+		</div>
+
+	</header>
+		<header class="headersp">
+		<section class="header_inr">
+			<h1><a href="https://www.daiichisouko.com/">ゲイ業界最大規模のゲイビデオ中古販売･アウトレット･中古買取サイト「第壱倉庫」</a></h1>
+			<section class="nav_main acacd">
+								<h2 class="cart bttn">
+					<a href="javascript:;" class="accr">ショッピングカート</a>
+									</h2>
+				<section class="cart_info" style="display: none;">
+					<a href="https://www.daiichisouko.com/cart/"><h2>ショッピングカート<br>購入手続きへ</h2>
+					<p><span class="tx_bld">0点</span>：<span class="tx_bld">¥0</span><br>
+										現在、<span class="tx_bld">送料無料</span>です。</p></a>
+									</section>
+								<h2 class="menu bttn"><a href="javascript:void(0)" class="acmn">メニュー</a></h2>
+				<nav style="display: none;">
+					<ul class="clearfix">
+						<li class="home"><a href="https://www.daiichisouko.com/">ホーム│HOME</a></li>
+						<li class="video"><a href="https://www.daiichisouko.com/products/list.php?class_id=1">DVD･Blu-ray│DVD･Blu-ray LIST</a></li>
+						<li class="goods"><a href="https://www.daiichisouko.com/products/list.php?class_id=2">グッズ│GOODS LIST</a></li>
+						<li class="sell"><a href="https://www.daiichisouko.com/sellorder/">中古買取│SELL ORDER</a></li>
+						<li class="present"><a href="https://www.daiichisouko.com/present/">プレゼント│PRESENT</a></li>
+					</ul>
+					<form name="search_form_word" method="GET" action="/products/list.php">
+						<input type="hidden" name="mode" value="search">
+						<input type="text" name="name" value="" maxlength="50" class="search_keyword ui-autocomplete-input" placeholder="キーワード検索" autocomplete="off">
+						<input type="submit" name="">
+					</form>
+				</nav>
+			</section>
+		</section>
+
+		<section class="nav_sub">
+			<div class="tel"><a href="tel:0120336981">電話受付時間 10:00～18:00(月～土) どんなことでもお気軽にお電話ください</a></div>
+			<nav>
+				<ul class="clearfix">
+										<li class="my"><a href="https://www.daiichisouko.com/mypage/login.php#signup">会員登録</a></li>
+					<li class="sign"><a href="https://www.daiichisouko.com/mypage/login.php">ログイン</a></li>
+										<li class="question"><a href="https://www.daiichisouko.com/abouts/">サイト案内</a></li>
+				</ul>
+			</nav>
+		</section>
+	</header>
+
+</div><!--/head-->
+<div class="main_inr clearfix"><article class="brdli mrb20"><ul class="clearfix"><li><p><a href="https://www.daiichisouko.com/">ホーム</a></p></li><li><p>商品詳細</p></li></ul></article></div><div class="maincl clearfix"><article class="sdcl"><!-- ▼DVD・Blu-ray検索 --><script src="/js/jquery.clean-query.js"></script>
+<script type="text/javascript">
+	$(function(){
+		// リセットクリック
+		$("#search_dvd_reset").click(function(event){
+			var target = [".select_all", "[class^=maker_id_]", ".category_ids", ".play_ids", ".outleton", ".price_ids"];
+			$.each(target, function(){
+				$(this.toString()).prop("checked", false);		// すべて
+			});
+		});
+		// レーベルをクリック
+		$("[class^=maker_id_]").click(function(){
+			// すべてを解除
+			$(".select_all", $(this).parents(".maker_label")).prop("checked", false);
+		});
+		// 「すべて」クリック
+		$(".select_all").click(function(){
+			$(".maker_id_"+this.value).prop("checked", false);
+		});
+
+		$('#search_form_dvd').cleanQuery();
+	});
+</script>
+
+<section class="tx_brdr mrb20">
+	<form name="search_form_dvd" id="search_form_dvd" method="GET" action="https://www.daiichisouko.com/products/list.php">
+		<input type="hidden" name="class_id" value="1">
+		<input type="hidden" name="mode" value="search">
+	<h2 class="tl_f tx_tac">DVD･Blu-ray検索</h2>
+	<div class="srchli pd10">
+				<fieldset class="foacd">
+		<legend class="bttn"><span>メーカー・シリーズ</span></legend>
+		<ul style="display: none;">
+			<li>
+												<p class="bttn">KO</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="1">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="331">今ヌキ隊</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="329">合法シ〇タ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="324">Model’s</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="322">X-BODY</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="309">どぴゅノンケ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="303">SUITS</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="302">JOKER</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="256">SUPER STAR</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="1">BEAST</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="257">裸王</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="2">Secret Film</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="3">号外</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="4">Go guy</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="260">ガチ撮り</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="5">Mania Club</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="6">SCORE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="7">SONIC FILM</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="8">KO</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="9">surprise!</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="10">エムステーション</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="11">日本男児</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="12">KO-COMPANY</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="13">INDIES</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="14">ジゴロ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="15">SPORTUS</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="16">TOP ATHLETE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="17">TYSON VIDEO</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="18">KURUU(旧:狂)</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="19">HUNTER</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="20">eros</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="170">DEEP</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="203">PANDORA</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="207">JUNO</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="208">Papillon</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="214">LINE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="230">ガキエロ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="234">Non Fiction</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="248">BUMP</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="249">DG Darling guy</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_1" value="253">XXX</label></li>
+									</ul>
+																<p class="bttn">KO-EAST</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="107">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="323">KO-EAST</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="317">うまのすけ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="316">益荒男</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="313">ぶっこみ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="308">CHAOS</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="307">BOYS PROJECT</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="306">V-STYLE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="297">エンドレス</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="296">TOKYOボーイズ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="295">Boys Crash</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="294">SUNRISE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="265">monster</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="266">アブSEX</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="267">超エロ男子</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_107" value="268">強豪</label></li>
+									</ul>
+																<p class="bttn">ACCEED</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="8">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_8" value="38">ACCEED</label></li>
+									</ul>
+																<p class="bttn">ADONIS LAND</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="94">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_94" value="206">ADONIS LAND</label></li>
+									</ul>
+																<p class="bttn">ARGO STUDIO</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="12">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_12" value="44">SCO VIDEO</label></li>
+									</ul>
+																<p class="bttn">AMENITY PLANNING</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="103">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_103" value="252">AMENITY PLANNING</label></li>
+									</ul>
+																<p class="bttn">AXIS PICTURES</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="119">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_119" value="328">AXIS PICTURES</label></li>
+									</ul>
+																<p class="bttn">Beard Project</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="14">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_14" value="46">Danjivideo</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_14" value="103">over40</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_14" value="104">MACHO</label></li>
+									</ul>
+																<p class="bttn">BOYSLAB</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="100">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_100" value="247">BOYSLAB</label></li>
+									</ul>
+																<p class="bttn">B PRODUCT</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="18">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_18" value="55">Bプロダクト</label></li>
+									</ul>
+																<p class="bttn">BRAVO</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="5">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_5" value="32">BRAVO!</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_5" value="106">oooops!!</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_5" value="236">AJITO</label></li>
+									</ul>
+																<p class="bttn">COAT</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="2">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="334">解禁Special</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="333">SPARK</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="321">NONKE PLAY ROOM</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="320">@nonke.com</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="318">MVP</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="315">TRAP HOLE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="314">R-30</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="312">エロコレ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="311">ROOKIE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="310">EXPOSE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="304">FIXER</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="291">NUDE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="290">maniac</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="289">Smart</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="287">EXTRA LEGEND</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="218">ACTIVE BODY</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="117">AV</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="120">Babylon</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="275">COLLECTORS EDITION</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="277">CUTTING EDGE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="115">D・M・T</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="278">Fine</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="286">scooop</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="283">GRAND SLAM</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="284">ONLY SHINING STAR</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="282">Jump!</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="118">Number</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="219">Hello!</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="281">Style One</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="280">PRISONER</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="276">Straight Style</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="23">コート</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="114">PRECIOUS</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="116">COAT</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="119">OUT STAFF</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="122">POWER GRIP</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="175">EXFEED</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="223">ROCK BULL</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="224">SHOOT</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="285">ザ・シリーズ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="123">体育会制覇</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="113">ナンパ専門学群</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="279">爆裂天使</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="121">変態面接官</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_2" value="232">フェラ三昧</label></li>
+									</ul>
+																<p class="bttn">COOL FACTORY</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="60">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_60" value="109">COOL FACTORY</label></li>
+									</ul>
+																<p class="bttn">DANK</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="21">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_21" value="59">DANK</label></li>
+									</ul>
+																<p class="bttn">DNA</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="20">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_20" value="57">EJIKI</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_20" value="58">D.N.A.</label></li>
+									</ul>
+																<p class="bttn">EXFEED</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="92">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_92" value="200">EXFEED</label></li>
+									</ul>
+																<p class="bttn">FALCON</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="95">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_95" value="217">FALCON</label></li>
+									</ul>
+																<p class="bttn">FutureEntertainment</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="87">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_87" value="164">FutureEntertainment</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_87" value="209">VICTORY</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_87" value="210">Addict</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_87" value="211">BLADE</label></li>
+									</ul>
+																<p class="bttn">FIELD</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="6">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_6" value="33">FIELD</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_6" value="34">ATHLETE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_6" value="35">DEBUT</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_6" value="36">Surf Surf Revolution</label></li>
+									</ul>
+																<p class="bttn">G@MES</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="3">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_3" value="298">HUNK VIDEO</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_3" value="24">G@MES</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_3" value="25">WILD G@MES</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_3" value="26">STYLE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_3" value="102">裏G@MES</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_3" value="111">MONSTER</label></li>
+									</ul>
+																<p class="bttn">GENMA</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="49">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_49" value="91">スーパーゲンマ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_49" value="92">ゲンマ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_49" value="112">aniky</label></li>
+									</ul>
+																<p class="bttn">G-BOT</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="109">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_109" value="263">G-BOT</label></li>
+									</ul>
+																<p class="bttn">GIRL'S CH</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="112">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_112" value="292">GIRL'S CH</label></li>
+									</ul>
+																<p class="bttn">HERCULES</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="108">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_108" value="262">HERCULES</label></li>
+									</ul>
+																<p class="bttn">i-dax</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="24">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_24" value="63">i-dax</label></li>
+									</ul>
+																<p class="bttn">JAPAN</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="7">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_7" value="37">JAPAN</label></li>
+									</ul>
+																<p class="bttn">JUSTICE</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="26">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_26" value="65">JUSTICE</label></li>
+									</ul>
+																<p class="bttn">KONG</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="27">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_27" value="66">KONG</label></li>
+									</ul>
+																<p class="bttn">Likeboys</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="28">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_28" value="67">Likeboys</label></li>
+									</ul>
+																<p class="bttn">MEC COMPANY</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="30">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_30" value="69">MEC</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_30" value="70">SYMBOL</label></li>
+									</ul>
+																<p class="bttn">MANNHOUSE</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="16">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_16" value="48">マンハウス</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_16" value="49">アトリエイマーゴ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_16" value="50">エロティックスキャン</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_16" value="51">LIVE SHOCK</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_16" value="52">ヒートアップ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_16" value="53">ミスターハット</label></li>
+									</ul>
+																<p class="bttn">Media Wave</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="53">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_53" value="96">GET</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_53" value="204">Media Wave</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_53" value="243">Men's Street</label></li>
+									</ul>
+																<p class="bttn">OSUINRA</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="106">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_106" value="258">OSUINRA</label></li>
+									</ul>
+																<p class="bttn">OTOKO</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="99">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_99" value="246">OTOKO(復刻版)</label></li>
+									</ul>
+																<p class="bttn">OUT LAW</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="32">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_32" value="74">OUTLAW</label></li>
+									</ul>
+																<p class="bttn">RCHS JAPAN</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="104">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_104" value="254">RCHS JAPAN</label></li>
+									</ul>
+																<p class="bttn">Project DIAMOND</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="114">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_114" value="299">Project DIAMOND</label></li>
+									</ul>
+																<p class="bttn">REAL FILM</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="34">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_34" value="76">REAL FILM</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_34" value="231">SHAKE JAPAN</label></li>
+									</ul>
+																<p class="bttn">Rosenkrap</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="35">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_35" value="77">Rosenkrap</label></li>
+									</ul>
+																<p class="bttn">STRIKE</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="101">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_101" value="250">STRIKE</label></li>
+									</ul>
+																<p class="bttn">STUDIO GUMPTION</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="90">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_90" value="195">STUDIO GUMPTION</label></li>
+									</ul>
+																<p class="bttn">SOFT ON DEMAND</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="65">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_65" value="146">SOFT ONDEMAND</label></li>
+									</ul>
+																<p class="bttn">SQUASH</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="110">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_110" value="264">SQUASH</label></li>
+									</ul>
+																<p class="bttn">SUPER THREE</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="38">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_38" value="80">SUPER THREE</label></li>
+									</ul>
+																<p class="bttn">SURF RIDER</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="37">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_37" value="79">SFR</label></li>
+									</ul>
+																<p class="bttn">SILK LABO</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="113">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_113" value="293">SILK LABO</label></li>
+									</ul>
+																<p class="bttn">V Factory</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="39">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_39" value="81">V-Factory</label></li>
+									</ul>
+																<p class="bttn">Wrestle Factory</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="43">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_43" value="85">wrestle factory</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_43" value="179">AMBITIOUS</label></li>
+									</ul>
+																<p class="bttn">YBスポーツ</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="10">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_10" value="42">YBスポーツ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_10" value="105">at-B</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_10" value="173">VISUAL i　LAND</label></li>
+									</ul>
+																<p class="bttn">インテック</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="91">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_91" value="198">インテック</label></li>
+									</ul>
+																<p class="bttn">インフォメディア</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="102">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_102" value="251">インフォメディア</label></li>
+									</ul>
+																<p class="bttn">海鳴館</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="55">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_55" value="99">サムソンビデオ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_55" value="157">豊漫VIDEO</label></li>
+									</ul>
+																<p class="bttn">ジャックリード</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="50">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_50" value="93">ジャックリード</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_50" value="174">CYBER J</label></li>
+									</ul>
+																<p class="bttn">テキーラ</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="54">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_54" value="97">テキーラ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_54" value="98">サンダー</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_54" value="178">SEXUAL DESIRE</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_54" value="188">ATOMICちゃぶ</label></li>
+									</ul>
+																<p class="bttn">テラ出版</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="51">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_51" value="94">ビデオバディ</label></li>
+									</ul>
+																<p class="bttn">西麻布撮影所</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="111">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_111" value="269">西麻布撮影所</label></li>
+									</ul>
+																<p class="bttn">メンズキャンプ</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="93">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_93" value="201">メンズキャンプ</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_93" value="202">ブラックサタン</label></li>
+									</ul>
+																<p class="bttn">古川書房</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="80">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_80" value="159">VG-men</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_80" value="215">G-BLESS</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_80" value="238">GGV</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_80" value="239">G LEGEND</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_80" value="240">G-MAX</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_80" value="241">SM-ZV</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_80" value="242">古川書房</label></li>
+									</ul>
+																<p class="bttn">その他</p>
+				<ul class="maker_label" style="display: none;">
+					<li><label><input type="checkbox" name="company_id[]" class="select_all" value="86">すべて</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="274">外国人もの</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="270">ブックスマル</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="165">その他</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="45">B+B VIDEO</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="62">Force</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="68">MC</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="110">DESPERADO</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="143">Fatty</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="144">HEAVY WEIGHT</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="152">V JET</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="155">フェアエスト</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="161">108 GAY STUDIO</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="162">パンダ商会</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="163">FreeDom</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="172">DEEPBOYS</label></li>
+										<li><label><input type="checkbox" name="label_id[]" class="maker_id_86" value="180">Men'S Heaven</label></li>
+									</ul>
+																			</li>
+		</ul>
+		</fieldset>
+		
+
+				<fieldset class="foacd">
+		<legend class="bttn"><span>タイプ</span></legend>
+		<ul style="display: none;">
+					<li><label><input type="checkbox" name="category_id[]" value="3" class="category_ids">さわやか・カッコイイ系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="6" class="category_ids">体育会系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="2" class="category_ids">カワイイ・美少年系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="4" class="category_ids">ギャル男・ホスト系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="5" class="category_ids">短髪・ヒゲ・野郎系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="8" class="category_ids">ガチムチ系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="7" class="category_ids">マッチョ系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="9" class="category_ids">太め系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="10" class="category_ids">オヤジ系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="11" class="category_ids">外国人系</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="20" class="category_ids">スジ筋</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="22" class="category_ids">巨根・デカマラ</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="16" class="category_ids">フェチ</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="18" class="category_ids">BEST盤・再編集もの</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="26" class="category_ids">女性向け</label></li>
+		<li><label><input type="checkbox" name="category_id[]" value="32" class="category_ids">KOLEGEND</label></li>
+			</ul>
+		</fieldset>
+		
+				<fieldset class="foacd">
+		<legend class="bttn"><span>ジャンル</span></legend>
+		<ul style="display: none;">
+					<li><label><input type="checkbox" name="play_id[]" value="4" class="play_ids">アナルSEX</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="3" class="play_ids">生SEX有</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="5" class="play_ids">ノンケもの</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="11" class="play_ids">男女カラミ有</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="6" class="play_ids">制服・コスプレ</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="2" class="play_ids">嫌がり系</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="1" class="play_ids">複数</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="9" class="play_ids">フェラ・手コキ・オナニー</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="8" class="play_ids">野外・露出</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="7" class="play_ids">ストーリー</label></li>
+		<li><label><input type="checkbox" name="play_id[]" value="10" class="play_ids">着エロ・イメージDVD</label></li>
+			</ul>
+		</fieldset>
+		
+				<fieldset class="foacd">
+		<legend class="bttn"><span>状態</span></legend>
+		<ul style="display: none;">
+					<li><label><input type="checkbox" name="outleton[]" value="1" class="outleton">新作</label></li>
+		<li><label><input type="checkbox" name="outleton[]" value="2" class="outleton">ミドル(準新作新品)</label></li>
+		<li><label><input type="checkbox" name="outleton[]" value="3" class="outleton">アウトレット(新品)</label></li>
+		<li><label><input type="checkbox" name="outleton[]" value="4" class="outleton">中古ランクA(中古美品)</label></li>
+		<li><label><input type="checkbox" name="outleton[]" value="5" class="outleton">中古ランクB(傷･汚れ有り)</label></li>
+		<li><label><input type="checkbox" name="outleton[]" value="6" class="outleton">中古ランクC(ディスクのみ)</label></li>
+			</ul>
+		</fieldset>
+		
+		<fieldset class="foacd">
+		<legend class="bttn"><span>価格</span></legend>
+		<ul style="display: none;">
+			<li><input type="text" name="price" value=""> 円以下</li>
+			<li><input type="text" name="price_from" value=""> － <input type="text" name="price_to" value=""></li>
+		</ul>
+		</fieldset>
+
+		<fieldset class="pd10 tx_tac clearfix">
+		<input type="submit" value="検索">
+		<input type="reset" class="reset" id="search_dvd_reset" value="リセット">
+		</fieldset>
+	</div>
+	</form>
+</section>
+<!-- ▲DVD・Blu-ray検索 --><!-- ▼グッズ検索 --><script type="text/javascript">
+	$(function(){
+		$("#search_goods_reset").click(function(event){
+			// event.preventDefault();
+			$(".goods_label").prop("checked", false);
+		});
+	});
+</script>
+<section class="tx_brdr mrb20">
+	<form name="search_form_goods" id="search_form_goods" method="GET" action="/products/list.php">
+		<input type="hidden" name="class_id" value="2">
+		<input type="hidden" name="mode" value="search">
+	<h2 class="tl_f tx_tac">グッズ検索</h2>
+	<div class="srchli pd10">
+		<fieldset class="aoacd">
+			<legend class="bttn active"><span>カテゴリ</span></legend>
+			<ul>
+						<li><label><input type="checkbox" name="label_id[]" value="332" class="goods_label">使用済み下着&amp;セクシー動画</label></li>
+		<li><label><input type="checkbox" name="label_id[]" value="101" class="goods_label">ローション</label></li>
+		<li><label><input type="checkbox" name="label_id[]" value="166" class="goods_label">コンドーム</label></li>
+		<li><label><input type="checkbox" name="label_id[]" value="167" class="goods_label">リング・サック</label></li>
+		<li><label><input type="checkbox" name="label_id[]" value="168" class="goods_label">オナホール</label></li>
+		<li><label><input type="checkbox" name="label_id[]" value="169" class="goods_label">バイブ/ハリガタ</label></li>
+		<li><label><input type="checkbox" name="label_id[]" value="272" class="goods_label">その他部位</label></li>
+		<li><label><input type="checkbox" name="label_id[]" value="185" class="goods_label">イクペイチャージカード</label></li>
+		<li><label><input type="checkbox" name="label_id[]" value="199" class="goods_label">書籍</label></li>
+				</ul>
+		</fieldset>
+		<fieldset class="pd10 tx_tac clearfix">
+		<input type="submit" value="検索">
+		<input type="reset" class="reset" id="search_goods_reset" value="リセット">
+		</fieldset>
+	</div>
+	</form>
+</section>
+<!-- ▲グッズ検索 --></article><article class="mnfcl"><!-- ▼メイン --><script type="text/javascript">
+// カートに追加
+var addCart = (function(){
+	var in_progress = false;
+	return function(product_id, product_rank_id){
+		if(in_progress){
+			alert("処理中です。");
+			return ;
+		}
+		in_progress = true;
+	    var post = {};
+	    post['mode'] = 'add';
+	    post['transactionid'] = 'edaab6e63f23cf11876fba798634d38be8a76b26';
+	    post['product_id'] = product_id;
+	    post['product_rank_id'] = product_rank_id;
+	    $.ajax({
+	        url: "/frontparts/bloc/cart.php",
+	        type: "POST",
+	        cache: false,
+	        dataType: "json",
+	        data: post,
+	        success: function(data){
+				in_progress = false;
+	            if(data.success){
+	            	var $cartInfo = $(".cart_info p");	// レスポンシブ縮小時
+	            	var $cartPc = $("#cart_pc_wide");	// レスポンシブワイド
+
+	            	$cartInfo.empty();
+	            	$cartPc.empty();
+	            	// 金額、数量情報
+	            	var appendTotalQuantity = function($ele, total, quantity){
+		            	$ele.append(
+		            		'<span class="tx_bld" id="cart_quantity">'+data.quantity+'点</span>:<span class="tx_bld" id="cart_total">¥'+data.total+'(税込)</span><br>'
+		            	);
+	            	};
+					appendTotalQuantity($cartInfo, data.total, data.quantity);
+					appendTotalQuantity($cartPc, data.total, data.quantity);
+
+	            	if($("#cart_pin")[0]){
+	            		$("#cart_pin").html(data.quantity);
+	            	}else{
+	            		$("h2.cart").append('<span class="pin" id="cart_pin">'+data.quantity+'</span>');
+	            	}
+								// お支払い方法制限商品なら文言追加
+								if(data.payment_limited > 0){
+									alert("カートに追加しました。\n※お支払い方法が制限されている商品が追加されました。");
+								}else{
+									alert("カートに追加しました。");
+								}
+
+					setTimeout(function(){
+						if($('.cart_info')[0]){
+							$('.cart_info').show();
+						}
+					},100);
+	            }else{
+	            	alert(data.message);
+	            }
+	        },
+	        error: function(xhr, ts, err){
+	        	in_progress = false;
+	        	alert("システムエラーが発生したため、商品を追加できませんでした。");
+	        },
+	    });
+	};
+})();
+</script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".fancybox").fancybox();
+	$("a[rel=gallery_group]").fancybox({
+		'transitionIn'    : 'elastic',
+		'transitionOut'   : 'elastic',
+		'titlePosition'   : 'inside',
+		'titleFormat'   : function(title, currentArray, currentIndex, currentOpts) {
+			return '<span id="fancybox-title-inside">Image ' + (currentIndex + 1) + ' / ' + currentArray.length + (title.length ? ' &nbsp; ' + title : '') + '</span>';
+		}
+	});
+});
+</script>
+<section class="mrb20">
+
+<h2 class="tl_f">肉便器けい太</h2>
+<div class="dtday pdt5 pdb5 clearfix">
+<div class="iccel clearfix">
+	</div>
+<p class="naday">最新入荷日 2023.07.03</p>
+</div>
+
+<div class="itemdt">
+<div class="thumb">
+<a href="/upload/save_image//products/32/BWB269_DVD.jpg?t=1688374802" id="gallery" class="fancybox">
+	<img src="/upload/save_image//products/32/BWB269_DVD.jpg?t=1688374802">
+</a>
+</div>
+<div class="dtinfo">
+<p class="mrb5">
+		<span class="tx_bld tx_rg">申し訳ございませんが、只今品切れ中です。</span></p>
+
+<div class="mrt10 crex">
+<ul>
+<li><p><span class="tx_bld">ランク説明</span></p></li>
+<li><p class="srank"><span>S</span>新品未開封</p></li>
+<li><p class="arank"><span>A</span>中古良品</p></li>
+<li><p class="brank"><span>B</span>傷・汚れ有</p></li>
+<li><p class="crank"><span>C</span>ディスクのみ</p></li>
+</ul>
+</div>
+<p class="btn_gr mrb10"><a href="#resale">再入荷の案内</a></p>
+<div class="stc mrb10">
+<dl><dt><p>メーカー</p></dt>
+<dd><p><a href="/products/list.php?company_id=5">BRAVO</a><a href="/products/list.php?label_id=32">BRAVO!</a></p></dd></dl>
+<dl><dt><p>商品コード</p></dt>
+<dd><p>BWB269_DVD</p></dd></dl>
+<dl><dt><p>発売日</p></dt>
+<dd>
+	<p>
+				2019.12.29
+	</p>
+</dd>
+</dl>
+<dl><dt><p>収録時間</p></dt>
+<dd><p>130分</p></dd></dl>
+<dl><dt><p>タイプ</p></dt>
+	<dd>
+		<p>
+						<a href="/products/list.php?category_id=6">体育会系</a>
+						<a href="/products/list.php?category_id=5">短髪・ヒゲ・野郎系</a>
+						<a href="/products/list.php?category_id=8">ガチムチ系</a>
+					</p>
+	</dd>
+</dl>
+<dl>
+	<dt><p>ジャンル</p></dt>
+	<dd>
+		<p>
+						<a href="/products/list.php?play_id=4">アナルSEX</a>
+						<a href="/products/list.php?play_id=9">フェラ・手コキ・オナニー</a>
+					</p>
+	</dd>
+</dl>
+</div>
+</div>
+<p class="clear">アジトレーベル初の肉便器大作!<br>
+精液を懇願する変態GOGO穴奴●が登場!<br>
+<br>
+PART01 ぶっかけ大会 編<br>
+挑発しながらチンポを晒し踊るGOGOけい太。<br>
+欲情した客の硬マラが●●的にねじ込まれる!<br>
+制御不能状態のチンポも踊り出す!<br>
+大量ザーメンの匂いに釣られ客全員が連続射精!<br>
+おいでよザーメン天国!<br>
+<br>
+PART02 肉便器大会 編<br>
+集められた掘り師達のデカマラをフェラ奉仕しろ!<br>
+ノンストップの●●にけい太が狂いまくる!<br>
+容赦なしの性処理行列の過酷!<br>
+ザーメンまみれになりながらも掘られ続ける「これぞ肉便器!」<br>
+さあ、もっと掘れ!どんどんぶっかけろ!<br>
+全員射精するまで終われねえぞ!<br>
+<br>
+PART03 和装3P  編<br>
+お祭り野郎に変身した、けい太を〇え!<br>
+ケツ穴の奥まで突き上げられて悶絶!<br>
+拡張される肛門!奴●本能が蘇る!<br>
+「あぁ、気持ちイイ!もっと欲しい!」<br>
+<br>
+PART04 ズリネタ選び  編<br>
+好きな男優を選べというと、選んだのはアノ人!</p>
+</div>
+<div id="resale" name="resale">
+<h3 class="tl_s">再入荷の案内</h3>
+<p>「<span class="tx_bld tx_rg">肉便器けい太</span>」の商品が再入荷した際、<span class="tx_rg">リアルタイム(午前10時～午後10時の間)</span>でメールにてお知らせいたします。<br>
+人気商品は再入荷後、すぐに完売する場合がございます。予めご了承ください。<br>
+尚、会員様はログインメールアドレスでお申し込みされた商品のみ、マイページ内のメール配信設定より、設定中の商品を確認、解除していただけます。<br>
+(それ以外のお客様で、配信を解除なさる場合は、受付完了メールに記載されているURLより解除できます。)</p>
+<form name="form1" id="form1" class="fset" action="?product_id=14393" method="post">
+	<input type="hidden" name="transactionid" value="edaab6e63f23cf11876fba798634d38be8a76b26">
+	<input type="hidden" name="mode" value="rec_info">
+	<input type="hidden" name="uniqid" value="69a1ddada4623fXy9DFbx">
+	<fieldset>
+		<label>ご連絡先メールアドレス</label>
+				<input id="email" name="email" type="text" placeholder="例：ikupon@ikupon.com" value="" style="">
+		<hr class="spa10">
+		<div class="check-group clearfix" style="width:205px;">
+						<input id="addmagazine">
+			<div>
+								<input name="addmagazine" type="checkbox" class="checkbox" value="1">
+				<label for="add_mailmagazine">同時にメールマガジンへの登録</label>
+			</div>
+		</div>
+		<p><a href="/user_data/packages/default/img/mailpoint.jpg" id="gallery" class="fancybox">メールマガジン特典</a></p>
+	</fieldset>
+	<div class="wd70 mrlauto mrrauto pd5 clearfix">
+		<input type="submit" value="申し込む">
+		<input type="reset" class="reset" value="リセット">
+	</div>
+</form>
+</div>
+</section><!-- ▲メイン --><!-- ▼中央バナー --><section class="mrb20">
+<ul class="bnrcl"><li><img src="/upload/save_image/banner/04071724_67f38bd7ef115.png"></li><li><img src="/upload/save_image/banner/04071734_67f38dfc5a559.gif"></li></ul>
+</section>
+<!-- ▲中央バナー --><!-- ▼福袋バナー --><!-- ▲福袋バナー --></article></div><div class="main_inr clearfix"><article><!-- ▼関連商品 --><!-- ▲関連商品 --><!-- ▼最近チェックした商品 --><!-- ▲最近チェックした商品 --><!-- ▼下バナー --><section class="mrb20">
+<ul class="bnrcl"><li><a href="https://x77.jp/" target="_blank"><img src="/upload/save_image/banner/11071205_672c2e97c6c44.gif"></a></li><li><a href="https://bit.ly/2QsuhX7"><img src="/upload/save_image/banner/06081816_593915d7e9640.gif"></a></li></ul>
+</section>
+<!-- ▲下バナー --></article></div>
+<div class="pgtp" style="bottom: -100px;"><a href="#wrap">このページの上へ</a></div>
+<footer class="footer">
+<div class="footer_inr clearfix">
+<section class="ftcl">
+<h2>サイト案内</h2>
+<ul>
+<li><p><a href="https://www.daiichisouko.com/news/">インフォメーション</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/abouts/">当サイトについて</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/abouts/buy.php">購入について</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/faq/">FAQ</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/wide/">再入荷案内</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/mailmagazine/">メールマガジン</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/contact/">お問い合わせ</a></p></li>
+<li><p>	<a href="javascript:;" onclick="win02('http://www.ko-company.com/info/mail.php','mail_attention','700','800'); return false;">メール受信に関して</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/link/">相互リンク</a></p></li>
+<li><p><a href="javascript:;" onclick="win02('http://www.ko-company.com/top.php#service','mail_attention','700','800'); return false;">KOグループ</a></p></li>
+</ul>
+</section>
+<section class="ftcl">
+<h2>メニュー</h2>
+<ul>
+<li><p><a href="https://www.daiichisouko.com/">ホーム</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/products/list.php">DVD･Blu-ray</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/products/list.php">グッズ</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/sellorder/">中古買取</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/present/">プレゼント</a></p></li>
+</ul>
+</section>
+<section class="ftcl">
+<h2>アカウント</h2>
+<ul>
+<li><p><a href="https://www.daiichisouko.com/mypage/login.php">ログイン</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/mypage/login.php#signup">会員登録</a></p></li>
+</ul></section>
+<section class="ftcl">
+<h2>サイト規約</h2>
+<ul>
+<li><p><a href="https://www.daiichisouko.com/kiyaku/">利用規約</a></p></li>
+<li><p><a href="https://www.daiichisouko.com/order/">特定商取引に関する法律</a></p></li>
+<li><p><a href="javascript:;" onclick="win02('http://www.ko-company.com/info/privacy.php','mail_attention','700','800'); return false;">個人情報</a></p></li>
+</ul></section>
+<section class="ftcl">
+<h2>スマホ･モバイル</h2>
+<div><img src="/user_data/packages/default/img/qr.gif"></div>
+</section>
+<section class="ftscl">
+<h2>注意事項</h2>
+<div class="ssl clearfix"><img src="/user_data/packages/default/img/ssl.png" width="90" height="50"><p>当サイトはジオトラスト社のRapidSSLにより暗号化通信を行っております。安心してご購入できます。</p></div>
+<div class="nodrug">
+	<p>当サイトはDVD等のゲイ関連商品を扱っております。違法ドラッグの取扱は一切ございません。また、18歳未満ならびに高校生のご利用はお断りしております。あらかじめご了承ください。</p>
+</div>
+<div class="nodrug">
+	<p>古物商許可　大阪府公安委員会 第621132200207号 株式会社ケーオーカンパニー<br>無店舗型性風俗特殊営業届出　大阪府公安委員会 第18854号 株式会社ケーオーカンパニー</p>
+</div>
+<div class="nodrug"><p>CREDIX SURELINKS Netherlands B.V.<br>
+Herikerbergweg 194, Luna Arena, 1101CM Amsterdam, the Netherlands</p></div>
+<div class="nodrug"><p>BRACE GROVE UK LIMITED<br>
+Mabledon Place, Hamilton House, Bloomsbury, London, WC1H 9BB United Kingdom</p></div>
+<div class="nodrug"><p>T2ECOM EU EOOD Sredets region,19 Vitosha Blvd, 1st floor Sofia BULGARIA 1000</p></div>
+<div class="nodrug"><p>Shimatomo ITALY S.R.L.S. VIA DEL LAURO 9 20121 MILANO MI ITALY</p></div>
+</section>
+
+</div>
+<small>2010-2026 © 第壱倉庫 All rights reserved.</small>
+
+</footer><!--/footer-->
+
+
+
+<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-1" tabindex="0" style="display: none;"></ul><span role="status" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></span><ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2" tabindex="0" style="display: none;"></ul><span role="status" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></span><div class="nogiruka-btn-container"><button class="nogiruka-scroll-btn" data-direction="up"><svg viewBox="0 0 384 512"><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"></path></svg></button><button class="nogiruka-scroll-btn" data-direction="down"><svg viewBox="0 0 384 512"><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.8L54.6 246.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"></path></svg></button></div></body>
