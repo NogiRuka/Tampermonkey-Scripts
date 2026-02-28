@@ -13,6 +13,7 @@
 // @match        https://*.daiichisouko.com/*
 // @match        https://*.trance-video.com/*
 // @match        https://*.hunk-ch.com/*
+// @match        https://*.sayuncle.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -1537,6 +1538,106 @@
     }
   }
 
+  function initSayUncle() {
+    if (!location.host.includes('sayuncle.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'USA',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'SayUncle',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    const titleEl = document.querySelector('h1.sceneTitle');
+    if (titleEl) meta.title = titleEl.textContent.trim();
+
+    const dateEl = document.querySelector('.sceneDate');
+    if (dateEl) {
+      const dateText = dateEl.textContent.trim();
+      meta.extra += `Release Date: ${dateText}\n`;
+      const match = dateText.match(/(\d{4})/);
+      if (match) meta.year = match[1];
+    }
+
+    const actorLinks = document.querySelectorAll('.contentTitle .model-name-link');
+    actorLinks.forEach(a => {
+      meta.actors.push({ name: a.textContent.trim() });
+    });
+
+    const descEl = document.querySelector('.sceneDesc');
+    if (descEl) {
+      meta.description = descEl.textContent.trim();
+    }
+
+    const tagLinks = document.querySelectorAll('.tags-container a');
+    tagLinks.forEach(a => {
+      const tag = a.textContent.trim().replace(/,\s*$/, '');
+      if (tag) meta.genres.push(tag);
+    });
+
+    const seriesEl = document.querySelector('.siteName');
+    if (seriesEl) {
+      meta.extra += `Series: ${seriesEl.textContent.trim()}\n`;
+    }
+
+    const config = (metadataConfigs && typeof metadataConfigs === 'object') ? metadataConfigs : defaultMetadataConfigs;
+
+    // 1. Description Controls
+    if (descEl && meta.description) {
+      const type = 'description';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (conf && conf.enabled) {
+        const text = renderWithTemplate(meta, conf.template, type);
+        if (text && text.trim()) {
+          const controls = createMetadataControls(type, meta, conf);
+          controls.style.marginTop = '10px';
+          controls.style.display = 'block';
+          if (descEl.parentNode) {
+            descEl.parentNode.insertBefore(controls, descEl.nextSibling);
+          }
+        }
+      }
+    }
+
+    // 2. Genres Controls
+    const tagsContainer = document.querySelector('.tags-container');
+    if (tagsContainer && meta.genres.length > 0) {
+      const type = 'genres';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (conf && conf.enabled) {
+        const text = renderWithTemplate(meta, conf.template, type);
+        if (text && text.trim()) {
+          const controls = createMetadataControls(type, meta, conf);
+          controls.style.marginTop = '10px';
+          controls.style.display = 'block';
+          tagsContainer.appendChild(controls);
+        }
+      }
+    }
+
+    // 3. Actors Controls (Optional but helpful)
+    const contentTitle = document.querySelector('.contentTitle');
+    if (contentTitle && meta.actors.length > 0) {
+      const type = 'actors';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (conf && conf.enabled) {
+        const text = renderWithTemplate(meta, conf.template, type);
+        if (text && text.trim()) {
+          const controls = createMetadataControls(type, meta, conf);
+          controls.style.marginLeft = '10px';
+          controls.style.display = 'inline-flex';
+          contentTitle.appendChild(controls);
+        }
+      }
+    }
+  }
+
   function initHunkCh() {
     if (!location.host.includes('hunk-ch.com')) return;
     if (!location.pathname.includes('movie_detail.php')) return;
@@ -1646,6 +1747,7 @@
     }
   }
 
+  initSayUncle();
   initHunkCh();
   initGamesVideo();
   initFratx();
