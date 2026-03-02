@@ -1596,69 +1596,98 @@
   function initLatinBoyz() {
     if (!location.host.includes('latinboyz.com')) return;
     
-    // Find the tags container
-    const tagsUl = document.querySelector('ul.post-tags');
-    if (!tagsUl) return;
+    // Iterate over all tag containers found on the page
+    // This supports both list view (multiple items) and single page view
+    const tagContainers = document.querySelectorAll('ul.post-tags');
+    
+    tagContainers.forEach(tagsUl => {
+        // Prevent double injection
+        if (tagsUl.parentNode && tagsUl.parentNode.querySelector('.emby-metadata-controls')) return;
 
-    const meta = {
-      title: '',
-      year: '',
-      country: '',
-      genres: [],
-      duration: '',
-      director: '',
-      studio: 'LatinBoyz',
-      actors: [],
-      description: '',
-      extra: ''
-    };
+        // Determine scope: find the closest post container, or default to document for single page
+        const container = tagsUl.closest('.ttfmp-post-list-item') || document;
+        
+        const meta = {
+          title: '',
+          year: '',
+          country: '',
+          genres: [],
+          duration: '',
+          director: '',
+          studio: 'LatinBoyz',
+          actors: [],
+          description: '',
+          extra: ''
+        };
 
-    // Extract tags
-    tagsUl.querySelectorAll('li a').forEach(a => {
-        meta.genres.push(a.textContent.trim());
-    });
+        // Extract tags from the current container
+        tagsUl.querySelectorAll('li a').forEach(a => {
+            meta.genres.push(a.textContent.trim());
+        });
 
-    // Attempt to find title
-    const titleEl = document.querySelector('h1.entry-title') || document.querySelector('h1.post-title') || document.querySelector('.ttfmp-post-list-item-title a');
-    if (titleEl) {
-        meta.title = titleEl.textContent.trim();
-    }
-
-    // Attempt to find description
-    const descEl = document.querySelector('.entry-content p') || document.querySelector('.ttfmp-post-list-item-content p');
-    if (descEl) {
-        meta.description = descEl.textContent.trim();
-    }
-
-    // Attempt to find date
-    const dateEl = document.querySelector('.ttfmp-post-list-item-date a');
-    if (dateEl) {
-        const dateText = dateEl.textContent.trim();
-        const dateMatch = dateText.match(/(\d{4})/);
-        if (dateMatch) {
-            meta.year = dateMatch[1];
+        // Attempt to find title within scope
+        let titleEl;
+        if (container !== document) {
+             titleEl = container.querySelector('.ttfmp-post-list-item-title a');
+        } else {
+             titleEl = container.querySelector('h1.entry-title') || container.querySelector('h1.post-title');
         }
-    }
+        if (titleEl) {
+            meta.title = titleEl.textContent.trim();
+        }
 
-    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+        // Attempt to find description within scope
+        let descEl;
+        if (container !== document) {
+            descEl = container.querySelector('.ttfmp-post-list-item-content p');
+        } else {
+            descEl = container.querySelector('.entry-content p') || container.querySelector('.ttfmp-post-list-item-content p');
+        }
+        if (descEl) {
+             // Clone to safely remove "read more" links without affecting DOM
+             const clone = descEl.cloneNode(true);
+             const moreLink = clone.querySelector('.more-link');
+             if (moreLink) moreLink.remove();
+             meta.description = clone.textContent.trim();
+        }
 
-    if (meta.genres.length > 0) {
-        const type = 'genres';
-        const conf = (config && config[type]) || defaultMetadataConfigs[type];
-        if (conf && conf.enabled) {
-             const text = renderWithTemplate(meta, conf.template, type);
-             if (text && text.trim()) {
-                 const controls = createMetadataControls(type, meta, conf);
-                 controls.style.display = 'inline-flex';
-                 controls.style.marginLeft = '10px';
-                 
-                 // Inject after the UL
-                 if (tagsUl.parentNode) {
-                     tagsUl.parentNode.appendChild(controls);
+        // Attempt to find date within scope
+        let dateEl;
+        if (container !== document) {
+            dateEl = container.querySelector('.ttfmp-post-list-item-date a');
+        } else {
+             dateEl = container.querySelector('.ttfmp-post-list-item-date a') || container.querySelector('.date a') || container.querySelector('time');
+        }
+        
+        if (dateEl) {
+            const dateText = dateEl.textContent.trim();
+            const dateMatch = dateText.match(/(\d{4})/);
+            if (dateMatch) {
+                meta.year = dateMatch[1];
+            }
+        }
+
+        const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+        if (meta.genres.length > 0) {
+            const type = 'genres';
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                 const text = renderWithTemplate(meta, conf.template, type);
+                 if (text && text.trim()) {
+                     const controls = createMetadataControls(type, meta, conf);
+                     controls.classList.add('emby-metadata-controls'); // Mark to avoid duplicates
+                     controls.style.display = 'inline-flex';
+                     controls.style.marginLeft = '10px';
+                     
+                     // Inject after the UL
+                     if (tagsUl.parentNode) {
+                         tagsUl.parentNode.appendChild(controls);
+                     }
                  }
-             }
+            }
         }
-    }
+    });
   }
 
   function initSayUncle() {
