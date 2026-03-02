@@ -15,6 +15,7 @@
 // @match        https://*.hunk-ch.com/*
 // @match        https://*.sayuncle.com/*
 // @match        https://*.boy-studio.com/*
+// @match        https://*.latinboyz.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -1592,6 +1593,74 @@
     }
   }
 
+  function initLatinBoyz() {
+    if (!location.host.includes('latinboyz.com')) return;
+    
+    // Find the tags container
+    const tagsUl = document.querySelector('ul.post-tags');
+    if (!tagsUl) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: '',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'LatinBoyz',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // Extract tags
+    tagsUl.querySelectorAll('li a').forEach(a => {
+        meta.genres.push(a.textContent.trim());
+    });
+
+    // Attempt to find title
+    const titleEl = document.querySelector('h1.entry-title') || document.querySelector('h1.post-title') || document.querySelector('.ttfmp-post-list-item-title a');
+    if (titleEl) {
+        meta.title = titleEl.textContent.trim();
+    }
+
+    // Attempt to find description
+    const descEl = document.querySelector('.entry-content p') || document.querySelector('.ttfmp-post-list-item-content p');
+    if (descEl) {
+        meta.description = descEl.textContent.trim();
+    }
+
+    // Attempt to find date
+    const dateEl = document.querySelector('.ttfmp-post-list-item-date a');
+    if (dateEl) {
+        const dateText = dateEl.textContent.trim();
+        const dateMatch = dateText.match(/(\d{4})/);
+        if (dateMatch) {
+            meta.year = dateMatch[1];
+        }
+    }
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    if (meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.display = 'inline-flex';
+                 controls.style.marginLeft = '10px';
+                 
+                 // Inject after the UL
+                 if (tagsUl.parentNode) {
+                     tagsUl.parentNode.appendChild(controls);
+                 }
+             }
+        }
+    }
+  }
+
   function initSayUncle() {
     if (!location.host.includes('sayuncle.com')) return;
 
@@ -2031,6 +2100,7 @@
     }
   }
 
+  initLatinBoyz();
   initSayUncle();
   initBoyStudio();
   initHunkCh();
