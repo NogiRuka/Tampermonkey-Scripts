@@ -17,6 +17,7 @@
 // @match        https://*.boy-studio.com/*
 // @match        https://*.latinboyz.com/*
 // @match        https://*.gayerdar.com/*
+// @match        https://*.gokumen.jp/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -2246,7 +2247,124 @@
     }
   }
 
+  function initGokumen() {
+    if (!location.host.includes('gokumen.jp')) return;
+
+    // Auto expand sections
+    const accordions = document.querySelectorAll('.js-accordion_btn');
+    accordions.forEach(btn => {
+        const text = btn.textContent.trim();
+        if (text.includes('商品説明') || text.includes('商品詳細')) {
+             if (!btn.classList.contains('-active')) {
+                 btn.click(); // Try click first
+                 btn.classList.add('-active'); // Ensure active class
+             }
+             const body = btn.nextElementSibling;
+             if (body && body.classList.contains('js-accordion_body')) {
+                 body.classList.remove('accordion-close');
+                 body.style.display = 'block';
+             }
+        }
+    });
+
+    const meta = {
+      title: document.title.replace(' | GOKUMEN', '').trim(),
+      year: '',
+      country: 'JP',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'GOKUMEN',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // Description
+    const descEl = document.querySelector('.productDescription_text');
+    if (descEl) {
+        // Clone to avoid "read more" text if any, though here it seems plain text
+        meta.description = descEl.textContent.trim();
+        
+        // Try to extract title from description if formatted as 『Title』
+        const titleMatch = meta.description.match(/『(.*?)』/);
+        if (titleMatch) {
+            meta.title = titleMatch[1];
+        }
+    }
+
+    // Extract Metadata from DL
+    const dts = document.querySelectorAll('.productDetail_dt');
+    let genreDd = null;
+
+    dts.forEach(dt => {
+        const key = dt.textContent.trim();
+        const dd = dt.nextElementSibling;
+        if (!dd || dd.tagName !== 'DD') return;
+
+        if (key.includes('品番')) {
+             const code = dd.textContent.trim();
+             meta.extra += `Code: ${code}\n`;
+        } else if (key.includes('レーベル')) {
+             const label = dd.textContent.trim();
+             if (label) meta.studio = label;
+        } else if (key.includes('シリーズ')) {
+             const series = dd.textContent.trim();
+             meta.extra += `Series: ${series}\n`;
+             // If title is generic, append series?
+             if (!meta.title || meta.title === 'GOKUMEN') {
+                 meta.title = series;
+             }
+        } else if (key.includes('ジャンル')) {
+             genreDd = dd;
+             dd.querySelectorAll('span').forEach(span => {
+                 const g = span.textContent.trim();
+                 if (g) meta.genres.push(g);
+             });
+        }
+    });
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+    
+    // Genres (in Details section)
+    if (genreDd && meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+                const controls = createMetadataControls(type, meta, conf);
+                controls.style.marginTop = '5px';
+                controls.style.display = 'block';
+                // Append to DD
+                genreDd.appendChild(controls);
+            }
+        }
+    }
+
+    // Description
+    if (descEl && meta.description) {
+         const type = 'description';
+         const conf = (config && config[type]) || defaultMetadataConfigs[type];
+         if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 if (descEl.parentNode) {
+                     // Insert after description
+                     descEl.parentNode.insertBefore(controls, descEl.nextSibling);
+                 }
+             }
+         }
+    }
+  }
+
   initLatinBoyz();
+  initGokumen();
   initGayerdar();
   initSayUncle();
   initBoyStudio();
