@@ -2167,6 +2167,11 @@
 
       if (label.includes('品番')) {
         meta.extra += `Code: ${value}\n`;
+      } else if (label.includes('SERIES')) {
+        dd.querySelectorAll('a').forEach(a => {
+            const tag = a.textContent.trim();
+            if (tag) meta.genres.push(tag);
+        });
       } else if (label.includes('PLAY LIST')) {
         dd.querySelectorAll('a').forEach(a => {
             const tag = a.textContent.trim();
@@ -2198,11 +2203,11 @@
     if (descEl) meta.description = descEl.textContent.trim();
 
     // 4. Inject Controls
-    // Inject after MODEL TYPE or PLAY LIST for genres
+    // Inject after MODEL TYPE, PLAY LIST, or SERIES for genres
     let targetDl = null;
     dls.forEach(dl => {
         const dt = dl.querySelector('dt');
-        if (dt && (dt.textContent.includes('MODEL TYPE') || dt.textContent.includes('PLAY LIST'))) {
+        if (dt && (dt.textContent.includes('MODEL TYPE') || dt.textContent.includes('PLAY LIST') || dt.textContent.includes('SERIES'))) {
             targetDl = dl; // Prefer the last one found
         }
     });
