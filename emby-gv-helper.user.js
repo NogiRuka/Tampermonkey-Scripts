@@ -2134,117 +2134,139 @@
   function initGayerdar() {
     if (!location.host.includes('gayerdar.com')) return;
 
-    const meta = {
-      title: '',
-      year: '',
-      country: '',
-      genres: [],
-      duration: '',
-      director: '',
-      studio: 'Gayerdar',
-      actors: [],
-      description: '',
-      extra: ''
-    };
+    const run = () => {
+        const tagsUl = document.querySelector('ul.iq-blogtag');
+        if (!tagsUl) return false;
 
-    // 1. Title
-    const titleEl = document.querySelector('h2.trending-text');
-    if (titleEl) {
-        meta.title = titleEl.textContent.trim();
-    }
+        // Prevent double injection
+        if (tagsUl.parentNode && tagsUl.parentNode.querySelector('.emby-metadata-controls')) return true;
 
-    // 2. Code (GDSR-005-1)
-    const codeEl = document.querySelector('div.list-inline a.text-primary');
-    if (codeEl) {
-        const code = codeEl.textContent.trim();
-        meta.extra += `Code: ${code}\n`;
-    }
+        const meta = {
+            title: '',
+            year: '',
+            country: '',
+            genres: [],
+            duration: '',
+            director: '',
+            studio: 'Gayerdar',
+            actors: [],
+            description: '',
+            extra: ''
+        };
 
-    // 3. Year / Date
-    const dateEl = document.querySelector('.trending-year');
-    if (dateEl) {
-        const dateText = dateEl.textContent.trim();
-        meta.extra += `Release Date: ${dateText}\n`;
-        const match = dateText.match(/(\d{4})/);
-        if (match) meta.year = match[1];
-    }
+        // 1. Title
+        const titleEl = document.querySelector('h2.trending-text');
+        if (titleEl) {
+            meta.title = titleEl.textContent.trim();
+        }
 
-    // 4. Genres / Tags
-    const tagsUl = document.querySelector('ul.iq-blogtag');
-    if (tagsUl) {
+        // 2. Code (GDSR-005-1)
+        const codeEl = document.querySelector('div.list-inline a.text-primary');
+        if (codeEl) {
+            const code = codeEl.textContent.trim();
+            meta.extra += `Code: ${code}\n`;
+        }
+
+        // 3. Year / Date
+        const dateEl = document.querySelector('.trending-year');
+        if (dateEl) {
+            const dateText = dateEl.textContent.trim();
+            meta.extra += `Release Date: ${dateText}\n`;
+            const match = dateText.match(/(\d{4})/);
+            if (match) meta.year = match[1];
+        }
+
+        // 4. Genres / Tags
         tagsUl.querySelectorAll('li a.title').forEach(a => {
             meta.genres.push(a.textContent.trim());
         });
-    }
 
-    // 5. Description
-    const descEl = document.querySelector('#description-01 .description-content p');
-    if (descEl) {
-        meta.description = descEl.textContent.trim();
-    }
+        // 5. Description
+        const descEl = document.querySelector('#description-01 .description-content p');
+        if (descEl) {
+            meta.description = descEl.textContent.trim();
+        }
 
-    // 6. Actors
-    const actorsList = document.querySelectorAll('.tab-content ul li h6');
-    actorsList.forEach(h6 => {
-        meta.actors.push({ name: h6.textContent.trim() });
-    });
+        // 6. Actors
+        const actorsList = document.querySelectorAll('.tab-content ul li h6');
+        actorsList.forEach(h6 => {
+            meta.actors.push({ name: h6.textContent.trim() });
+        });
 
-    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+        const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
 
-    // Inject Controls
-    
-    // Genres
-    if (tagsUl && meta.genres.length > 0) {
-        const type = 'genres';
-        const conf = (config && config[type]) || defaultMetadataConfigs[type];
-        if (conf && conf.enabled) {
-            const text = renderWithTemplate(meta, conf.template, type);
-            if (text && text.trim()) {
-                const controls = createMetadataControls(type, meta, conf);
-                controls.style.marginLeft = '10px';
-                controls.style.display = 'inline-flex';
-                // Append to parent div (flex container)
-                if (tagsUl.parentNode) {
-                    tagsUl.parentNode.appendChild(controls);
+        // Inject Controls
+        
+        // Genres
+        if (tagsUl && meta.genres.length > 0) {
+            const type = 'genres';
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                const text = renderWithTemplate(meta, conf.template, type);
+                if (text && text.trim()) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.classList.add('emby-metadata-controls');
+                    controls.style.marginLeft = '10px';
+                    controls.style.display = 'inline-flex';
+                    // Append to parent div (flex container)
+                    if (tagsUl.parentNode) {
+                        tagsUl.parentNode.appendChild(controls);
+                    }
                 }
             }
         }
-    }
 
-    // Description
-    if (descEl && meta.description) {
-         const type = 'description';
-         const conf = (config && config[type]) || defaultMetadataConfigs[type];
-         if (conf && conf.enabled) {
-             const text = renderWithTemplate(meta, conf.template, type);
-             if (text && text.trim()) {
-                 const controls = createMetadataControls(type, meta, conf);
-                 controls.style.marginTop = '10px';
-                 controls.style.display = 'block';
-                 if (descEl.parentNode) {
-                     descEl.parentNode.appendChild(controls);
-                 }
-             }
-         }
-    }
-    
-    // Actors (optional injection point)
-    const actorsTab = document.querySelector('.tab-content ul');
-    if (actorsTab && meta.actors.length > 0) {
-        const type = 'actors';
-        const conf = (config && config[type]) || defaultMetadataConfigs[type];
-        if (conf && conf.enabled) {
-            const text = renderWithTemplate(meta, conf.template, type);
-            if (text && text.trim()) {
-                 const controls = createMetadataControls(type, meta, conf);
-                 controls.style.marginTop = '10px';
-                 controls.style.display = 'block';
-                 if (actorsTab.parentNode) {
-                     actorsTab.parentNode.insertBefore(controls, actorsTab);
-                 }
+        // Description
+        if (descEl && meta.description) {
+            const type = 'description';
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                const text = renderWithTemplate(meta, conf.template, type);
+                if (text && text.trim()) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.classList.add('emby-metadata-controls');
+                    controls.style.marginTop = '10px';
+                    controls.style.display = 'block';
+                    if (descEl.parentNode) {
+                        descEl.parentNode.appendChild(controls);
+                    }
+                }
             }
         }
-    }
+        
+        // Actors (optional injection point)
+        const actorsTab = document.querySelector('.tab-content ul');
+        if (actorsTab && meta.actors.length > 0) {
+            const type = 'actors';
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                const text = renderWithTemplate(meta, conf.template, type);
+                if (text && text.trim()) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.classList.add('emby-metadata-controls');
+                    controls.style.marginTop = '10px';
+                    controls.style.display = 'block';
+                    if (actorsTab.parentNode) {
+                        actorsTab.parentNode.insertBefore(controls, actorsTab);
+                    }
+                }
+            }
+        }
+        return true;
+    };
+
+    // Attempt to run immediately
+    if (run()) return;
+
+    // Retry for dynamic content (SPA)
+    let retryCount = 0;
+    const maxRetries = 20; // 20 seconds
+    const interval = setInterval(() => {
+        retryCount++;
+        if (run() || retryCount >= maxRetries) {
+            clearInterval(interval);
+        }
+    }, 1000);
   }
 
   function initGokumen() {
