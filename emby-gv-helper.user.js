@@ -18,6 +18,7 @@
 // @match        https://*.latinboyz.com/*
 // @match        https://*.gayerdar.com/*
 // @match        https://*.gokumen.jp/*
+// @match        https://*.str8boys2023.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
