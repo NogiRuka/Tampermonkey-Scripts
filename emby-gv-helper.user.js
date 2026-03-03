@@ -2448,7 +2448,7 @@
 
     // Extract Metadata from DL
     const dts = document.querySelectorAll('.productDetail_dt');
-    let genreDd = null;
+    let targetDd = null;
 
     dts.forEach(dt => {
         const key = dt.textContent.trim();
@@ -2464,12 +2464,14 @@
         } else if (key.includes('シリーズ')) {
              const series = dd.textContent.trim();
              meta.extra += `Series: ${series}\n`;
+             if (series) meta.genres.push(series);
+             targetDd = dd;
              // If title is generic, append series?
              if (!meta.title || meta.title === 'GOKUMEN') {
                  meta.title = series;
              }
         } else if (key.includes('ジャンル')) {
-             genreDd = dd;
+             targetDd = dd;
              dd.querySelectorAll('span').forEach(span => {
                  const g = span.textContent.trim();
                  if (g) meta.genres.push(g);
@@ -2482,7 +2484,7 @@
     // Inject Controls
     
     // Genres (in Details section)
-    if (genreDd && meta.genres.length > 0) {
+    if (targetDd && meta.genres.length > 0) {
         const type = 'genres';
         const conf = (config && config[type]) || defaultMetadataConfigs[type];
         if (conf && conf.enabled) {
@@ -2492,7 +2494,7 @@
                 controls.style.marginTop = '5px';
                 controls.style.display = 'block';
                 // Append to DD
-                genreDd.appendChild(controls);
+                targetDd.appendChild(controls);
             }
         }
     }
