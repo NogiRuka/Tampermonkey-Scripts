@@ -16,6 +16,7 @@
 // @match        https://*.sayuncle.com/*
 // @match        https://*.boy-studio.com/*
 // @match        https://*.latinboyz.com/*
+// @match        https://*.gayerdar.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -2129,7 +2130,124 @@
     }
   }
 
+  function initGayerdar() {
+    if (!location.host.includes('gayerdar.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: '',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'Gayerdar',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title
+    const titleEl = document.querySelector('h2.trending-text');
+    if (titleEl) {
+        meta.title = titleEl.textContent.trim();
+    }
+
+    // 2. Code (GDSR-005-1)
+    const codeEl = document.querySelector('div.list-inline a.text-primary');
+    if (codeEl) {
+        const code = codeEl.textContent.trim();
+        meta.extra += `Code: ${code}\n`;
+    }
+
+    // 3. Year / Date
+    const dateEl = document.querySelector('.trending-year');
+    if (dateEl) {
+        const dateText = dateEl.textContent.trim();
+        meta.extra += `Release Date: ${dateText}\n`;
+        const match = dateText.match(/(\d{4})/);
+        if (match) meta.year = match[1];
+    }
+
+    // 4. Genres / Tags
+    const tagsUl = document.querySelector('ul.iq-blogtag');
+    if (tagsUl) {
+        tagsUl.querySelectorAll('li a.title').forEach(a => {
+            meta.genres.push(a.textContent.trim());
+        });
+    }
+
+    // 5. Description
+    const descEl = document.querySelector('#description-01 .description-content p');
+    if (descEl) {
+        meta.description = descEl.textContent.trim();
+    }
+
+    // 6. Actors
+    const actorsList = document.querySelectorAll('.tab-content ul li h6');
+    actorsList.forEach(h6 => {
+        meta.actors.push({ name: h6.textContent.trim() });
+    });
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+    
+    // Genres
+    if (tagsUl && meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+                const controls = createMetadataControls(type, meta, conf);
+                controls.style.marginLeft = '10px';
+                controls.style.display = 'inline-flex';
+                // Append to parent div (flex container)
+                if (tagsUl.parentNode) {
+                    tagsUl.parentNode.appendChild(controls);
+                }
+            }
+        }
+    }
+
+    // Description
+    if (descEl && meta.description) {
+         const type = 'description';
+         const conf = (config && config[type]) || defaultMetadataConfigs[type];
+         if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 if (descEl.parentNode) {
+                     descEl.parentNode.appendChild(controls);
+                 }
+             }
+         }
+    }
+    
+    // Actors (optional injection point)
+    const actorsTab = document.querySelector('.tab-content ul');
+    if (actorsTab && meta.actors.length > 0) {
+        const type = 'actors';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 if (actorsTab.parentNode) {
+                     actorsTab.parentNode.insertBefore(controls, actorsTab);
+                 }
+            }
+        }
+    }
+  }
+
   initLatinBoyz();
+  initGayerdar();
   initSayUncle();
   initBoyStudio();
   initHunkCh();
