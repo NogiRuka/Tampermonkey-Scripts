@@ -2131,6 +2131,131 @@
     }
   }
 
+  function initStr8Boys() {
+    if (!location.host.includes('str8boys2023.com')) return;
+    
+    // Auto expand sections if needed (similar to gokumen)
+    // Currently str8boys structure seems static, but check for drawer/accordion if any
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'Japan',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'STR8 BOYS',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title
+    const titleEl = document.querySelector('.detailleft h1');
+    if (titleEl) meta.title = titleEl.textContent.trim();
+
+    // 2. Metadata List (dl/dt/dd)
+    const dls = document.querySelectorAll('.detail-table-list li dl');
+    dls.forEach(dl => {
+      const dt = dl.querySelector('dt');
+      const dd = dl.querySelector('dd');
+      if (!dt || !dd) return;
+
+      const label = dt.textContent.trim();
+      const value = dd.textContent.trim();
+
+      if (label.includes('品番')) {
+        meta.extra += `Code: ${value}\n`;
+      } else if (label.includes('PLAY LIST')) {
+        dd.querySelectorAll('a').forEach(a => {
+            const tag = a.textContent.trim();
+            if (tag) meta.genres.push(tag);
+        });
+      } else if (label.includes('MODEL TYPE')) {
+        dd.querySelectorAll('a').forEach(a => {
+            const tag = a.textContent.trim();
+            if (tag) meta.genres.push(tag);
+        });
+      } else if (label.includes('レーベル')) {
+        meta.studio = value;
+      } else if (label.includes('MODEL NAME')) {
+        dd.querySelectorAll('a').forEach(a => {
+            const name = a.textContent.trim();
+            if (name) meta.actors.push(name);
+        });
+      } else if (label.includes('公開日')) {
+        meta.extra += `Release Date: ${value}\n`;
+        const match = value.match(/(\d{4})/);
+        if (match) meta.year = match[1];
+      } else if (label.includes('TIME')) {
+        meta.duration = value;
+      }
+    });
+
+    // 3. Description
+    const descEl = document.querySelector('.detailtextblock .cp_container p');
+    if (descEl) meta.description = descEl.textContent.trim();
+
+    // 4. Inject Controls
+    // Inject after MODEL TYPE or PLAY LIST for genres
+    let targetDl = null;
+    dls.forEach(dl => {
+        const dt = dl.querySelector('dt');
+        if (dt && (dt.textContent.includes('MODEL TYPE') || dt.textContent.includes('PLAY LIST'))) {
+            targetDl = dl; // Prefer the last one found
+        }
+    });
+
+    if (targetDl && meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (metadataConfigs && metadataConfigs[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+            const controls = createMetadataControls(type, meta, conf);
+            controls.style.marginTop = '5px';
+            controls.classList.add('emby-metadata-controls');
+            if (targetDl.parentNode) {
+                targetDl.parentNode.appendChild(controls);
+            }
+        }
+    }
+    
+    // Inject Description Copy
+    if (descEl && meta.description) {
+         const type = 'description';
+         const conf = (metadataConfigs && metadataConfigs[type]) || defaultMetadataConfigs[type];
+         if (conf && conf.enabled) {
+             const controls = createMetadataControls(type, meta, conf);
+             controls.style.marginTop = '10px';
+             controls.classList.add('emby-metadata-controls');
+             if (descEl.parentNode) {
+                 descEl.parentNode.appendChild(controls);
+             }
+         }
+    }
+
+    // Inject Actors Copy
+    let actorDl = null;
+    dls.forEach(dl => {
+        const dt = dl.querySelector('dt');
+        if (dt && dt.textContent.includes('MODEL NAME')) {
+            actorDl = dl;
+        }
+    });
+
+    if (actorDl && meta.actors.length > 0) {
+        const type = 'actors';
+        const conf = (metadataConfigs && metadataConfigs[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+            const controls = createMetadataControls(type, meta, conf);
+            controls.style.marginTop = '5px';
+            controls.classList.add('emby-metadata-controls');
+            if (actorDl.parentNode) {
+                actorDl.parentNode.appendChild(controls);
+            }
+        }
+    }
+  }
+
   function initGayerdar() {
     if (!location.host.includes('gayerdar.com')) return;
 
@@ -2387,6 +2512,7 @@
 
   initLatinBoyz();
   initGokumen();
+  initStr8Boys();
   initGayerdar();
   initSayUncle();
   initBoyStudio();
