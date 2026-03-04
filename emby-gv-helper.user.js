@@ -19,6 +19,7 @@
 // @match        https://*.gayerdar.com/*
 // @match        https://*.gokumen.jp/*
 // @match        https://*.str8boys2023.com/*
+// @match        https://*.ck-download.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -2518,6 +2519,129 @@
     }
   }
 
+  function initCkDownload() {
+    if (!location.host.includes('ck-download.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'JP',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'CK Original',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title
+    const titleEl = document.querySelector('#Contents h3');
+    if (titleEl) {
+        meta.title = titleEl.textContent.trim();
+    }
+
+    // 2. Description
+    const descEl = document.querySelector('.intro_text');
+    if (descEl) {
+        meta.description = descEl.textContent.trim();
+    }
+
+    // 3. Date
+    const dateEl = document.querySelector('.date');
+    if (dateEl) {
+        const dateText = dateEl.textContent.replace('UP', '').trim();
+        meta.extra += `Release Date: ${dateText}\n`;
+        const match = dateText.match(/(\d{4})/);
+        if (match) meta.year = match[1];
+    }
+
+    // 4. Tags (Play Content & Model Type)
+    const categoryLis = document.querySelectorAll('.prod_category ul li');
+    categoryLis.forEach(li => {
+        const strong = li.querySelector('strong');
+        if (!strong) return;
+        const label = strong.textContent.trim();
+        if (label === 'プレイ内容' || label === 'モデルタイプ') {
+             li.querySelectorAll('.item a').forEach(a => {
+                 const tag = a.textContent.trim();
+                 if (tag) meta.genres.push(tag);
+             });
+        }
+    });
+
+    // 5. Table Data (Code, Duration, Maker, Label)
+    const table = document.querySelector('table.prod_data');
+    if (table) {
+        table.querySelectorAll('tr').forEach(tr => {
+            tr.querySelectorAll('th').forEach(th => {
+                const key = th.textContent.trim();
+                const td = th.nextElementSibling;
+                if (td && td.tagName === 'TD') {
+                    const value = td.textContent.trim();
+                    if (key === 'プロダクトナンバー') {
+                        meta.extra += `Code: ${value}\n`;
+                    } else if (key === 'メーカー') {
+                        meta.studio = value;
+                    } else if (key === 'レーベル') {
+                        // User wants label in tags too
+                        const labelLink = td.querySelector('a');
+                        const labelName = labelLink ? labelLink.textContent.trim() : value;
+                        if (labelName) {
+                             meta.extra += `Label: ${labelName}\n`;
+                             meta.genres.push(labelName);
+                        }
+                    } else if (key === '再生時間') {
+                        meta.duration = value;
+                    }
+                }
+            });
+        });
+    }
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+
+    // 1. Tags Controls (Inject after .prod_category)
+    const categoryDiv = document.querySelector('.prod_category');
+    if (categoryDiv && meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 if (categoryDiv.parentNode) {
+                     categoryDiv.parentNode.insertBefore(controls, categoryDiv.nextSibling);
+                 }
+             }
+        }
+    }
+
+    // 2. Description Controls
+    if (descEl && meta.description) {
+        const type = 'description';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 if (descEl.parentNode) {
+                     descEl.parentNode.insertBefore(controls, descEl.nextSibling);
+                 }
+             }
+        }
+    }
+  }
+
+  initCkDownload();
   initLatinBoyz();
   initGokumen();
   initStr8Boys();
