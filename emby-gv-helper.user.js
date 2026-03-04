@@ -102,7 +102,9 @@
       jsonPreview: 'JSON 预览',
       send: '发送',
       cancel: '取消',
-      invalidJson: 'JSON 格式错误'
+      invalidJson: 'JSON 格式错误',
+      copyItemId: '复制 Item ID',
+      itemIdCopied: 'Item ID 已复制'
     },
     en: {
       settings: '⚙️ Settings',
@@ -142,7 +144,9 @@
       jsonPreview: 'JSON Preview',
       send: 'Send',
       cancel: 'Cancel',
-      invalidJson: 'Invalid JSON'
+      invalidJson: 'Invalid JSON',
+      copyItemId: 'Copy Item ID',
+      itemIdCopied: 'Item ID copied'
     }
   }[lang];
 
@@ -1254,6 +1258,33 @@
               }
             };
             titleContainer.appendChild(imgBtn);
+          }
+
+          // New: Copy Item ID Button
+          const existingCopyBtn = titleContainer.querySelector('[data-dan-copy-id="1"]');
+          if (!existingCopyBtn) {
+            const copyBtn = document.createElement('button');
+            copyBtn.setAttribute('is', 'paper-icon-button-light');
+            copyBtn.className = 'btnDetailEdit secondaryText flex-shrink-zero paper-icon-button-light';
+            copyBtn.title = t.copyItemId;
+            copyBtn.ariaLabel = t.copyItemId;
+            copyBtn.dataset.danCopyId = '1';
+            copyBtn.innerHTML = '<i class="md-icon" style="color:' + themeColor + '">content_copy</i>';
+            copyBtn.onclick = () => {
+               const match = location.hash.match(/id=(\d+)/);
+               const itemId = match ? match[1] : null;
+               if (itemId) {
+                   copyToClipboard(itemId).then(() => {
+                       showToast(t.itemIdCopied + ': ' + itemId);
+                   }).catch((err) => {
+                       console.error(debugPrefix, 'Copy failed', err);
+                       showToast(t.metadataCopyFailed);
+                   });
+               } else {
+                   console.error(debugPrefix, 'Could not find ItemId in hash');
+               }
+            };
+            titleContainer.appendChild(copyBtn);
           }
         }
 
