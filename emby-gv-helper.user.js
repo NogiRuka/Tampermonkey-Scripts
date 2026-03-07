@@ -19,6 +19,7 @@
 // @match        https://*.gayerdar.com/*
 // @match        https://*.gokumen.jp/*
 // @match        https://*.str8boys2023.com/*
+// @match        https://*.englishlads.com/*
 // @match        https://*.ck-download.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
@@ -2672,7 +2673,141 @@
     }
   }
 
+  function initEnglishLads() {
+    if (!location.host.includes('englishlads.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'UK',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'English Lads',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title, Date, Actor from H2
+    // Format: "22nd Jul 2012 - Title - "
+    const h2 = document.querySelector('.shoot-header-row-title h2');
+    let titleText = '';
+    if (h2) {
+        // Extract raw text excluding children (anchor tag usually follows title)
+        titleText = h2.childNodes[0].textContent.trim();
+        const parts = titleText.split('-').map(s => s.trim()).filter(s => s);
+        
+        if (parts.length > 0) {
+            // Part 0: Date "22nd Jul 2012"
+            const dateStr = parts[0];
+            // Remove st/nd/rd/th suffix from day
+            const cleanDateStr = dateStr.replace(/(\d+)(st|nd|rd|th)/, '$1');
+            const date = new Date(cleanDateStr);
+            if (!isNaN(date.getTime())) {
+                meta.year = date.getFullYear().toString();
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const dd = String(date.getDate()).padStart(2, '0');
+                meta.extra += `Date: ${date.getFullYear()}-${mm}-${dd}\n`;
+            }
+        }
+        
+        if (parts.length > 1) {
+            // Part 1: Title
+            meta.title = parts[1];
+        } else {
+             meta.title = titleText;
+        }
+
+        // Actor Link inside H2
+        const actorLink = h2.querySelector('a');
+        if (actorLink) {
+            meta.actors.push(actorLink.textContent.trim());
+        }
+    }
+
+    // 2. Duration
+    const durEl = document.querySelector('.shoot-type');
+    if (durEl) {
+        meta.duration = durEl.textContent.trim();
+    }
+
+    // 3. Description
+    // Find div after .large-update
+    const largeUpdate = document.querySelector('.large-update');
+    let descEl = null;
+    if (largeUpdate) {
+        // The description div is usually the next element sibling
+        descEl = largeUpdate.nextElementSibling;
+        // Verify it's a div and contains text
+        if (descEl && descEl.tagName === 'DIV' && descEl.textContent.trim().length > 0) {
+             meta.description = descEl.textContent.trim();
+        }
+    }
+
+    // 4. Genres (Tags)
+    // Find all 'a' tags with href containing 'tag='
+    const tagLinks = document.querySelectorAll('a[href*="tag="]');
+    tagLinks.forEach(a => {
+        const tag = a.textContent.trim();
+        if (tag) meta.genres.push(tag);
+    });
+
+    const config = (metadataConfigs && typeof metadataConfigs === 'object') ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+    
+    // A. Description Controls
+    if (descEl && meta.description) {
+        const type = 'description';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 if (descEl.parentNode) {
+                     descEl.parentNode.insertBefore(controls, descEl.nextSibling);
+                 }
+             }
+        }
+    }
+
+    // B. Tags Controls
+    // Find where to inject: after the last tag link
+    if (tagLinks.length > 0) {
+        const lastTagLink = tagLinks[tagLinks.length - 1];
+        // Check if followed by BR
+        let injectPoint = lastTagLink;
+        if (lastTagLink.nextSibling && lastTagLink.nextSibling.tagName === 'BR') {
+            injectPoint = lastTagLink.nextSibling;
+        }
+
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'inline-block';
+                 controls.classList.add('emby-metadata-controls');
+                 
+                 if (injectPoint.parentNode) {
+                     injectPoint.parentNode.insertBefore(controls, injectPoint.nextSibling);
+                     // Add spacing
+                     const space = document.createTextNode(' ');
+                     injectPoint.parentNode.insertBefore(space, controls);
+                 }
+             }
+        }
+    }
+  }
+
   initCkDownload();
+  initEnglishLads();
   initLatinBoyz();
   initGokumen();
   initStr8Boys();
