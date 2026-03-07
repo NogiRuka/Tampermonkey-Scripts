@@ -2678,157 +2678,180 @@
   function initMenCom() {
     if (!location.host.includes('men.com')) return;
 
-    const meta = {
-      title: '',
-      year: '',
-      country: 'USA',
-      genres: [],
-      duration: '',
-      director: '',
-      studio: 'Men.com',
-      actors: [],
-      description: '',
-      extra: ''
-    };
+    let retries = 0;
+    const maxRetries = 20;
 
-    // 1. Title & Date
-    // Date is usually the first h2 with a date format
-    const h2s = Array.from(document.querySelectorAll('h2'));
-    const dateRegex = /^[A-Z][a-z]+ \d{1,2}, \d{4}$/; // e.g., March 6, 2026
-    
-    let dateFound = false;
-    for (let i = 0; i < h2s.length; i++) {
-        const h2 = h2s[i];
-        const text = h2.textContent.trim();
-        if (dateRegex.test(text)) {
-            const date = new Date(text);
-            if (!isNaN(date.getTime())) {
-                meta.year = date.getFullYear().toString();
-                const mm = String(date.getMonth() + 1).padStart(2, '0');
-                const dd = String(date.getDate()).padStart(2, '0');
-                meta.extra += `Date: ${date.getFullYear()}-${mm}-${dd}\n`;
-                dateFound = true;
-                
-                // The Title is usually the NEXT h2
-                // Check next sibling
-                let next = h2.nextElementSibling;
-                while(next && next.tagName !== 'H2') {
-                    next = next.nextElementSibling;
+    function run() {
+        const meta = {
+            title: '',
+            year: '',
+            country: 'USA',
+            genres: [],
+            duration: '',
+            director: '',
+            studio: 'Men.com',
+            actors: [],
+            description: '',
+            extra: ''
+        };
+
+        // 1. Title & Date
+        const h2s = Array.from(document.querySelectorAll('h2'));
+        const dateRegex = /^[A-Z][a-z]+ \d{1,2}, \d{4}$/; // e.g., March 6, 2026
+        
+        for (let i = 0; i < h2s.length; i++) {
+            const h2 = h2s[i];
+            const text = h2.textContent.trim();
+            if (dateRegex.test(text)) {
+                const date = new Date(text);
+                if (!isNaN(date.getTime())) {
+                    meta.year = date.getFullYear().toString();
+                    const mm = String(date.getMonth() + 1).padStart(2, '0');
+                    const dd = String(date.getDate()).padStart(2, '0');
+                    meta.extra += `Date: ${date.getFullYear()}-${mm}-${dd}\n`;
+                    
+                    let next = h2.nextElementSibling;
+                    while(next && next.tagName !== 'H2') {
+                        next = next.nextElementSibling;
+                    }
+                    if (next && next.tagName === 'H2') {
+                        meta.title = next.textContent.trim();
+                    }
+                    break;
                 }
-                if (next && next.tagName === 'H2') {
-                    meta.title = next.textContent.trim();
-                }
-                break;
             }
         }
-    }
 
-    if (!meta.title) {
-        const metaTitle = document.querySelector('meta[property="og:title"]');
-        if (metaTitle) {
-            meta.title = metaTitle.content.replace(' - Men.com', '').trim();
-        } else {
-             meta.title = document.title.replace(' - Men.com', '').trim();
+        if (!meta.title) {
+            const metaTitle = document.querySelector('meta[property="og:title"]');
+            if (metaTitle) {
+                meta.title = metaTitle.content.replace(' - Men.com', '').trim();
+            } else {
+                 meta.title = document.title.replace(' - Men.com', '').trim();
+            }
         }
-    }
 
-    // 2. Description
-    // Look for section with data-cy="description"
-    const descSection = document.querySelector('section[data-cy="description"]');
-    if (descSection) {
-        const p = descSection.querySelector('p');
-        if (p) {
-            meta.description = p.textContent.trim();
+        // 2. Description
+        const descSection = document.querySelector('section[data-cy="description"]');
+        if (descSection) {
+            const p = descSection.querySelector('p');
+            if (p) {
+                meta.description = p.textContent.trim();
+            }
         }
-    }
 
-    // 3. Tags
-    // Look for div with "Tags" text, then next div with links
-    const divs = Array.from(document.querySelectorAll('div'));
-    const tagsLabelDiv = divs.find(d => d.textContent.trim() === 'Tags');
-    let tagsContainer = null;
-    if (tagsLabelDiv) {
-        tagsContainer = tagsLabelDiv.nextElementSibling;
-        if (tagsContainer) {
-            tagsContainer.querySelectorAll('a').forEach(a => {
-                const tag = a.textContent.trim();
-                if (tag) meta.genres.push(tag);
-            });
+        // 3. Tags
+        const divs = Array.from(document.querySelectorAll('div'));
+        const tagsLabelDiv = divs.find(d => d.textContent.trim() === 'Tags');
+        let tagsContainer = null;
+        if (tagsLabelDiv) {
+            tagsContainer = tagsLabelDiv.nextElementSibling;
+            if (tagsContainer) {
+                tagsContainer.querySelectorAll('a').forEach(a => {
+                    const tag = a.textContent.trim();
+                    if (tag) meta.genres.push(tag);
+                });
+            }
         }
-    }
 
-    // 4. Actors
-    // Use regex on href to be safe
-    const actorLinks = document.querySelectorAll('a[href*="/modelprofile/"]');
-    const actorSet = new Set();
-    actorLinks.forEach(a => {
-        const name = a.textContent.trim();
-        if (name && !actorSet.has(name)) {
-            actorSet.add(name);
-            meta.actors.push({ name });
+        // 4. Actors
+        const actorLinks = document.querySelectorAll('a[href*="/modelprofile/"]');
+        const actorSet = new Set();
+        actorLinks.forEach(a => {
+            const name = a.textContent.trim();
+            if (name && !actorSet.has(name)) {
+                actorSet.add(name);
+                meta.actors.push({ name });
+            }
+        });
+        
+        // 5. Studio Subsite
+        const siteLink = document.querySelector('a[href*="/scenes?site="]');
+        if (siteLink) {
+            const siteName = siteLink.textContent.trim();
+            if (siteName && siteName !== 'Men') {
+                meta.studio = `Men.com (${siteName})`;
+            }
         }
-    });
-    
-    // 5. Studio Subsite
-    const siteLink = document.querySelector('a[href*="/scenes?site="]');
-    if (siteLink) {
-        const siteName = siteLink.textContent.trim();
-        if (siteName && siteName !== 'Men') {
-            meta.studio = `Men.com (${siteName})`;
+
+        const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+        // Inject Controls
+        let injected = false;
+
+        // Tags
+        if (tagsContainer && meta.genres.length > 0) {
+            if (!tagsContainer.querySelector('.emby-metadata-controls[data-type="genres"]')) {
+                const type = 'genres';
+                const conf = (config && config[type]) || defaultMetadataConfigs[type];
+                if (conf && conf.enabled) {
+                    const text = renderWithTemplate(meta, conf.template, type);
+                    if (text && text.trim()) {
+                        const controls = createMetadataControls(type, meta, conf);
+                        controls.style.marginTop = '5px';
+                        controls.style.display = 'block';
+                        controls.classList.add('emby-metadata-controls');
+                        tagsContainer.appendChild(controls);
+                        injected = true;
+                    }
+                }
+            } else {
+                injected = true; // Already injected
+            }
         }
-    }
 
-    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
-
-    // Inject Controls
-
-    // Tags
-    if (tagsContainer && meta.genres.length > 0) {
-        const type = 'genres';
-        const conf = (config && config[type]) || defaultMetadataConfigs[type];
-        if (conf && conf.enabled) {
-             const text = renderWithTemplate(meta, conf.template, type);
-             if (text && text.trim()) {
-                 const controls = createMetadataControls(type, meta, conf);
-                 controls.style.marginTop = '5px';
-                 controls.style.display = 'block';
-                 controls.classList.add('emby-metadata-controls');
-                 tagsContainer.appendChild(controls);
-             }
+        // Actors
+        if (meta.actors.length > 0) {
+            const firstActorLink = document.querySelector('a[href*="/modelprofile/"]');
+            if (firstActorLink) {
+                let container = firstActorLink.closest('h2');
+                if (!container) container = firstActorLink.parentNode;
+                
+                if (container && container.parentNode) {
+                    if (!container.parentNode.querySelector('.emby-metadata-controls[data-type="actors"]')) {
+                        const type = 'actors';
+                        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+                        if (conf && conf.enabled) {
+                            const text = renderWithTemplate(meta, conf.template, type);
+                            if (text && text.trim()) {
+                                const controls = createMetadataControls(type, meta, conf);
+                                controls.style.marginTop = '5px';
+                                controls.style.display = 'block';
+                                controls.classList.add('emby-metadata-controls');
+                                container.parentNode.insertBefore(controls, container.nextSibling);
+                                injected = true;
+                            }
+                        }
+                    } else {
+                        injected = true;
+                    }
+                }
+            }
         }
+
+        return injected;
     }
 
-    // Actors
-    if (meta.actors.length > 0) {
-         // Find a place to inject. The actor list is usually near the title.
-         // Let's find the container of actor links.
-         const firstActorLink = document.querySelector('a[href*="/modelprofile/"]');
-         if (firstActorLink) {
-             // Go up to the container (h2 or div)
-             let container = firstActorLink.closest('h2');
-             // If not inside h2, maybe parent div
-             if (!container) container = firstActorLink.parentNode;
-             
-             if (container && container.parentNode) {
-                 const type = 'actors';
-                 const conf = (config && config[type]) || defaultMetadataConfigs[type];
-                 if (conf && conf.enabled) {
-                      const text = renderWithTemplate(meta, conf.template, type);
-                      if (text && text.trim()) {
-                          const controls = createMetadataControls(type, meta, conf);
-                          controls.style.marginTop = '5px';
-                          controls.style.display = 'block';
-                          controls.classList.add('emby-metadata-controls');
-                          
-                          // Check for duplicates
-                          if (!container.parentNode.querySelector(`.emby-metadata-controls[data-type="${type}"]`)) {
-                              container.parentNode.insertBefore(controls, container.nextSibling);
-                          }
-                      }
-                 }
-             }
-         }
-    }
+    // Try immediately
+    if (run()) return;
+
+    // Polling for SPA
+    const interval = setInterval(() => {
+        try {
+            if (run()) {
+                // Keep running for a few more times in case of partial load, but reduce frequency? 
+                // For now, if we injected something, we can probably stop, but maybe one part loaded and another didn't.
+                // However, run() re-checks existence before injecting.
+                // Let's stop if we found at least one target or max retries reached.
+                clearInterval(interval);
+            } else {
+                retries++;
+                if (retries >= maxRetries) clearInterval(interval);
+            }
+        } catch (e) {
+            console.error('initMenCom error', e);
+        }
+    }, 1000);
   }
 
   function initHelixStudios() {
