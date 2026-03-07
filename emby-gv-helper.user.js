@@ -19,6 +19,7 @@
 // @match        https://*.gayerdar.com/*
 // @match        https://*.gokumen.jp/*
 // @match        https://*.str8boys2023.com/*
+// @match        https://*.helixstudios.com/*
 // @match        https://*.englishlads.com/*
 // @match        https://*.ck-download.com/*
 // @grant        GM_setValue
@@ -2673,6 +2674,120 @@
     }
   }
 
+  function initHelixStudios() {
+    if (!location.host.includes('helixstudios.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'USA',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'Helix Studios',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title
+    const titleEl = document.querySelector('h1.description');
+    if (titleEl) {
+        meta.title = titleEl.textContent.trim();
+    }
+
+    // 2. Metadata (Released, Studio, Director, Length)
+    const col5 = document.querySelector('.col-sm-5');
+    if (col5) {
+        // Released
+        const releasedEl = Array.from(col5.querySelectorAll('.release-date')).find(el => el.textContent.includes('Released:'));
+        if (releasedEl) {
+            const text = releasedEl.textContent.replace('Released:', '').trim();
+            meta.extra += `Release Date: ${text}\n`;
+            const date = new Date(text);
+            if (!isNaN(date.getTime())) {
+                meta.year = date.getFullYear().toString();
+            }
+        }
+
+        // Studio
+        const studioEl = col5.querySelector('.studio');
+        if (studioEl) {
+             const text = studioEl.textContent.replace('Studio:', '').trim();
+             meta.studio = text;
+        }
+
+        // Director
+        const directorEl = col5.querySelector('.director');
+        if (directorEl) {
+             const text = directorEl.textContent.replace('Director:', '').trim();
+             meta.director = text;
+        }
+
+        // Length
+        const lengthEl = Array.from(col5.querySelectorAll('.release-date')).find(el => el.textContent.includes('Length:'));
+        if (lengthEl) {
+             const text = lengthEl.textContent.replace('Length:', '').trim();
+             meta.duration = text;
+        }
+    }
+
+    // 3. Tags
+    const tagsDiv = document.querySelector('.tags');
+    if (tagsDiv) {
+        tagsDiv.querySelectorAll('a').forEach(a => {
+            const tag = a.textContent.trim();
+            if (tag) meta.genres.push(tag);
+        });
+    }
+
+    // 4. Performers
+    const performerNames = document.querySelectorAll('.video-performer .performer-name');
+    performerNames.forEach(div => {
+        const name = div.textContent.trim();
+        if (name) meta.actors.push({ name: name });
+    });
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+
+    // Tags
+    if (tagsDiv && meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '5px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 tagsDiv.appendChild(controls);
+             }
+        }
+    }
+
+    // Actors
+    const performerContainer = document.querySelector('.video-performer-container');
+    if (performerContainer && meta.actors.length > 0) {
+        const type = 'actors';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 if (performerContainer.parentNode) {
+                     performerContainer.parentNode.insertBefore(controls, performerContainer);
+                 }
+             }
+        }
+    }
+  }
+
   function initEnglishLads() {
     if (!location.host.includes('englishlads.com')) return;
 
@@ -2807,6 +2922,7 @@
   }
 
   initCkDownload();
+  initHelixStudios();
   initEnglishLads();
   initLatinBoyz();
   initGokumen();
