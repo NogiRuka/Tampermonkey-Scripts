@@ -24,6 +24,7 @@
 // @match        https://*.men.com/*
 // @match        https://*.ck-download.com/*
 // @match        https://*.sketchysex.com/*
+// @match        https://*.clips4sale.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -3226,9 +3227,122 @@
     }
   }
 
+  function initClips4Sale() {
+    if (!location.host.includes('clips4sale.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'USA',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: '',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title
+    const titleEl = document.querySelector('h1[data-testid="clip-page-clipTitle"]');
+    if (titleEl) meta.title = titleEl.textContent.trim();
+
+    // 2. Date
+    const dateEl = document.querySelector('span[data-testid="individualClip-clip-date-added"]');
+    if (dateEl) {
+        const dateText = dateEl.textContent.replace('Added:', '').trim();
+        meta.extra += `Release Date: ${dateText}\n`;
+        const date = new Date(dateText);
+        if (!isNaN(date.getTime())) {
+            meta.year = date.getFullYear().toString();
+        }
+    }
+
+    // 3. Duration
+    const durEl = document.querySelector('span[data-testid="individualClip-clip-duration"]');
+    if (durEl) meta.duration = durEl.textContent.trim();
+
+    // 4. Studio
+    const studioEl = document.querySelector('a[data-testid="clip-page-studioName"]');
+    if (studioEl) meta.studio = studioEl.textContent.trim();
+
+    // 5. Description
+    const descEl = document.querySelector('div.read-more--text');
+    if (descEl) meta.description = descEl.textContent.trim();
+
+    // 6. Tags (Category + Related Categories + Keywords)
+    // Category
+    const catEl = document.querySelector('a[data-testid="clip-page-clipCategory"]');
+    if (catEl) meta.genres.push(catEl.textContent.trim());
+
+    // Related Categories
+    const relatedEls = document.querySelectorAll('span[data-testid="clip-page-relatedCategories"] a');
+    relatedEls.forEach(a => {
+        const t = a.textContent.trim().replace(/,$/, '');
+        if (t) meta.genres.push(t);
+    });
+
+    // Keywords
+    const keywordEls = document.querySelectorAll('span[data-testid="clip-page-keywords"] a');
+    keywordEls.forEach(a => {
+        const t = a.textContent.trim();
+        if (t) meta.genres.push(t);
+    });
+
+    // Deduplicate genres
+    meta.genres = [...new Set(meta.genres)];
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+    
+    // Description Controls
+    if (descEl && meta.description) {
+        const type = 'description';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 if (descEl.parentNode) {
+                     descEl.parentNode.insertBefore(controls, descEl.nextSibling);
+                 }
+             }
+        }
+    }
+
+    // Genres Controls
+    const keywordsSpan = document.querySelector('span[data-testid="clip-page-keywords"]');
+    const relatedSpan = document.querySelector('span[data-testid="clip-page-relatedCategories"]');
+    const targetEl = keywordsSpan || relatedSpan || catEl;
+
+    if (targetEl && meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 
+                 const container = targetEl.closest('div');
+                 if (container && container.parentNode) {
+                     container.parentNode.insertBefore(controls, container.nextSibling);
+                 }
+             }
+        }
+    }
+  }
+
   initCkDownload();
   initMenCom();
   initSketchySex();
+  initClips4Sale();
   initHelixStudios();
   initEnglishLads();
   initLatinBoyz();
