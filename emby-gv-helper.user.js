@@ -3231,6 +3231,15 @@
     if (!location.host.includes('clips4sale.com')) return;
 
     const run = () => {
+        // Auto-expand "Read More"
+        const buttons = document.querySelectorAll('button, div[role="button"], span[role="button"], a[role="button"]');
+        for (const btn of buttons) {
+            const text = btn.textContent ? btn.textContent.trim().toLowerCase() : '';
+            if (text === 'read more' && btn.offsetParent !== null) {
+                btn.click();
+            }
+        }
+
         // Find main content wrapper to ensure page is loaded
         const titleEl = document.querySelector('h1[data-testid="clip-page-clipTitle"]');
         if (!titleEl) return;
