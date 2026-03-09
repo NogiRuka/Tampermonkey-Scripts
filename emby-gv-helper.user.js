@@ -3283,7 +3283,7 @@
         // 6. Tags (Category + Related Categories + Keywords)
         // Category
         const catEl = document.querySelector('a[data-testid="clip-page-clipCategory"]');
-        if (catEl) meta.genres.push(catEl.textContent.trim());
+        if (catEl) meta.genres.push(catEl.textContent.trim().replace(/,$/, ''));
 
         // Related Categories
         const relatedEls = document.querySelectorAll('span[data-testid="clip-page-relatedCategories"] a');
@@ -3295,7 +3295,7 @@
         // Keywords
         const keywordEls = document.querySelectorAll('span[data-testid="clip-page-keywords"] a');
         keywordEls.forEach(a => {
-            const t = a.textContent.trim();
+            const t = a.textContent.trim().replace(/,$/, '');
             if (t) meta.genres.push(t);
         });
 
