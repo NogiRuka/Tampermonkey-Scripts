@@ -23,6 +23,7 @@
 // @match        https://*.englishlads.com/*
 // @match        https://*.men.com/*
 // @match        https://*.ck-download.com/*
+// @match        https://*.sketchysex.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -3101,8 +3102,133 @@
     }
   }
 
+  function initSketchySex() {
+    if (!location.host.includes('sketchysex.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'USA',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: 'Sketchy Sex',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title
+    const titleEl = document.querySelector('.VideoInfoWrap .info .name span');
+    if (titleEl) {
+        meta.title = titleEl.textContent.trim();
+    }
+
+    // 2. Date & Description
+    const descEl = document.querySelector('.VideoDescription');
+    if (descEl) {
+        const text = descEl.textContent.trim();
+        // Format: "March 4th, 2026 - Description..."
+        const match = text.match(/^([A-Za-z]+ \d+(?:st|nd|rd|th)?, \d{4}) - (.*)$/s);
+        if (match) {
+            const dateText = match[1];
+            meta.extra += `Release Date: ${dateText}\n`;
+            
+            // Parse year
+            const yearMatch = dateText.match(/(\d{4})/);
+            if (yearMatch) meta.year = yearMatch[1];
+            
+            meta.description = match[2].trim();
+        } else {
+            meta.description = text;
+        }
+    }
+    
+    // Fallback date
+    const dateDiv = document.querySelector('.VideoInfoWrap .info .date');
+    if (dateDiv && !meta.year) {
+        const dateText = dateDiv.textContent.trim();
+        if (dateText) {
+             meta.extra += `Release Date: ${dateText}\n`;
+             const match = dateText.match(/(\d{4})/);
+             if (match) meta.year = match[1];
+        }
+    }
+
+    // 3. Tags
+    const tagLinks = document.querySelectorAll('.VideoTagsWrap .tag .tag-text');
+    tagLinks.forEach(span => {
+        const tag = span.textContent.trim();
+        if (tag) meta.genres.push(tag);
+    });
+
+    // 4. Actors
+    const actorLinks = document.querySelectorAll('.ModelNamesWrap .ModelNames li a, .ModelNamesWrap .ModelNames a');
+    actorLinks.forEach(a => {
+        const name = a.textContent.trim();
+        if (name) meta.actors.push({ name });
+    });
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+    
+    // Tags Controls
+    const tagsWrap = document.querySelector('.VideoTagsWrap');
+    if (tagsWrap && meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 tagsWrap.appendChild(controls);
+             }
+        }
+    }
+
+    // Description Controls
+    if (descEl && meta.description) {
+        const type = 'description';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '10px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 if (descEl.parentNode) {
+                     descEl.parentNode.insertBefore(controls, descEl.nextSibling);
+                 }
+             }
+        }
+    }
+    
+    // Actors Controls
+    const actorsWrap = document.querySelector('.ModelNamesWrap');
+    if (actorsWrap && meta.actors.length > 0) {
+        const type = 'actors';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+             const text = renderWithTemplate(meta, conf.template, type);
+             if (text && text.trim()) {
+                 const controls = createMetadataControls(type, meta, conf);
+                 controls.style.marginTop = '5px';
+                 controls.style.display = 'block';
+                 controls.classList.add('emby-metadata-controls');
+                 actorsWrap.appendChild(controls);
+             }
+        }
+    }
+  }
+
   initCkDownload();
   initMenCom();
+  initSketchySex();
   initHelixStudios();
   initEnglishLads();
   initLatinBoyz();
