@@ -2128,7 +2128,10 @@
           const a = td.querySelector('a');
           meta.studio = a ? a.textContent.trim() : valueText;
         } else if (headerText.includes('シリーズ')) {
-          if (valueText) meta.extra += `Series: ${valueText}\n`;
+          if (valueText) {
+              meta.extra += `Series: ${valueText}\n`;
+              meta.genres.push(valueText);
+          }
         } else if (headerText.includes('ジャンル')) {
           genresTd = td;
           const links = td.querySelectorAll('a');
