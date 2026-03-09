@@ -2042,6 +2042,53 @@
   function initBoyStudio() {
     if (!location.host.includes('boy-studio.com')) return;
 
+    // Enable Text Selection/Copy
+    const enableCopy = () => {
+        const style = document.createElement('style');
+        style.innerHTML = `
+            * {
+                user-select: text !important;
+                -webkit-user-select: text !important;
+                -moz-user-select: text !important;
+                -ms-user-select: text !important;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.body.oncopy = null;
+        document.body.onselectstart = null;
+        document.oncontextmenu = null;
+        
+        // Remove event listeners that might block selection
+        const events = ['copy', 'cut', 'paste', 'selectstart', 'contextmenu', 'mousedown', 'mouseup', 'keydown', 'keyup'];
+        events.forEach(event => {
+            document.addEventListener(event, (e) => {
+                e.stopPropagation();
+            }, true);
+        });
+    };
+    
+    // Auto-expand details
+    const expandDetails = () => {
+        const summaries = document.querySelectorAll('summary');
+        summaries.forEach(summary => {
+            const text = summary.textContent.trim();
+            if (text.includes('詳細を表示') || text.includes('商品説明を読む')) {
+                const details = summary.parentElement;
+                // Check if it's a DETAILS element
+                if (details && details.tagName === 'DETAILS' && !details.open) {
+                    details.open = true;
+                }
+            }
+        });
+    };
+
+    // Run enhancements
+    enableCopy();
+    expandDetails();
+    // Re-run periodically for dynamic content
+    setInterval(expandDetails, 2000);
+
     const meta = {
       title: '',
       year: '',
