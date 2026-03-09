@@ -25,6 +25,7 @@
 // @match        https://*.ck-download.com/*
 // @match        https://*.sketchysex.com/*
 // @match        https://*.clips4sale.com/*
+// @match        https://*.jgvdata.com/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
@@ -2216,6 +2217,117 @@
     }
   }
 
+  function initJgvData() {
+    if (!location.host.includes('jgvdata.com')) return;
+
+    const meta = {
+      title: '',
+      year: '',
+      country: '',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: '',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    // 1. Title
+    const titleEl = document.querySelector('h1.title.single');
+    if (titleEl) {
+        meta.title = titleEl.textContent.trim();
+    }
+
+    // 2. Metadata (DL)
+    const dls = document.querySelectorAll('.pcontent dl');
+    let labelDd = null;
+    let contextDd = null;
+
+    dls.forEach(dl => {
+        const dts = dl.querySelectorAll('dt');
+        dts.forEach(dt => {
+            const label = dt.textContent.trim();
+            const dd = dt.nextElementSibling;
+            if (!dd || dd.tagName !== 'DD') return;
+
+            const value = dd.textContent.trim();
+
+            if (label.includes('GV Code')) {
+                meta.extra += `Code: ${value}\n`;
+            } else if (label.includes('Runtime')) {
+                meta.duration = value;
+            } else if (label.includes('Release Date')) {
+                meta.extra += `Release Date: ${value}\n`;
+                const match = value.match(/(\d{4})/);
+                if (match) meta.year = match[1];
+            } else if (label.includes('Label')) {
+                labelDd = dd;
+                const links = dd.querySelectorAll('a');
+                links.forEach(a => {
+                    const tag = a.textContent.trim().replace(/,$/, '');
+                    // Check if it's studio (usually first tag or matches studio logic)
+                    // But here studio is also in .mg-blog-category
+                    if (tag) meta.genres.push(tag);
+                });
+            } else if (label.includes('Context')) {
+                contextDd = dd;
+                meta.description = value;
+            }
+        });
+    });
+
+    // Studio (from category header if available, otherwise maybe from tags?)
+    const studioEl = document.querySelector('.mg-blog-category a');
+    if (studioEl) {
+        meta.studio = studioEl.textContent.trim();
+        // Remove studio from genres if present
+        const studioIndex = meta.genres.indexOf(meta.studio);
+        if (studioIndex > -1) {
+            meta.genres.splice(studioIndex, 1);
+        }
+    } else {
+        // Fallback: assume first tag might be studio if matches specific logic, 
+        // but for now let's just leave it in genres if not sure.
+        // Based on HTML, "BOY" is first tag and "BOYSTUDIO" is category.
+        // Let's rely on .mg-blog-category for Studio.
+    }
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    // Inject Controls
+    
+    // Genres
+    if (labelDd && meta.genres.length > 0) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+                const controls = createMetadataControls(type, meta, conf);
+                controls.style.marginTop = '5px';
+                controls.style.display = 'block';
+                labelDd.appendChild(controls);
+            }
+        }
+    }
+
+    // Description
+    if (contextDd && meta.description) {
+        const type = 'description';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+                const controls = createMetadataControls(type, meta, conf);
+                controls.style.marginTop = '10px';
+                controls.style.display = 'block';
+                contextDd.appendChild(controls);
+            }
+        }
+    }
+  }
+
   function initStr8Boys() {
     if (!location.host.includes('str8boys2023.com')) return;
     
@@ -3421,6 +3533,7 @@
   initGayerdar();
   initSayUncle();
   initBoyStudio();
+  initJgvData();
   initHunkCh();
   initGamesVideo();
   initFratx();
