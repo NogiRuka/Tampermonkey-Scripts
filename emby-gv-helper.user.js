@@ -3077,7 +3077,7 @@
     }
 
     // 3. Tags
-    const tagsDiv = document.querySelector('.tags');
+    const tagsDiv = document.querySelector('.tags') || document.querySelector('.categories');
     if (tagsDiv) {
         tagsDiv.querySelectorAll('a').forEach(a => {
             const tag = a.textContent.trim();
@@ -3086,15 +3086,61 @@
     }
 
     // 4. Performers
-    const performerNames = document.querySelectorAll('.video-performer .performer-name');
-    performerNames.forEach(div => {
-        const name = div.textContent.trim();
-        if (name) meta.actors.push({ name: name });
-    });
+    // Try data-label="Performer" first (covers both image and text links)
+    const performerLinks = document.querySelectorAll('a[data-label="Performer"]');
+    if (performerLinks.length > 0) {
+        performerLinks.forEach(a => {
+            // If it has a .performer-name child, use that (image card)
+            const nameDiv = a.querySelector('.performer-name');
+            let name = '';
+            if (nameDiv) {
+                name = nameDiv.textContent.trim();
+            } else {
+                // Otherwise use own text (text link)
+                name = a.textContent.trim();
+            }
+            
+            if (name && !meta.actors.some(actor => actor.name === name)) {
+                meta.actors.push({ name: name });
+            }
+        });
+    } else {
+        // Fallback to old selector
+        const performerNames = document.querySelectorAll('.video-performer .performer-name');
+        performerNames.forEach(div => {
+            const name = div.textContent.trim();
+            if (name && !meta.actors.some(actor => actor.name === name)) {
+                meta.actors.push({ name: name });
+            }
+        });
+    }
+
+    // 5. Description
+    const descP = document.querySelector('.synopsis p');
+    if (descP) {
+        meta.description = descP.textContent.trim();
+    }
 
     const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
 
     // Inject Controls
+
+    // Description Controls
+    if (descP && meta.description) {
+        const type = 'description';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+                const controls = createMetadataControls(type, meta, conf);
+                controls.style.marginTop = '10px';
+                controls.style.display = 'block';
+                if (descP.parentNode) {
+                    descP.parentNode.insertBefore(controls, descP.nextSibling);
+                }
+            }
+        }
+    }
 
     // Tags
     if (tagsDiv && meta.genres.length > 0) {
