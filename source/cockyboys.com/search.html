@@ -1,0 +1,2130 @@
+<body class="	tour	
+	    
+    desktop
+    
+        
+    previewsOff
+    
+        
+    modelPage
+    
+        ">
+
+    <div id="wrapper">
+
+        <header>
+
+
+            <section>
+
+
+
+                <style>
+                    header section {
+                        justify-content: space-between;
+                    }
+
+                    header section div:nth-child(2) {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        align-items: center;
+                        justify-content: flex-start;
+                    }
+
+                    header section div:last-child {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        align-items: center;
+                        justify-content: flex-end;
+                    }
+                </style>
+
+                <div>
+                    <a href="/" title="Home" id="logo">
+                        <!-- pride logo -->
+                        <!--<img src="https://cdn.cockyboys.com/images_v4/logoPride.png" alt="CockBoys Logo">-->
+
+                        <!-- default logo -->
+                        <img src="https://cdn.cockyboys.com/nats/img/logo-black.png" alt="CockyBoys Logo"
+                            class="darkToggle" data-light="https://cdn.cockyboys.com/nats/img/logo-black.png"
+                            data-dark="https://cockyboys.com/images_v4/logo.png">
+
+                        <!-- holiday logo -->
+                        <!--<img src="https://cdn.cockyboys.com/nats/img/logo-black-xmas2022.png" alt="CockyBoys Logo" class="darkToggle" data-light="https://cdn.cockyboys.com/nats/img/logo-black-xmas2022.png" data-dark="https://cdn.cockyboys.com/nats/img/logo-white-xmas2022.png">-->
+
+                    </a>
+
+
+                    <script>
+                        $().ready(function () {
+                            $("#autosuggest").autocomplete({
+                                source: function (req, add) {
+                                    $.get('/search_ajax.php?q=' + req.term, function (data) {
+
+                                        arrStor = [];
+
+                                        arrLabel = new Array();
+                                        arrURL = new Array();
+                                        var arg = data.split("\n");
+
+                                        for (var i = 0; i < arg.length; i++) {
+                                            ix = arg[i].split("|");
+
+                                            if (ix.length == 2) {
+                                                arrStor[arrStor.length] = { label: ix[0].trim(), value: ix[1].trim() }
+                                            }
+
+                                            if (arrStor.length >= 15) break;
+                                        }
+
+                                        add(arrStor);
+                                    });
+                                },
+                                select: function (event, ui) {
+                                    this.value = ui.item.value
+                                    var form = $(this).parents('form:first').submit();
+                                }
+
+
+                            });
+
+
+                        });
+                    </script>
+
+                    <form id="searchform" style="display: none;" action="/search.php" method="get">
+                        <!--<input src="images/icons/search_submit_button.png" type="image"/>-->
+                        <input id="autosuggest" autocomplete="off" class="input ui-autocomplete-input" name="query"
+                            value="" placeholder="What're you looking for?" type="text">
+                        <em>×</em><!---->
+
+                    </form>
+                    <script>
+                        $().ready(function () {
+                            $("#autosuggest").autocomplete({
+                                source: function (req, add) {
+                                    $.get('/search_ajax.php?q=' + req.term, function (data) {
+
+                                        arrStor = [];
+
+                                        arrLabel = new Array();
+                                        arrURL = new Array();
+                                        var arg = data.split("\n");
+
+                                        for (var i = 0; i < arg.length; i++) {
+                                            ix = arg[i].split("|");
+
+                                            if (ix.length == 2) {
+                                                arrStor[arrStor.length] = { label: ix[0].trim(), value: ix[1].trim() }
+                                            }
+
+                                            if (arrStor.length >= 15) break;
+                                        }
+
+                                        add(arrStor);
+                                    });
+                                },
+                                select: function (event, ui) {
+                                    this.value = ui.item.value
+                                    var form = $(this).parents('form:first').submit();
+                                }
+
+
+                            });
+
+
+                        });
+                    </script>
+
+
+                    <nav>
+
+                        <style>
+                            #darkmode {
+                                display: flex;
+                                flex-flow: row nowrap;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 0;
+                                margin-left: 10px;
+                            }
+
+                            #darkmode:hover {
+                                border-bottom: 0 !important;
+                            }
+
+                            #darkmode img {
+                                width: auto;
+                                height: 25px;
+                            }
+                        </style>
+
+
+
+                        <ul>
+                            <li><a href="/categories/movies_1_d.html" title="Scenes">Scenes</a></li>
+                            <li><a href="/models/models_p.html" title="Models">Models</a></li>
+                            <li><a href="/pages.php?id=feature-films-sfw" title="Mini-Series and Films">Movies</a></li>
+                            <li><a href="/pages.php?id=categories-sfw" title="Genres">Genres</a></li>
+                            <li><a href="https://cockyboysstore.com/?utm_source=cockyboys&amp;utm_medium=MenuLInk&amp;utm_campaign=dvdstore"
+                                    title="CockyBoys DVD Store" target="_blank">DVDs</a></li>
+                            <li><a href="javascript:;" id="search" title="Search">Search</a></li>
+
+
+                            <li><a href="javascript:;" title="Switch to dark mode" id="darkmode"><img
+                                        src="https://cdn.cockyboys.com/images/toggle-light2.png"
+                                        alt="Switch to dark mode" class="darkToggle"
+                                        data-light="https://cdn.cockyboys.com/images/toggle-light2.png"
+                                        data-dark="https://cdn.cockyboys.com/images/toggle-dark.png"></a></li>
+
+
+                        </ul>
+
+                    </nav>
+
+                </div>
+                <div>
+                    <a href="https://members.cockyboys.com" id="login" title="Log into CockyBoys">Log In</a>
+                    <a href="/join.php" class="join grow gothamy">Become a Member</a>
+                </div>
+
+            </section>
+
+        </header>
+
+
+
+        <div id="movieHeader">
+            <div class="left">
+                <h1 class="gothamy sectionTitle">Search Results</h1>
+            </div>
+            <div class="right" style="margin-right: 80px; margin-top: 0; font-size: 20px;">
+                <p>
+                    <strong>Search Results For: </strong>"Oliver Carter"<br>
+                </p>
+            </div>
+        </div>
+
+
+        <div class="sceneList newReleases responsive">
+            <!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2418" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/aiden-ward-oliver-carter.html?type=vids" class="abso"
+                    title="Aiden Ward &amp; Oliver Carter">Watch Aiden Ward &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/aiden-ward-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24688.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24688.jpg" id="thing-2418" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Aiden-Ward-Oliver-Carter/clipmobile/aiden_ward_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Aiden Ward &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">20 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2449" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/alan-apollo-oliver-carter.html?type=vids" class="abso"
+                    title="Alan Apollo &amp; Oliver Carter">Watch Alan Apollo &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/alan-apollo-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24780.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24780.jpg" id="thing-2449" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Alan-Apollo-Oliver-Carter/clipmobile/alan_apollo_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Alan Apollo &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">18 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2428" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/alex-kof-oliver-carter.html?type=vids" class="abso"
+                    title="Alex Kof &amp; Oliver Carter">Watch Alex Kof &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/alex-kof-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24717.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24717.jpg" id="thing-2428" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Alex-Kof-Oliver-Carter/clipmobile/alex_kof_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Alex Kof &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">21 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2483" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/alfonso-osnaya-oliver-carter.html?type=vids" class="abso"
+                    title="Alfonso Osnaya &amp; Oliver Carter">Watch Alfonso Osnaya &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/alfonso-osnaya-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24890.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24890.jpg" id="thing-2483" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Alfonso-Osnaya-Oliver-Carter/clipmobile/alfonso_osnaya-oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Alfonso Osnaya &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">25 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2539" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/angel-elais-oliver-carter.html?type=vids" class="abso"
+                    title="Angel Elias &amp; Oliver Carter">Watch Angel Elias &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/angel-elais-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/27593.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/27593.jpg" id="thing-2539" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Angel-Elais-Oliver-Carter/clipmobile/angel_elias_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Angel Elias &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">22 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2499" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/arno-antino-oliver-carter.html?type=vids" class="abso"
+                    title="Arno Antino &amp; Oliver Carter">Watch Arno Antino &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/arno-antino-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24956.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24956.jpg" id="thing-2499" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Arno-Antino-Oliver-Carter/clipmobile/arno_antino_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Arno Antino &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">17 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2582" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/caden-dior-oliver-carter.html?type=vids" class="abso"
+                    title="Caden Dior &amp; Oliver Carter">Watch Caden Dior &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/caden-dior-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/27774.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/27774.jpg" id="thing-2582" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Caden-Dior-Oliver-Carter/clipmobile/caden_dior_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Caden Dior &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">20 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2434" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/canyon-cole-oliver-carter.html?type=vids" class="abso"
+                    title="Canyon Cole &amp; Oliver Carter">Watch Canyon Cole &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/canyon-cole-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24735.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24735.jpg" id="thing-2434" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Canyon-Cole-Oliver-Carter/clipmobile/canyon_cole_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Canyon Cole &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">27 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2401" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/daniel-evans-oliver-carter.html?type=vids" class="abso"
+                    title="Daniel Evans &amp; Oliver Carter">Watch Daniel Evans &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/daniel-evans-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24631.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24631.jpg" id="thing-2401" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Daniel-Evans-Oliver-Carter/clipmobile/daniel_evans_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Daniel Evans &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">19 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2464" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/flynn-fenix-oliver-carter.html?type=vids" class="abso"
+                    title="Flynn Fenix &amp; Oliver Carter">Watch Flynn Fenix &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/flynn-fenix-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24825.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24825.jpg" id="thing-2464" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Flynn-Fenix-Oliver-Carter/clipmobile/flynn_fenix_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Flynn Fenix &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">23 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRatingHalf.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2564" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/hunter-oliver-carter.html?type=vids" class="abso"
+                    title="Hunter &amp; Oliver Carter">Watch Hunter &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/hunter-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/27701.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/27701.jpg" id="thing-2564" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Hunter-Oliver-Carter/clipmobile/hunter_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Hunter &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">19 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2544" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/jordan-starr-oliver-carter.html?type=vids" class="abso"
+                    title="Jordan Starr &amp; Oliver Carter">Watch Jordan Starr &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/jordan-starr-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/27613.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/27613.jpg" id="thing-2544" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Jordan-Starr-Oliver-Carter1/clipmobile/jordan_starr_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Jordan Starr &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">20 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2478" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/kai-reynolds-oliver-carter.html?type=vids" class="abso"
+                    title="Kai Reynolds &amp; Oliver Carter">Watch Kai Reynolds &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/kai-reynolds-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24867.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24867.jpg" id="thing-2478" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Kai-Reynolds-Oliver-Carter/clipmobile/kai_reynolds_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Kai Reynolds &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">15 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2523" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/kane-fox-oliver-carter.html?type=vids" class="abso"
+                    title="Kane Fox &amp; Oliver Carter">Watch Kane Fox &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/kane-fox-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/27499.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/27499.jpg" id="thing-2523" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Kane-Fox-Oliver-Carter/clipmobile/kane_fox_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Kane Fox &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">24 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2531" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/manuel-skye-oliver-carter.html?type=vids" class="abso"
+                    title="Manuel Skye &amp; Oliver Carter">Watch Manuel Skye &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/manuel-skye-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/27560.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/27560.jpg" id="thing-2531" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Manuel-Skye-Oliver-Carter/clipmobile/manuel_skye_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Manuel Skye &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">20 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRatingHalf.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2503" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/mike-monroe-oliver-carter.html?type=vids" class="abso"
+                    title="Mike Monroe &amp; Oliver Carter">Watch Mike Monroe &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/mike-monroe-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24962.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24962.jpg" id="thing-2503" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Mike-Monroe-Oliver-Carter/clipmobile/mike_monroe_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Mike Monroe &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">17 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2562" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/oliver-carter-siren-santiago.html?type=vids" class="abso"
+                    title="Oliver Carter &amp; Siren Santiago">Watch Oliver Carter &amp; Siren Santiago</a>
+
+                <div>
+
+                    <a href="/scenes/oliver-carter-siren-santiago.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/27693.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/27693.jpg" id="thing-2562" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Oliver-Carter-Siren-Santiago/clipmobile/oliver_carter_siren_santiago_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Oliver Carter &amp; Siren Santiago</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">16 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRatingEmpty.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2407" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/oliver-carter-zane-kazan.html?type=vids" class="abso"
+                    title="Oliver Carter &amp; Zane Kazan">Watch Oliver Carter &amp; Zane Kazan</a>
+
+                <div>
+
+                    <a href="/scenes/oliver-carter-zane-kazan.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24649.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24649.jpg" id="thing-2407" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Oliver-Carter-Zane-Kazan/clipmobile/oliver_carter_zane_kazan_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Oliver Carter &amp; Zane Kazan</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">22 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2423" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/oliver-carter-tristan-hunter.html?type=vids" class="abso"
+                    title="Summer Cruising: Oliver Carter &amp; Tristan Hunter">Watch Summer Cruising: Oliver Carter
+                    &amp; Tristan Hunter</a>
+
+                <div>
+
+                    <a href="/scenes/oliver-carter-tristan-hunter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24702.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24702.jpg" id="thing-2423" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Oliver-Carter-Tristan-Hunter/clipmobile/oliver_carter_tristan_hunter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>Summer Cruising: Oliver Carter &amp; Tristan Hunter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">20 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section><!--clip entered in cms-->
+            <section class="previewThumb  hasClip " id="2413" style="height: auto;">
+
+                <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn on instant previews</span>
+
+                </a>
+
+                <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                            fill="currentColor"></path>
+                    </svg>
+
+                    <span style="display: none;">Turn off instant previews</span>
+
+                </a>
+
+                <a href="/scenes/lane-colten-oliver-carter.html?type=vids" class="abso"
+                    title="What's Your Kink?: Lane Colten &amp; Oliver Carter">Watch What's Your Kink?: Lane Colten
+                    &amp; Oliver Carter</a>
+
+                <div>
+
+                    <a href="/scenes/lane-colten-oliver-carter.html?type=vids" rel="nofollow" class="thumbCover">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/24672.jpg">
+                    </a>
+
+
+                    <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                        poster="https://cdn.cockyboys.com/content/contentthumbs/24672.jpg" id="thing-2413" class="vid ">
+                        <source
+                            src="https://cdn.cockyboys.com/content/upload/Lane-Colten-Oliver-Carter/clipmobile/lane_colten_oliver_carter_mobile.mp4">
+                    </video>
+
+
+                    <div style="display: none;"></div>
+
+                </div>
+
+                <p><strong>What's Your Kink?: Lane Colten &amp; Oliver Carter</strong>
+
+                    <span>
+
+                        <span>
+
+
+                            <em style="color: #BD220F;">New Release</em>
+
+
+                            | <em style="color: #262626;">20 minutes</em>
+
+                        </span>
+
+                        <span>
+                            <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                    </span>
+
+                </p>
+
+
+            </section>
+        </div>
+
+
+
+
+        <!-- Page Navigation Numbers -->
+
+
+
+
+
+        <!--Footer-->
+
+
+        <!-- closes "wrapper", which is opened in header.tpl -->
+    </div>
+
+    <!-- no javascript alert -->
+    <noscript>
+        <div id="javascript">
+            <div>
+                <h3><i class="fa fa-exclamation-triangle"></i><strong>Javascript</strong> Required</h3>
+                <p>Nowadays, almost all web pages contain JavaScript, a scripting programming language that allows
+                    robust web features, videos, and basically, all the things that can make a website experience
+                    awesome for you, the user.</p>
+                <p>So, to keep things working awesomely for you, and to enjoy the full experience and features of
+                    CockyBoys.com, you'll need to enable JavaScript in your web browser.</p>
+                <p>After enabling JavaScript, refresh this page and everything will be right again with the world (or at
+                    the very least, your porning experience).</p>
+                <a href="http://enable-javascript.com/" class="gothamy" target="_blank" title="Enable javascript">Learn
+                    How to Enable Javascript</a>
+                <a href="/pages.php?id=account#contact" class="gothamy" title="Contact us">Having Trouble? Contact
+                    Customer Service</a>
+            </div>
+        </div>
+    </noscript>
+
+    <div id="cookies" style="display: none;">
+        <p><i class="fa fa-exclamation-triangle"></i> Cookies must be enabled to enjoy the full features of this
+            website. Learn more about cookies and how to enable them by <a
+                href="http://www.wikihow.com/Enable-Cookies-in-Your-Internet-Web-Browser" target="_blank"
+                title="Enable cookies in your browser">clicking here.</a></p>
+    </div>
+
+    <div id="footer">
+
+        <div id="footerContainer">
+
+            <div id="footerManifesto">
+                <h4 style="text-align: center; margin-bottom: 10px;">The Manifesto</h4>
+                <div class="cycle-slideshow manifesto" data-cycle-pause-on-hover="true"
+                    data-cycle-auto-height="container" data-cycle-fx="fade" data-cycle-speed="1000"
+                    data-cycle-timeout="5000" data-cycle-slides=".slideBox" style="position: relative; height: 34px;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <!--div class="slideBox"><p class="manifestoItem" style="padding-top:15px">Oscar Wilde said it best – “Humanity takes itself too seriously. It is the world’s original sin. If the caveman had known how to laugh, history would have been different.”</p></div-->
+
+                    <div style="text-align: center; width:100%; position:absolute; bottom:-50px;" class="cycle-next">
+                        <img src="https://cockyboys.com/images_v3/white/navAngel.png" alt="CockyBoys halo logo"></div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 89; opacity: 0; display: block; visibility: hidden;">
+                        <p class="manifestoItem">Be proud!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 88; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">You are not a type. You are you.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 87; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">“Cocky” does not mean rude.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 86; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Gay sex is not shameful. It is a blessing like a fine wine, a great
+                            meal, or a roller coaster ride. It is part of life and should be enjoyed.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 85; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Be safe. Be smart in all that you do. When in doubt, use the head
+                            holding up your ears!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 84; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Negativity only invites and creates more negativity.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 100; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Mutual respect is the path to true power. Power = pride. Pride = loving
+                            yourself. Love yourself and you can love another.</p>
+                    </div>
+                    <div class="slideBox cycle-slide cycle-slide-active"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 99; visibility: visible; opacity: 1; display: block;">
+                        <p class="manifestoItem">Gay is good.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 97; visibility: hidden;">
+                        <p class="manifestoItem">CockyBoys are proud, confident men. At times funny, goofy, sometimes
+                            crazy, and shy.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 96; visibility: hidden;">
+                        <p class="manifestoItem">They have dark days along with good. They like being admired. They do
+                            not succumb to cowardice.<br>
+                            They love and want to be loved.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 95; visibility: hidden;">
+                        <p class="manifestoItem">I am a CockyBoy!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 94; visibility: hidden;">
+                        <p class="manifestoItem">I am a CockyBoy!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 93; visibility: hidden;">
+                        <p class="manifestoItem">Please check your high horse at the door.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 92; visibility: hidden;">
+                        <p class="manifestoItem">There is nothing wrong with being a “porn star.” It may not be your
+                            choice. Choice is freedom. So choose.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 91; visibility: hidden;">
+                        <p class="manifestoItem">When having a bad day… stop. Think of five things you are grateful
+                            for….feel better?</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 90; visibility: hidden;">
+                        <p class="manifestoItem">Love Always &amp; Be Nice,<br><br>
+                            <strong style="display:block">Jake Jaxson</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!--div id="press">
+
+			<div id="quote-1">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+                    
+                                        
+					    <img src="/images_v4/press3.jpg" class="logo darkToggle" alt="New York Magazine logo" data-light="/images_v4/press3.jpg" data-dark="/images_v4/press3w.jpg">
+                    
+                                        
+				</a>
+				<p><i class="fa fa-quote-left"></i> There is something about the CockyBoys aesthetic that gets porn wheels turning&mdash;an ironic touch that’s light enough not to compromise the simple pleasures of whacking off. <i class="fa fa-quote-right"></i></p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; New York Magazine</a></strong>
+			</div>
+
+			<div id="quote-2">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+                
+                                        
+                        <img src="/images_v4/press2.jpg" class="logo darkToggle" alt="Salon.com logo" data-light="/images_v4/press2.jpg" data-dark="/images_v4/press2w.jpg">
+                    
+                                            
+				</a>
+				<p>
+					<i class="fa fa-quote-left"></i>The Walt Whitman of gay porn.<i class="fa fa-quote-right"></i><br>
+					<i class="fa fa-quote-left"></i> Jake Jaxson wants to revolutionize porn with an erotic documentary inspired by great poets and celebrating life. <i class="fa fa-quote-right"></i>
+				</p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; Salon.com</a></strong>
+			</div>
+
+			<div id="quote-3">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+					<img src="/images_v4/press5.gif" class="logo" alt="Village Voice logo">
+				</a>
+				<p><i class="fa fa-quote-left"></i> In five short years, Jake Jaxson’s particular brand of arthouse erotica has propelled CockyBoys to the top of its industry. <i class="fa fa-quote-right"></i></p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; The Village Voice</a></strong>
+			</div>
+
+		</div-->
+
+            <div id="sendy">
+                <h4>Subscribe to Our Newsletter<br><i>Exclusive Offers + Free Video</i></h4>
+
+                <form action="https://sendy.cockyboys.com/subscribe" method="POST" accept-charset="utf-8">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email"><br>
+                    <div style="display:none;">
+                        <label for="hp">HP</label><br>
+                        <input type="text" name="hp" id="hp">
+                    </div>
+                    <input type="hidden" name="list" value="MhdwSleQW5WXxeUZb7XsTw">
+                    <input type="hidden" name="subform" value="yes">
+                    <input type="submit" name="submit" id="submit" value="Sign Up" class="grow">
+                </form>
+
+            </div>
+
+            <div id="footerSupport">
+
+                <div>
+
+                    <h4>Need Help?</h4>
+                    <div>
+                        <a href="/pages.php?id=account-sfw" title="Support center">
+                            <strong>Support Center</strong>
+                        </a>
+                    </div>
+                    <div>
+                        <a href="mailto:support@cockyboys.com" title="Contact Us" target="_blank">
+                            <strong>Contact Us</strong>
+                        </a>
+                    </div>
+                    <!--div>
+                	<a href="/pages.php?id=account-sfw#password" title="Reset password">
+                        <strong>Forgot Your Password?</strong>
+                	</a>
+				</div-->
+                    <!--div>
+                    <a href="/pages.php?id=model-application-sfw" title="Become a model">
+                        <strong>Become a Model</strong>
+                    </a>
+                </div-->
+                    <!--div>
+                    <a href="/pages.php?id=meet-the-morecocks-sfw" title="About us">
+                        <strong>About Us</strong>
+                    </a>
+                </div>
+            	<div>
+                    <a href="/pages.php?id=press-sfw" title="Press">
+                        <strong>Press</strong>
+                    </a>
+                </div-->
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+    <div id="footerFoot">
+
+        <img class="footerLogo" src="https://cdn.cockyboys.com/images/260311-logo-footer.png" alt="CockyBoys logo">
+
+        <ul>
+            <li>
+                <a href="/pages.php?id=meet-the-morecocks-sfw" class="fancyLink cboxElement" title="About Us">About
+                    Us</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=press-sfw" class="fancyLink cboxElement" title="Press">Press</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=terms-of-use-sfw" class="fancyLink cboxElement" title="Terms of use">Terms of
+                    Use</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=content-complaints-sfw" class="fancyLink cboxElement"
+                    title="Terms of use">Content Complaints</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=privacy-notice-sfw" class="fancyLink cboxElement"
+                    title="Privacy notice">Privacy</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=privacy-ca-sfw" class="fancyLink cboxElement" title="Privacy CA">Privacy CA</a>
+            </li>
+            <li>
+                <a href="http://gayhubnetwork.com/" target="_blank" title="Bigbling">Webmasters</a>
+            </li>
+            <!--li>
+            	<a href="/pages.php?id=account-sfw#help" class="fancyLink cboxElement" title="FAQ">FAQ</a>
+            </li-->
+
+
+            <!--li>
+            	<a href="/pages.php?id=copyright-policy-sfw" class="fancyLink cboxElement" title="Terms of use">Copyright</a>
+            </li-->
+        </ul>
+
+        <span id="footerFoot">
+            <a href="/pages.php?id=2257-sfw" title="2257 Record-Keeping" class="compliance fancyLink cboxElement">18
+                U.S.C 2257 Record-Keeping<br>Requirements Compliance Statement</a>;
+            <br>Copyright © <strong id="insertHere">2026</strong>
+            <script>
+                var d = new Date();
+                var el = document.getElementById('insertHere');
+                el.innerHTML = d.getFullYear();
+            </script>
+            HC Multimedia, LLC, Nevada, United States and<br>HC Media, s.r.o - Vodickova 791/41 Nove Mesto, 110 00 Praha
+            1, Czech Republic
+        </span>
+
+    </div>
+
+    <div class="content-alert adult-warning splash" style="display: none;">
+
+        <div class="alert">
+            <h2>You are entering the hottest Gay Adult Site on the Internet.</h2>
+            <p>CockyBoys.com is the most awarded gay studio, offering you unrivaled premium content with unlimited
+                streaming as well as limited downloads. 100% Secure and Privacy Guaranteed!</p>
+            <p class="under18year-frame">Please read and comply with the following conditions before you continue: This
+                website contains information, links, images and videos of sexually explicit material.If you are under
+                the age of 21, if such material offends you or if it's illegal to view such material in your community
+                please do not continue. Here is an excellent website to find something more to your tastes.Please read
+                and comply with the following conditions before you continue:I am at least 21 years of age.The sexually
+                explicit material I am viewing is for my own personal use and I will not expose minors to the material.
+                I desire to receive/view sexually explicit material. I believe that as an adult it is my inalienable
+                right to receive/view sexually explicit material. I believe that sexual acts between consenting adults
+                are neither offensive nor obscene. The viewing, reading and downloading of sexually explicit materials
+                does not violate the standards of my community, town, city, state or country. I am solely responsible
+                for any false disclosures or legal ramifications of viewing, reading or downloading any material in this
+                site. Furthermore this website nor its affiliates will be held responsible for any legal ramifications
+                arising from fraudulent entry into or use of this website.</p>
+            <a href="#" id="adult-continue" class="positive continue trackclick">Enter CockyBoys</a>
+
+        </div>
+        <div class="background-alert"></div>
+    </div>
+
+
+    <script>
+        //jquery cookie plugin
+        (function (e) { if (typeof define === "function" && define.amd) { define(["jquery"], e) } else if (typeof exports === "object") { e(require("jquery")) } else { e(jQuery) } })(function (e) { function n(e) { return u.raw ? e : encodeURIComponent(e) } function r(e) { return u.raw ? e : decodeURIComponent(e) } function i(e) { return n(u.json ? JSON.stringify(e) : String(e)) } function s(e) { if (e.indexOf('"') === 0) { e = e.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, "\\") } try { e = decodeURIComponent(e.replace(t, " ")); return u.json ? JSON.parse(e) : e } catch (n) { } } function o(t, n) { var r = u.raw ? t : s(t); return e.isFunction(n) ? n(r) : r } var t = /\+/g; var u = e.cookie = function (t, s, a) { if (s !== undefined && !e.isFunction(s)) { a = e.extend({}, u.defaults, a); if (typeof a.expires === "number") { var f = a.expires, l = a.expires = new Date; l.setTime(+l + f * 864e5) } return document.cookie = [n(t), "=", i(s), a.expires ? "; expires=" + a.expires.toUTCString() : "", a.path ? "; path=" + a.path : "", a.domain ? "; domain=" + a.domain : "", a.secure ? "; secure" : ""].join("") } var c = t ? undefined : {}; var h = document.cookie ? document.cookie.split("; ") : []; for (var p = 0, d = h.length; p < d; p++) { var v = h[p].split("="); var m = r(v.shift()); var g = v.join("="); if (t && t === m) { c = o(g, s); break } if (!t && (g = o(g)) !== undefined) { c[m] = g } } return c }; u.defaults = {}; e.removeCookie = function (t, n) { if (e.cookie(t) === undefined) { return false } e.cookie(t, "", e.extend({}, n, { expires: -1 })); return !e.cookie(t) } })
+
+        function Set_Cookie(name, value, expires_in_days, cookie_path, cookie_domain, secure) {
+            $.cookie(name, value, { expires: expires_in_days, path: cookie_path, domain: cookie_domain });
+        };
+
+        function cookieExists(cookiename) {
+            return (typeof $.cookie(cookiename) !== "undefined");
+        }
+
+        function getCookie(c_name) {
+            return $.cookie(c_name);
+        }
+
+    </script>
+
+
+
+    <!-- JavaScript at the bottom for fast page loading -->
+    <!-- ElevX -->
+    <script src="https://cdn.cockyboys.com/js/fancybox/jquery.fancybox.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.cockyboys.com/js/fancybox/jquery.fancybox.css">
+    <script src="https://cdn.cockyboys.com/js/fancybox/helpers/jquery.fancybox-thumbs.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.cockyboys.com/js/fancybox/helpers/jquery.fancybox-thumbs.css">
+    <!-- hover intent plugin -->
+    <script src="https://cdn.cockyboys.com/js_v2/hoverintent.js"></script>
+    <!-- cookies plugin -->
+    <script type="text/javascript" src="https://cdn.cockyboys.com/js_v3/js.cookie.js"></script>
+    <!--<script type="text/javascript" src="https://cdn.cockyboys.com/js_v3/jquery.cookie.js"></script>-->
+    <!--cycle2-->
+    <script src="https://cdn.cockyboys.com/js_v4/jquery.cycle2.min.js"></script>
+    <!-- custom scripts -->
+    <!--<script src="/js_v4/scripts_2311.js?35"></script>-->
+    <script src="https://cdn.cockyboys.com/js_v4/scripts_2603.js?1"></script>
+
+
+
+
+    <!-- adult warning -->
+
+    <script>
+        //Adult warning. Si no podem crear galetes no mostrem missatge.
+        if (!cookieExists('adultcheck')) {
+            $(".adult-warning a.continue").show();
+            $(".adult-warning").css("display", "block");
+        } else {
+            // en el cas que els idiomes siguin iguals només mostrem botó continue si és la primera vegada que entrem a la pàgina.
+            if (cookieExists('adultcheck')) {
+                adult_warning_cookie = getCookie('adultcheck');
+                //console.log("Ja tenim galeta adultcheck! No mostrem res.");
+            } else {
+                //no tenim galeta de adult warning per tant mostrem pantalla amb continue i li donem valor quan es fa click a algún dels botons
+                $(".adult-warning").css("display", "block");
+                //$(".adult-warning a.continue").prop("href", "adult-continue");
+                //console.log("Com que no tenim galeta adultcheck mostrem el popup amb només botó continue ja que els idiomes calculats i de customer són iguals.");
+            }
+        }
+
+        //Botó de la dreta per tant mantenim idioma.
+        $('div.adult-warning div.alert > a.alert-close, div.adult-warning div.alert > a.continue').click(function (e) {
+            e.preventDefault();
+            Set_Cookie('adultcheck', '1', 30, '/', 'cockyboys.com');
+            $(".adult-warning").css("display", "none");
+        });
+    </script>
+
+    <script>
+        //load it with jquery, to prevent initial page slowing, because the thumbs are so large
+        /*$('#f4fAPI').load('/js_v4/f4f-api2.php?code=ar2d9&template=slider');
+        $('#f4fNav').load('/js_v4/f4f-api2.php?code=ad6cd&template=nav');*/
+    </script>
+
+    <!-- flash sale animation on join now button in header -->
+
+    <!-- END flash sale animation on join now button in header -->
+
+
+    <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
+       chromium.org/developers/how-tos/chrome-frame-getting-started -->
+    <!--[if lt IE 7 ]>
+    <script src="https://ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+
+
+    <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-1" tabindex="0"
+        style="display: none;"></ul><span role="status" aria-live="assertive" aria-relevant="additions"
+        class="ui-helper-hidden-accessible"></span>
+    <div class="nogiruka-btn-container"><button class="nogiruka-scroll-btn" data-direction="up"><svg
+                viewBox="0 0 384 512">
+                <path
+                    d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z">
+                </path>
+            </svg></button><button class="nogiruka-scroll-btn" data-direction="down"><svg viewBox="0 0 384 512">
+                <path
+                    d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.8L54.6 246.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5 32.8 0 45.3l160 160z">
+                </path>
+            </svg></button></div>
+</body>

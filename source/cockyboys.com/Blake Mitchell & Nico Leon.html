@@ -1,0 +1,2101 @@
+<body class="	tour	
+	    
+    desktop
+    
+        
+	previewsOn
+    
+	    
+    moviesPage
+    
+        ">
+
+    <div id="wrapper">
+
+        <header>
+
+
+            <section>
+
+
+
+                <style>
+                    header section {
+                        justify-content: space-between;
+                    }
+
+                    header section div:nth-child(2) {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        align-items: center;
+                        justify-content: flex-start;
+                    }
+
+                    header section div:last-child {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        align-items: center;
+                        justify-content: flex-end;
+                    }
+                </style>
+
+                <div>
+                    <a href="/" title="Home" id="logo">
+                        <!-- pride logo -->
+                        <!--<img src="https://cdn.cockyboys.com/images_v4/logoPride.png" alt="CockBoys Logo">-->
+
+                        <!-- default logo -->
+                        <img src="https://cdn.cockyboys.com/nats/img/logo-black.png" alt="CockyBoys Logo"
+                            class="darkToggle" data-light="https://cdn.cockyboys.com/nats/img/logo-black.png"
+                            data-dark="https://cockyboys.com/images_v4/logo.png">
+
+                        <!-- holiday logo -->
+                        <!--<img src="https://cdn.cockyboys.com/nats/img/logo-black-xmas2022.png" alt="CockyBoys Logo" class="darkToggle" data-light="https://cdn.cockyboys.com/nats/img/logo-black-xmas2022.png" data-dark="https://cdn.cockyboys.com/nats/img/logo-white-xmas2022.png">-->
+
+                    </a>
+
+
+                    <script>
+                        $().ready(function () {
+                            $("#autosuggest").autocomplete({
+                                source: function (req, add) {
+                                    $.get('/search_ajax.php?q=' + req.term, function (data) {
+
+                                        arrStor = [];
+
+                                        arrLabel = new Array();
+                                        arrURL = new Array();
+                                        var arg = data.split("\n");
+
+                                        for (var i = 0; i < arg.length; i++) {
+                                            ix = arg[i].split("|");
+
+                                            if (ix.length == 2) {
+                                                arrStor[arrStor.length] = { label: ix[0].trim(), value: ix[1].trim() }
+                                            }
+
+                                            if (arrStor.length >= 15) break;
+                                        }
+
+                                        add(arrStor);
+                                    });
+                                },
+                                select: function (event, ui) {
+                                    this.value = ui.item.value
+                                    var form = $(this).parents('form:first').submit();
+                                }
+
+
+                            });
+
+
+                        });
+                    </script>
+
+                    <form id="searchform" style="display: none;" action="/search.php" method="get">
+                        <!--<input src="images/icons/search_submit_button.png" type="image"/>-->
+                        <input id="autosuggest" autocomplete="off" class="input ui-autocomplete-input" name="query"
+                            value="" placeholder="What're you looking for?" type="text">
+                        <em>×</em><!---->
+
+                    </form>
+                    <script>
+                        $().ready(function () {
+                            $("#autosuggest").autocomplete({
+                                source: function (req, add) {
+                                    $.get('/search_ajax.php?q=' + req.term, function (data) {
+
+                                        arrStor = [];
+
+                                        arrLabel = new Array();
+                                        arrURL = new Array();
+                                        var arg = data.split("\n");
+
+                                        for (var i = 0; i < arg.length; i++) {
+                                            ix = arg[i].split("|");
+
+                                            if (ix.length == 2) {
+                                                arrStor[arrStor.length] = { label: ix[0].trim(), value: ix[1].trim() }
+                                            }
+
+                                            if (arrStor.length >= 15) break;
+                                        }
+
+                                        add(arrStor);
+                                    });
+                                },
+                                select: function (event, ui) {
+                                    this.value = ui.item.value
+                                    var form = $(this).parents('form:first').submit();
+                                }
+
+
+                            });
+
+
+                        });
+                    </script>
+
+
+                    <nav>
+
+                        <style>
+                            #darkmode {
+                                display: flex;
+                                flex-flow: row nowrap;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 0;
+                                margin-left: 10px;
+                            }
+
+                            #darkmode:hover {
+                                border-bottom: 0 !important;
+                            }
+
+                            #darkmode img {
+                                width: auto;
+                                height: 25px;
+                            }
+                        </style>
+
+
+
+                        <ul>
+                            <li><a href="/categories/movies_1_d.html" title="Scenes">Scenes</a></li>
+                            <li><a href="/models/models_p.html" title="Models">Models</a></li>
+                            <li><a href="/pages.php?id=feature-films-sfw" title="Mini-Series and Films">Movies</a></li>
+                            <li><a href="/pages.php?id=categories-sfw" title="Genres">Genres</a></li>
+                            <li><a href="https://cockyboysstore.com/?utm_source=cockyboys&amp;utm_medium=MenuLInk&amp;utm_campaign=dvdstore"
+                                    title="CockyBoys DVD Store" target="_blank">DVDs</a></li>
+                            <li><a href="javascript:;" id="search" title="Search">Search</a></li>
+
+
+                            <li><a href="javascript:;" title="Switch to dark mode" id="darkmode"><img
+                                        src="https://cdn.cockyboys.com/images/toggle-light2.png"
+                                        alt="Switch to dark mode" class="darkToggle"
+                                        data-light="https://cdn.cockyboys.com/images/toggle-light2.png"
+                                        data-dark="https://cdn.cockyboys.com/images/toggle-dark.png"></a></li>
+
+
+                        </ul>
+
+                    </nav>
+
+                </div>
+                <div>
+                    <a href="https://members.cockyboys.com" id="login" title="Log into CockyBoys">Log In</a>
+                    <a href="/join.php" class="join grow gothamy">Become a Member</a>
+                </div>
+
+            </section>
+
+        </header>
+
+
+
+        <!-- Start Trial Area Code - Only used if user is a trial user -->
+
+        <script>
+            function TrackDownload(id, cg, type, mt) {
+                spuu = [id, '', '', '', type, mt, cg]
+                TrackContent(spuu);
+                return true;
+            }
+
+
+            var plr = null;
+
+
+            function replay() {
+                document.getElementById('hpromo').style.display = 'none';
+                document.getElementById('mediabox_parent').style.display = 'block';
+
+                func_playerload(pxx)
+            }
+
+
+
+            function showreport() {
+                $("#report_form").dialog({
+                    position: { my: "right top", at: "right bottom", of: $("#report_link") }
+                });
+            }
+
+            function submitreport(tx) {
+                pss = new Object();
+                pss.Subject = "Scene Problem: " + $(tx).html();
+                pss.Body = "Problem is on this page:\n" + document.location + "\n\nBrowser Information:" + navigator.userAgent;
+                pss.Send = "Send Message"
+                pss.ajax = "2";
+
+                $.post("mailbox.php", pss,
+                    function (data) {
+
+                        var dtt;
+
+                        try {
+                            dtt = $.parseJSON(data);
+                        }
+                        catch (e) {
+                            alert("Error: " + data)
+                            return false;
+                        }
+
+                        alert(dtt.message);
+                        if (dtt.success == "1") {
+                            $("#report_form").dialog("close");
+                        }
+                    });
+            }
+
+            $(document).ready(function () {
+                $('.submitproblem').click(function () {
+
+                    submitreport(this);
+                    return false;
+                });
+
+
+            });
+
+        </script>
+
+
+        <!-- End Trial Code -->
+
+
+        <!-- START PAGE DESIGN -->
+
+
+        <!-- Play video or show images -->
+
+
+
+
+
+
+        <div id="movieHeader">
+
+            <div class="left">
+                <h1 class="gothamy sectionTitle">Camp CockyBoys: Blake Mitchell &amp; Nico Leon</h1>
+
+            </div>
+
+
+            <!-- asdfgh
+        -->
+
+            <div class="right">
+                <p class="gothamy">Streaming Options:
+                    <!-- Viewing/Streaming options -->
+
+
+                    <span class="download">
+                        <span class="first">Choose Streaming Option</span>
+                        <span class="more" style="display: none;">
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">MP4 small</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">MP4 medium</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">MP4 720 (HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">MP4 1080 (full HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">QT small</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">QT medium</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">QT 720 (HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">QT 1080 (full HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">WMV small</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">WMV medium</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">WMV 720 (HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">WMV 1080 (full HD)</a>
+                        </span>
+                    </span>
+
+
+
+                </p>
+
+
+                <p class="gothamy">Download Options:
+
+                    <span class="download">
+                        <span class="first">Choose Format</span>
+                        <span class="more">
+
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">MP4 small</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">MP4 medium</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">MP4 720 (HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">MP4 1080 (full HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">QT small</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">QT medium</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">QT 720 (HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">QT 1080 (full HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">WMV small</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">WMV medium</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">WMV 720 (HD)</a>
+                            <a href="https://cockyboys.com/join.php" rel="nofollow">WMV 1080 (full HD)</a>
+                        </span>
+                    </span>
+
+
+                    <span id="downloadBox" style="display: none;">
+                        <span class="close">×</span>
+                        <em class="gothamy">Download</em>
+                        <em>If the movie file doesn't automatically start downloading in your web browser, then please
+                            right-click on the button below and select "Save As" to download the file to your
+                            computer.</em>
+                        <a href="javascript:;">Download</a>
+                    </span>
+                </p>
+
+
+            </div>
+
+        </div>
+
+        <style>
+            .mejs-overlay-button,
+            .no-svg .mejs-overlay-button {
+
+                background: url(/img/playArrow.png) center center no-repeat !important;
+                background-size: 50% !important;
+
+            }
+        </style>
+
+        <div class="movieStage">
+
+
+            <h2 class="joinText">Sign Up to Watch Full Video</h2>
+
+
+            <!-- Load Movie Player -->
+
+
+
+            <script src="/js/mp/mediaelement-and-player.min.js"></script>
+            <link rel="stylesheet" href="/js/mp/mediaelementplayer.min.css">
+
+
+
+
+
+            <div id="download_form" style="display:none" title="Download This File">
+
+                <span class="download_instructions">
+                    Right click the link below and select save as to download:
+                    <p>
+                        <a id="download_url" href="#">Download Movie</a>
+                    </p>
+
+                </span>
+
+            </div>
+
+            <script>
+
+                extl = [];
+                extl["m4v"] = "video/mp4";
+                extl["m3u8"] = "application/x-mpegURL";
+
+
+                atst = [];
+                atst[atst.length] = ".flv";
+                atst[atst.length] = ".f4v";
+                atst[atst.length] = ".mp4";
+                atst[atst.length] = ".mpeg4";
+                atst[atst.length] = ".m4v";
+                atst[atst.length] = ".m3u8";
+                atst[atst.length] = ".webm";
+
+
+                df_movie = new Array();
+                df_movie[df_movie.length] = { id: "518323", path: "https://cdn.cockyboys.com/content//upload/Blake-Mitchell-Nico_leon/trailer/Blake_Mitchell_Nico_Leon_trailer.mp4", movie_width: "960", movie_height: "540", name: "Trailer", type: "vids", setid: "2035", label: "Trailer", thumbnail: "", vtt_file: "" };
+
+                var movie = [];
+
+                movie["Trailer"] = {};
+                movie["Trailer"]["blake_mitchell_nico_leon_trailer"] = {
+                    path: "https://cdn.cockyboys.com/content//upload/Blake-Mitchell-Nico_leon/trailer/Blake_Mitchell_Nico_Leon_trailer.mp4",
+                    showplay: '1', showdownload: '1', movie_width: '960', movie_height: '540', name: 'Trailer', type: 'vids', vtt_file: ''
+                };
+
+                var pxx = null;
+
+                function loadmovie(t, n) {
+                    nn = movie[t];
+
+                    if (n != "") {
+                        nn = nn[n];
+
+                    }
+                    else {
+                        load_default_movie();
+                        return;
+                    }
+
+                    nx = movie[t];
+
+
+                    cnt = 0;
+                    tot = 0;
+                    prev = "";
+                    next = 0;
+
+                    var prevprop = "";
+                    var nextprop = "";
+
+                    for (var prop in nx) {
+                        // important check that this is objects own property
+                        // not from prototype prop inherited
+                        if (nx.hasOwnProperty(prop)) {
+                            tot++;
+
+                            if (next == 1) {
+                                next = 0;
+                                nextprop = prop;
+                            }
+
+                            if (prop == n) {
+                                cnt = tot;
+                                next = 1;
+
+                                if (prev != "") {
+                                    prevprop = prev;
+                                }
+
+                            }
+
+                            prev = prop;
+                        }
+                    }
+
+                    if (tot > 1 && cnt != tot) {
+                        next = cnt + 1;
+                    }
+
+
+                    if (tot <= 1) {
+                        $(".video_clip_navigation_wrapper").slideUp();
+                    }
+                    else {
+                        $("#video_clipnum").html(cnt);
+                        $("#video_numclips").html(tot);
+
+                        $(".video_clip_navigation_wrapper").slideDown();
+
+                        if (prevprop == "") {
+                            $("#prev_video").hide();
+                        }
+                        else {
+                            $("#prev_video").show();
+                            $("#prev_video a").attr("href", "javascript:loadmovie('" + t + "', '" + prevprop + "')");
+                        }
+
+                        if (nextprop == "") {
+                            $("#next_video").hide();
+                        }
+                        else {
+                            $("#next_video").show();
+                            $("#next_video a").attr("href", "javascript:loadmovie('" + t + "', '" + nextprop + "')");
+                        }
+
+                    }
+
+
+
+                    var pxr = [];
+                    pxr[0] = nn;
+
+
+                    fnme = nn["path"]
+
+                    umovie = 0;
+
+                    for (cnty = 0; cnty < atst.length; cnty++) {
+                        if (fnme.toLowerCase().indexOf(atst[cnty]) != -1 || fnme.toLowerCase().indexOf(atst[cnty]) != -1) {
+                            umovie = 1;
+                        }
+                    }
+                    if (umovie == 0 && (fnme.toLowerCase().indexOf(".wmv") != -1)) {
+                        umovie = 1;
+                    }
+
+                    if (umovie == 1) {
+                        pxx = pxr;
+                        func_playerload(pxr);
+                        $('html, body').animate({
+                            scrollTop: $('.title_bar').offset().top
+                        });
+                    }
+                    else {
+                        alert("This movie format can't be loaded for watching in the browser. Please download this movie.");
+                    }
+
+                    return;
+
+                }
+
+
+                function load_default_movie() {
+                    var pxr = [];
+
+                    if (df_movie.length == 0) {
+                        return;
+                    }
+
+                    for (var cntx = 0; cntx < df_movie.length; cntx++) {
+                        fnme = df_movie[cntx]["path"]
+
+                        umovie = 0;
+
+                        for (cnty = 0; cnty < atst.length; cnty++) {
+                            if (fnme.toLowerCase().indexOf(atst[cnty]) != -1 || fnme.toLowerCase().indexOf(atst[cnty]) != -1) {
+                                umovie = 1;
+                                pxr.push(df_movie[cntx]);
+                            }
+                            else if (umovie == 0 && (fnme.toLowerCase().indexOf(".wmv") != -1)) {
+                                umovie = 1;
+                                pxr.push(df_movie[cntx]);
+                            }
+                        }
+                    }
+
+                    if (umovie == 1) {
+                        pxx = pxr;
+                        func_playerload(pxr);
+                    }
+                    else {
+                        alert("Cannot load movie");
+                    }
+
+                }
+
+
+                $().ready(function () {
+                    load_default_movie();
+                });
+
+
+                useimage = "";
+
+                function download(f) {
+                    file = f[f.selectedIndex].value
+
+                    if ($(f[f.selectedIndex]).data("trial") == 1) {
+                        document.location = file;
+                        return;
+                    }
+
+
+                    if (file != "") {
+                        $("#download_url").attr("href", file)
+
+                        $("#download_form").dialog({
+                            position: { my: "right top", at: "right bottom", of: $("#download_select") }
+                        });
+                    }
+                }
+
+                function videotoggle(f) {
+                    file = f[f.selectedIndex].value
+
+                    if ($(f[f.selectedIndex]).data("trial") == 1) {
+                        document.location = file;
+                        return;
+                    }
+
+                    if (file == "") {
+                        load_default_movie();
+                        return;
+                    }
+
+                    sp = file.split(":");
+                    loadmovie(sp[0], sp[1]);
+                }
+
+
+                var fp = 0;
+
+
+                function func_playerload(picarr) {
+
+                    var plg1_streamer = "stream.php"
+                    var plg1_type = "http"
+
+                    var plg2_streamer = ""
+                    var plg2_type = "video"
+
+
+                    flashVersion = "";
+
+                    try {
+                        try {
+                            // avoid fp6 minor version lookup issues
+                            // see: http://blog.deconcept.com/2006/01/11/getvariable-setvariable-crash-internet-explorer-flash-6/
+                            var axo = new ActiveXObject('ShockwaveFlash.ShockwaveFlash.6');
+                            try { axo.AllowScriptAccess = 'always'; }
+                            catch (e) { hasFlash = false; }
+                        } catch (e) { }
+                        flashVersion = new ActiveXObject('ShockwaveFlash.ShockwaveFlash').GetVariable('$version').replace(/\D+/g, ',').match(/^,?(.+),?$/)[1].split(',').shift();
+                        // other browsers
+                    } catch (e) {
+                        try {
+                            if (navigator.mimeTypes["application/x-shockwave-flash"].enabledPlugin) {
+                                flashVersion = (navigator.plugins["Shockwave Flash 2.0"] || navigator.plugins["Shockwave Flash"]).description.replace(/\D+/g, ",").match(/^,?(.+),?$/)[1].split(',').shift();
+                            }
+                        } catch (e) { }
+                    }
+
+
+                    if (flashVersion == "") { hasFlash = false; }
+                    else if (flashVersion < 10) { hasFlash = false; }
+                    else { hasFlash = true; }
+
+                    var testEl = document.createElement("video");
+                    h264 = false;
+                    m3u8 = false;
+                    if (testEl.canPlayType) {
+                        h264 = "" !== (testEl.canPlayType('video/mp4; codecs="avc1.42E01E"') || testEl.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"'));
+                        m3u8 = "" !== (testEl.canPlayType('application/x-mpegURL;'));
+                    }
+
+                    errmsg = "<p class='getflash'>Your web browser does not support this video format. Please install Flash Player 10 or greater.</p>";
+                    errmsg = errmsg + "<a target='_blank' href='http://get.adobe.com/flashplayer/'>Get Flash Player</a>"
+
+                    // Get IE version, if possible.
+
+                    var ie = (function () {
+
+                        var undef,
+                            v = 3,
+                            div = document.createElement('div'),
+                            all = div.getElementsByTagName('i');
+
+                        while (
+                            div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->',
+                            all[0]
+                        );
+
+                        return v > 4 ? v : undef;
+
+                    }());
+
+                    // IE9 has issues with HLS, so force flash player to be present.
+
+                    if (!hasFlash && (!h264 || (ie < 10))) {
+                        $("#mediabox").html(errmsg)
+                        $("#mediabox").css('padding-top', '180px');
+                        $("#mediabox").css('height', '360px');
+                        $("#mediabox").css('background-color', 'black');
+                        $("#mediabox").css('color', 'white');
+                        $("#mediabox a").css('color', 'white');
+                        return;
+                    }
+
+                    // If FLV streamer is of type http and doesn't include a full http URL, add one
+                    if (plg1_type == "http") {
+                        if (!plg1_streamer.match(/^http/)) {
+                            areaurl = "https://cockyboys.com/"
+                            if (areaurl.match(/^http/)) {
+                                plg1_streamer = areaurl + "/" + plg1_streamer;
+                            }
+                            else if (areaurl != "") {
+                                plg1_streamer = "http://" + window.location.hostname + "/" + "https://cockyboys.com/" + plg1_streamer;
+                            }
+                        }
+                    }
+
+                    var lst = [];
+                    var uimage = "";
+                    wdth = 50;
+                    hdth = 50;
+                    var started = 0;
+                    passobj = {};
+                    passobj.mode = 'auto';
+                    passobj.enablePluginSmoothing = true;
+
+
+
+                    $('video#mediabox').each(function () {
+                        player = $(this).data("mediaelementplayer");
+                        player.setSrc("");
+                        player.remove();
+                    });
+
+                    for (var cntx = 0; cntx < picarr.length; cntx++) {
+                        pa = picarr[cntx]
+
+                        if (parseInt(pa["movie_width"]) > 980) {
+                            wdth = 980;
+                            hdth = Math.ceil(parseInt(pa["movie_height"]) * (wdth) / parseInt(pa["movie_width"]));
+                        }
+                        else if (parseInt(pa["movie_width"]) > wdth) {
+                            wdth = parseInt(pa["movie_width"]);
+                            hdth = Math.ceil(parseInt(pa["movie_height"]) * (wdth) / parseInt(pa["movie_width"]));
+                        }
+
+                        flee = pa["path"] + "";
+
+                        playerlist = {}
+
+                        if (useimage != "") {
+                            uimage = useimage;
+                        }
+                        else {
+                            uimage = pa.thumbnail;
+                        }
+
+                        ext = flee.split('.').pop().split("?").shift();
+                        if (extl[ext] != undefined) {
+                            playerlist.type = extl[ext]
+                        }
+                        else {
+                            playerlist.type = "video/" + ext;
+                        }
+
+                        if ((flee.split('.').pop() == "mp4" || flee.split('.').pop() == "m4v" || flee.split('.').pop() == "f4v")) {
+                            fl_streamer = plg2_streamer;
+                            fl_type = plg2_type;
+                            rtmp_prefix = "mp4"
+                        }
+                        else if (flee.split('.').pop() == "m3u8") {
+                            fl_streamer = plg1_streamer;
+                            fl_type = plg1_type;
+                            rtmp_prefix = ""
+
+                            if (!m3u8 && hasFlash) passobj.mode = 'auto_plugin';
+                        }
+                        else if (flee.split('.').pop() == "flv") {
+                            fl_streamer = plg1_streamer;
+                            fl_type = plg1_type;
+                            rtmp_prefix = "flv"
+                        }
+                        else if (flee.split('.').pop() == "wmv") {
+                            fl_streamer = plg1_streamer;
+                            fl_type = plg1_type;
+                            rtmp_prefix = ""
+                        }
+                        else {
+                            fl_streamer = plg1_streamer;
+                            fl_type = plg1_type;
+                            rtmp_prefix = ""
+                        }
+
+                        if (fl_type == "lighttpd") {
+                            playerlist.src = flee;
+                            passobj.enablePseudoStreaming = true;
+                        }
+                        else if (fl_type == "http" && (fl_streamer.indexOf("stream.php") != -1) && (rtmp_prefix == "flv")) {
+                            playerlist.src = fl_streamer + "?file=" + encodeURI(flee);
+                        }
+                        else if (fl_type == "http") {
+                            // console.log("Please contact CMS support to setup / configure pseudostreaming")
+                            playerlist.src = flee;
+                        }
+                        else if (fl_type == "rtmp" && hasFlash) {
+                            playerlist.src = fl_streamer + "/" + rtmp_prefix + ":" + flee;
+                        }
+                        else {
+                            playerlist.src = flee;
+                        }
+
+
+                        lst[lst.length] = playerlist;
+                    }
+
+                    try {
+                        txt = '<video id="mediabox"'
+
+                        if (uimage != "" && uimage != undefined) {
+                            txt = txt + ' poster="' + uimage + '" ';
+                        }
+
+                        txt = txt + '>';
+                        for (i = 0; i < lst.length; i++) {
+                            txt = txt + "\n" + '<source type="' + lst[i].type + '" src="' + lst[i].src + '" />';
+                        }
+                        txt = txt + '</video>';
+
+                        $("#mediabox_parent").html(txt);
+
+                        passobj.success = function (media, node, player) {
+
+                            if ("1" != "0") {
+                                media.play();
+                            }
+
+                            media.addEventListener('play', function (e) {
+
+                                if (started == 0) {
+                                    for (i = 0; i < picarr.length; i++) {
+                                        if (media.src.indexOf(escape(picarr[i].path)) > 0) {
+                                            url = "stattrack.php?pagename=image&id=" + picarr[i].id + "&cg=" + picarr[i].setid + "&type=" + picarr[i].type + "&mt=" + picarr[i].name;
+                                            $.get(url);
+                                        }
+                                    }
+
+                                    started = 1;
+                                }
+                            });
+
+                            media.addEventListener('ended', function (e) {
+                                started = 0;
+                            });
+
+
+                            media.addEventListener('ended', function (e) {
+
+                                document.getElementById('mediabox_parent').style.display = 'none';
+                                document.getElementById('hpromo').style.display = 'block';
+                                document.getElementById('trailerViews').classList.add('notrailer');
+
+                                if (document.getElementById("postroll_url")) {
+                                    document.getElementById("postroll_url").href = "";
+                                }
+
+                            });
+
+                        };
+
+
+                        $('#mediabox').mediaelementplayer(passobj);
+                    }
+                    catch (e) {
+                        alert(e)
+                    }
+
+
+
+                }
+
+
+                $(document).ready(function () {
+                    //$("#movieformat_select").val("");
+                    $("#download_select").val("");
+                });
+
+            </script>
+
+
+
+
+
+
+
+
+
+
+            <!-- END PLAYER FUNCTIONS - START EDITABLE DESIGN CODE -->
+
+
+            <style>
+                .mejs-layer,
+                .mejs-video,
+                #mediabox {
+                    aspect-ratio: 960 / 540 !important;
+                    width: 100% !important;
+                    height: auto !important;
+                }
+
+                .movie_wrapper {
+                    width: 60%;
+                    background: #e4eaec;
+                    padding: 0;
+                    padding-top: 10px;
+                    background-size: 100% auto;
+                    position: relative;
+                }
+
+                .darkmode .movie_wrapper {
+                    background: #000;
+                }
+
+                #trailerViews {
+                    position: absolute;
+                    left: 5px;
+                    bottom: 20px;
+                    z-index: 100;
+                    background: rgba(0, 0, 0, 0.6);
+                    border-radius: 5px;
+                    background: transparent linear-gradient(180deg, #4da2cf 0%, #0e86be 40%, #0e86be 100%) 0% 0% no-repeat padding-box;
+                    color: #fff;
+                    padding: 2px 10px;
+                    -o-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                    -moz-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                    -webkit-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+                }
+
+                #trailerViews.notrailer {
+                    bottom: 5px;
+                }
+
+                #trailerJoin {
+                    display: flex;
+                    flex-flow: row nowrap;
+                    justify-content: center;
+                    margin-left: 3%;
+                }
+
+                #signupframe {
+                    width: 40%;
+                    border: 0;
+                    aspect-ratio: 580 / 800;
+                    max-width: 570px;
+                    margin-top: 5px;
+                }
+
+                .sectionTitle {
+                    font-size: 33px;
+                    margin-top: 20px;
+                }
+
+                .movieDesc {
+                    margin: 20px 25px;
+                    padding-bottom: 15px;
+                    font-size: 22px;
+                    line-height: 27px;
+                    border-bottom: 0;
+                }
+
+                #movieHeader {
+                    display: none;
+                }
+
+                #tags {
+                    margin: -15px 0 -5px 25px;
+                }
+
+                #tags a {
+                    background: #003761;
+                    color: #fff;
+                    margin: 0 5px 5px 0;
+                    padding: 1px 12px;
+                    border-radius: 10px;
+                    font-weight: bold;
+                    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.6);
+                    font-size: 20px;
+                    white-space: nowrap;
+                    display: inline-block;
+                }
+
+                #tags a:hover {
+                    background: #d6352c;
+                }
+
+                .darkmode #tags a {
+                    background: #5aadd6;
+                }
+
+                .underPlayer,
+                .movieLeft,
+                .movieRight {
+                    display: none;
+                }
+            </style>
+
+
+            <div id="trailerJoin">
+
+                <!--Movie player code-->
+                <div class="movie_wrapper">
+
+
+                    <div style="position: relative;">
+
+                        <p id="trailerViews">You have<strong> 0 free preview(s)</strong> left.</p>
+
+                        <div id="hpromo" style="display:none; position: relative;">
+
+                            <div id="featured" class="call2action two">
+                                <a href="/join.php" rel="nofollow" class="playArrow" title="Join CockyBoys">Join
+                                    Now!</a>
+                                <span>
+                                    <a href="/join.php" rel="nofollow" class="title" title="Become a Member!"> <img
+                                            src="https://cdn.cockyboys.com/images_v4/callActionText1w.png" style=""
+                                            alt="Join CockyBoys"><img
+                                            src="https://cdn.cockyboys.com/images_v4/callActionText2w.png"
+                                            alt="Join CockyBoys"></a>
+                                    <a href="/join.php" rel="nofollow" class="watchButton join grow"
+                                        title="Join CockyBoys">Become a Member</a>
+                                </span>
+                                <video poster="/a4a/images/poster2a.jpg" loop="" muted="" autoplay="">
+                                    <source src="https://cdn.cockyboys.com/a4a/atob_02.mp4" type="video/mp4">
+                                    <img src="/a4a/images/poster2a.jpg" alt="Join CockyBoys">
+                                </video>
+                            </div>
+
+                        </div>
+
+                        <div id="mediabox_parent" align="center" style="position: relative;"><span
+                                class="mejs-offscreen">Video Player</span>
+                            <div id="mep_0" class="mejs-container svg mejs-video" tabindex="0" role="application"
+                                aria-label="Video Player" style="width: 960px; height: 540px;">
+                                <div class="mejs-inner">
+                                    <div class="mejs-mediaelement"><video id="mediabox"
+                                            src="https://cdn.cockyboys.com/content//upload/Blake-Mitchell-Nico_leon/trailer/Blake_Mitchell_Nico_Leon_trailer.mp4"
+                                            width="960" height="540">
+                                            <source type="video/mp4"
+                                                src="https://cdn.cockyboys.com/content//upload/Blake-Mitchell-Nico_leon/trailer/Blake_Mitchell_Nico_Leon_trailer.mp4">
+                                        </video></div>
+                                    <div class="mejs-layers">
+                                        <div class="mejs-poster mejs-layer"
+                                            style="display: none; width: 960px; height: 540px;"></div>
+                                        <div class="mejs-overlay mejs-layer"
+                                            style="width: 960px; height: 540px; display: none;">
+                                            <div class="mejs-overlay-loading"><span></span></div>
+                                        </div>
+                                        <div class="mejs-overlay mejs-layer"
+                                            style="display: none; width: 960px; height: 540px;">
+                                            <div class="mejs-overlay-error"></div>
+                                        </div>
+                                        <div class="mejs-overlay mejs-layer mejs-overlay-play"
+                                            style="width: 960px; height: 540px; display: block;">
+                                            <div class="mejs-overlay-button"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mejs-controls" style="display: block; visibility: hidden;">
+                                        <div class="mejs-button mejs-playpause-button mejs-play"><button type="button"
+                                                aria-controls="mep_0" title="Play" aria-label="Play"></button></div>
+                                        <div class="mejs-time mejs-currenttime-container" role="timer" aria-live="off">
+                                            <span class="mejs-currenttime">00:14</span></div>
+                                        <div class="mejs-time-rail" style="width: 651px;"><span
+                                                class="mejs-time-total mejs-time-slider" style="width: 641px;"
+                                                aria-label="Time Slider" aria-valuemin="0" aria-valuemax="101.5014"
+                                                aria-valuenow="14.407643" aria-valuetext="00:14" role="slider"
+                                                tabindex="0"><span class="mejs-time-buffering"
+                                                    style="display: none;"></span><span class="mejs-time-loaded"
+                                                    style="width: 178.574px;"></span><span class="mejs-time-current"
+                                                    style="width: 91px;"></span><span class="mejs-time-handle"
+                                                    style="left: 84px;"></span><span class="mejs-time-float"
+                                                    style="display: none; left: 296.75px;"><span
+                                                        class="mejs-time-float-current">00:31</span><span
+                                                        class="mejs-time-float-corner"></span></span></span></div>
+                                        <div class="mejs-time mejs-duration-container"><span
+                                                class="mejs-duration">01:41</span></div>
+                                        <div class="mejs-button mejs-volume-button mejs-mute"><button type="button"
+                                                aria-controls="mep_0" title="Mute" aria-label="Mute"></button><a
+                                                href="javascript:void(0);" class="mejs-volume-slider"
+                                                style="display: none;" aria-label="volumeSlider" aria-valuemin="0"
+                                                aria-valuemax="100" aria-valuenow="80" aria-valuetext="80%"
+                                                role="slider" tabindex="0"><span class="mejs-offscreen">Use Up/Down
+                                                    Arrow keys to increase or decrease volume.</span>
+                                                <div class="mejs-volume-total"></div>
+                                                <div class="mejs-volume-current" style="height: 80px; top: 28px;"></div>
+                                                <div class="mejs-volume-handle" style="top: 25px;"></div>
+                                            </a></div>
+                                        <div class="mejs-button mejs-fullscreen-button"><button type="button"
+                                                aria-controls="mep_0" title="Fullscreen"
+                                                aria-label="Fullscreen"></button></div>
+                                    </div>
+                                    <div class="mejs-clear"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Do not delete this -->
+                    <div id="nomansland" style="width:0px; height:0px;position:absolute;"></div>
+
+                    <h1 class="gothamy sectionTitle">Camp CockyBoys: Blake Mitchell &amp; Nico Leon</h1>
+                    <div class="movieDesc"><a href="/models/blake-mitchell.html" title="Blake Mitchell">Blake
+                            Mitchell</a>'s return to Camp CockyBoys continues as he finally gets to play out a fantasy
+                        with<a href="/models/nico-leon.html" title="Nico Leon"> Nico Leon</a>! Blake surprises and
+                        delights Nico with dreamy set-up: a big, inviting bed in the woods. Just like that they sweetly
+                        make out on the bed with Blake's lips and hands making their way down Nico's ripped torso. He
+                        traces every muscle until he finally opens Nico's shorts to suck his growing cock.
+                        <br><br>
+                        Nico basks in Blake's oral &amp; tactile until he sits up to kiss him back more passionately.
+                        Soon though he wants Blake's big uncut cock in his mouth and positions himself on his back to
+                        receive it. After feeding Nico and face-fucking him, Blake swivels him around to tongue fuck
+                        him. He soon makes a smooth transition to sliding his cock into Nico and thrusting deep into the
+                        moaning bottom.Blake pounds Nico and spurred by his vocal responses, he goes harder and grips
+                        his neck
+                        <br><br>
+                        Blake also gives Nico some control to sit on his cock and ride Blake as he pleases. Blake loves
+                        it but in time takes the wheel again to fuck Nico from the side. He soon can't hold back any
+                        more and pulls out to cream over Nico's hole and slide back into him. Nico is on the edge too
+                        and as he lies back Blake's mere touch make him erupt in a thick load. And after remarking how
+                        amazing that was, Blake and Nico lie in each other's arms. <br><br>
+
+                        Enjoy,<br>
+                        Jake Jaxson
+                    </div>
+                    <div id="tags">
+                        <a href="/sets.php?id=595" title="Blake Mitchell">Blake Mitchell</a><a href="/sets.php?id=584"
+                            title="Nico Leon">Nico Leon</a>
+                        <a href="https://cockyboys.com/categories/bareback.html">BareBack</a><a
+                            href="https://cockyboys.com/categories/boyfriends-romance.html">Boyfriends &amp;
+                            Romance</a><a href="https://cockyboys.com/categories/condomless.html">Condomless</a><a
+                            href="https://cockyboys.com/categories/hung-amp-big-dicks.html">Hung &amp; Big Dicks</a><a
+                            href="https://cockyboys.com/categories/muscled.html">Muscled</a><a
+                            href="https://cockyboys.com/categories/oral-deep-throating.html">Oral &amp; Deep
+                            Throating</a><a href="https://cockyboys.com/categories/outdoors.html">Outdoors</a><a
+                            href="https://cockyboys.com/categories/power-bottoms.html">Power Bottoms</a>
+                    </div>
+
+                </div>
+
+
+                <iframe id="signupframe"
+                    src="https://join.cockyboys.com/signup/signup.php?nats=NDAwMTIxNS4xLjEuMS4wLjAuMC4wLjA&amp;switched=1&amp;strack=0&amp;iframe=1&amp;darkmode=off"
+                    class="darkToggle"
+                    data-light="https://join.cockyboys.com/signup/signup.php?nats=NDAwMTIxNS4xLjEuMS4wLjAuMC4wLjA&amp;switched=1&amp;strack=0&amp;iframe=1&amp;darkmode=off"
+                    data-dark="https://join.cockyboys.com/signup/signup.php?nats=NDAwMTIxNS4xLjEuMS4wLjAuMC4wLjA&amp;switched=1&amp;strack=0&amp;darkmode=on&amp;iframe=1&amp;"></iframe>
+
+
+            </div>
+
+
+
+        </div>
+
+
+
+        <div class="underPlayer">
+            <div>
+                <p class="gothamy">9.3</p>
+                <span class="gothamy">Avg Rating</span>
+            </div>
+
+
+            <a href="https://cockyboys.com/join.php" rel="nofollow" class="container favorite">
+                <img src="https://cdn.cockyboys.com/images/icon-favorite-dm.png" alt="Favorite"
+                    class="iconPlayer darkToggle" data-light="https://cdn.cockyboys.com/images/icon-favorite.png"
+                    data-dark="https://cdn.cockyboys.com/images/icon-favorite-dm.png">
+                <span class="gothamy">Add to Playlist</span>
+            </a>
+
+            <style>
+                img.iconPlayer {
+                    width: 55px;
+                }
+            </style>
+
+            <div id="info">
+                <p>
+                    <span><strong>Released:</strong> 08/27/2020</span>
+
+                    <span><strong>Categorized Under:</strong>
+                        <a href="https://cockyboys.com/categories/bareback.html">BareBack</a><a
+                            href="https://cockyboys.com/categories/boyfriends-romance.html">Boyfriends &amp;
+                            Romance</a><a href="https://cockyboys.com/categories/condomless.html">Condomless</a><a
+                            href="https://cockyboys.com/categories/hung-amp-big-dicks.html">Hung &amp; Big Dicks</a><a
+                            href="https://cockyboys.com/categories/muscled.html">Muscled</a><a
+                            href="https://cockyboys.com/categories/oral-deep-throating.html">Oral &amp; Deep
+                            Throating</a><a href="https://cockyboys.com/categories/outdoors.html">Outdoors</a><a
+                            href="https://cockyboys.com/categories/power-bottoms.html">Power Bottoms</a></span>
+
+                    <!-- model names -->
+                    <span><strong>Featuring: </strong> <a href="/sets.php?id=595" title="Blake Mitchell">Blake
+                            Mitchell</a> &amp; <a href="/sets.php?id=584" title="Nico Leon">Nico Leon</a> </span>
+                    <span>
+                    </span>
+                </p>
+            </div>
+
+            <a href="/join.php" class="container iconComment">
+
+                <img src="https://cdn.cockyboys.com/images/icon-watch-dm.png" alt="Watch" class="iconPlayer darkToggle"
+                    data-light="https://cdn.cockyboys.com/images/icon-watch.png"
+                    data-dark="https://cdn.cockyboys.com/images/icon-watch-dm.png">
+
+                <span class="gothamy">Watch</span>
+            </a>
+            <a href="/join.php" class="container iconImages">
+
+                <img src="https://cdn.cockyboys.com/images/icon-images-dm.png" alt="Images"
+                    class="iconPlayer darkToggle" data-light="https://cdn.cockyboys.com/images/icon-images.png"
+                    data-dark="https://cdn.cockyboys.com/images/icon-images-dm.png">
+
+                <span class="gothamy">Images</span>
+            </a>
+            <a href="/join.php" rel="nofollow" class="container iconScreen">
+
+                <img src="https://cdn.cockyboys.com/images/icon-stills2-dm.png" alt="Screengrabs"
+                    class="iconPlayer darkToggle" data-light="https://cdn.cockyboys.com/images/icon-stills2.png"
+                    data-dark="https://cdn.cockyboys.com/images/icon-stills2-dm.png">
+
+
+                <span class="gothamy">Screen Grabs</span>
+            </a>
+            <a href="javascript:;" style="border-right: 1px solid #a9a9a9;" class="container iconMore">
+
+                <img src="https://cdn.cockyboys.com/images/icon-more-dm.png" alt="More like this"
+                    class="iconPlayer darkToggle" data-light="https://cdn.cockyboys.com/images/icon-more.png"
+                    data-dark="https://cdn.cockyboys.com/images/icon-more-dm.png">
+
+
+                <span class="gothamy">More Like This</span>
+            </a>
+        </div>
+
+
+        <div class="movieLeft">
+            <div class="movieDesc">
+                <h2 class="gothamy">Description</h2>
+                <a href="/models/blake-mitchell.html" title="Blake Mitchell">Blake Mitchell</a>'s return to Camp
+                CockyBoys continues as he finally gets to play out a fantasy with<a href="/models/nico-leon.html"
+                    title="Nico Leon"> Nico Leon</a>! Blake surprises and delights Nico with dreamy set-up: a big,
+                inviting bed in the woods. Just like that they sweetly make out on the bed with Blake's lips and hands
+                making their way down Nico's ripped torso. He traces every muscle until he finally opens Nico's shorts
+                to suck his growing cock.
+                <br><br>
+                Nico basks in Blake's oral &amp; tactile until he sits up to kiss him back more passionately. Soon
+                though he wants Blake's big uncut cock in his mouth and positions himself on his back to receive it.
+                After feeding Nico and face-fucking him, Blake swivels him around to tongue fuck him. He soon makes a
+                smooth transition to sliding his cock into Nico and thrusting deep into the moaning bottom.Blake pounds
+                Nico and spurred by his vocal responses, he goes harder and grips his neck
+                <br><br>
+                Blake also gives Nico some control to sit on his cock and ride Blake as he pleases. Blake loves it but
+                in time takes the wheel again to fuck Nico from the side. He soon can't hold back any more and pulls out
+                to cream over Nico's hole and slide back into him. Nico is on the edge too and as he lies back Blake's
+                mere touch make him erupt in a thick load. And after remarking how amazing that was, Blake and Nico lie
+                in each other's arms. <br><br>
+
+                Enjoy,<br>
+                Jake Jaxson
+            </div>
+
+            <!-- model thumbs -->
+            <div class="movieModels">
+                <h2 class="gothamy">Models Featured in this Scene</h2>
+                <span>
+                    <a class="name gothamy" href="/models/blake-mitchell.html" title="Blake Mitchell">Blake Mitchell</a>
+                    <a class="fade" href="/models/blake-mitchell.html" title="Blake Mitchell"><img
+                            src="https://cdn.cockyboys.com/content//contentthumbs/2444-set.jpg"
+                            alt="Blake Mitchell"></a>
+                </span>
+                <span>
+                    <a class="name gothamy" href="/models/nico-leon.html" title="Nico Leon">Nico Leon</a>
+                    <a class="fade" href="/models/nico-leon.html" title="Nico Leon"><img
+                            src="https://cdn.cockyboys.com/content//contentthumbs/2293-set.jpg" alt="Nico Leon"></a>
+                </span>
+            </div>
+
+            <!-- ADVERT CAM LEFT SIDE -->
+
+        </div>
+
+        <style>
+            .movieRight iframe {
+                height: 850px;
+                min-height: auto;
+                max-width: 800px;
+            }
+        </style>
+        <div class="movieRight">
+
+
+        </div>
+
+        <br style="clear: both;">
+
+        <div class="bottom">
+            <span id="scrollToMe"></span>
+
+            <!-- DVDs -->
+
+            <div class="movieDVDs">
+                <a href="/dvds.php?id=77" title=""><img
+                        src="https://cdn.cockyboys.com/content//contentthumbs/303-dvdasc.jpg" alt=""></a>
+                <div>
+                    <em class="gothamy">This scene is featured in</em>
+                    <p class="gothamy"><a href="/dvds.php?id=77" title="">Lips Together</a></p>
+                    <p class="gothamy blurb">Written &amp; Directed by Jake Jaxson &amp; RJ Sebastian.</p>
+                    <a class="watchButton" href="/dvds.php?id=77"><i class="fa fa-play"></i> View Episodes</a>
+                    <span class="watchButton gothamy"><i class="fa fa-shopping-cart"></i> DVD On Sale Soon!</span>
+                    <p></p>
+
+                    <p>Featuring:
+                        <a href="/sets.php?id=599" title="Austin Avery">Austin Avery</a>, <a href="/sets.php?id=600"
+                            title="Brock Banks">Brock Banks</a>, <a href="/sets.php?id=618" title="Sharok">Sharok</a>,
+                        <a href="/sets.php?id=543" title="Sean Ford">Sean Ford</a>, <a href="/sets.php?id=620"
+                            title="Angel Rivera">Angel Rivera</a>, <a href="/sets.php?id=584" title="Nico Leon">Nico
+                            Leon</a>, <a href="/sets.php?id=595" title="Blake Mitchell">Blake Mitchell</a>, <a
+                            href="/sets.php?id=515" title="Benjamin Blue">Benjamin Blue</a> &amp; <a
+                            href="/sets.php?id=536" title="">Skyy Knox</a>
+                    </p>
+                    <p>Angel Rivera makes his CockyBoys Exclusive debut in the poignant short, “Lips Together – Six Feet
+                        Apart” written and directed by Jake Jaxson &amp; RJ Sebastian. Joined by Exclusive Sean Ford,
+                        Lips Together showcases the sweet longing that occurs when one is forced to be apart from
+                        someone they love. Blake Mitchell, Nico Leon, Brock Banks &amp; Sharok fill out the cast on this
+                        collection of wistful sexual encounters.</p>
+                </div>
+            </div>
+
+            <h2 class="gothamy">You Might Also Like</h2>
+            <div class="horizontal alsolike" style="padding-bottom: 20px; margin-bottom: 20px;">
+                <div class="item" style="margin: 0.5%; width: 23%;">
+                    <a class="playArrow"
+                        style="background: url(https://cockyboys.com/images_v3/white/angelPlay.png) center 40% no-repeat; background-size: 50px"
+                        href="/gallery.php?id=2032&amp;type=vids&amp;" title="Angel Rivera &amp; Sean Ford">Play</a>
+
+                    <a class="sceneTitle gothamy" href="/gallery.php?id=2032&amp;type=vids&amp;"
+                        title="Angel Rivera &amp; Sean Ford">
+                        <strong>Angel Rivera &amp; Sean Ford</strong>
+                    </a>
+                    <a href="/gallery.php?id=2032&amp;type=vids&amp;" title="Angel Rivera &amp; Sean Ford">
+                        <img style="width: 100%;" src="https://cdn.cockyboys.com/content/contentthumbs/23213.jpg"
+                            alt="Angel Rivera &amp; Sean Ford">
+                    </a>
+                </div>
+                <div class="item" style="margin: 0.5%; width: 23%;">
+
+                    <a class="playArrow" href="/gallery.php?id=2036&amp;type=vids&amp;"
+                        title="Benjamin Blue &amp; Skyy Knox">Play</a>
+
+                    <a class="sceneTitle gothamy" href="/gallery.php?id=2036&amp;type=vids&amp;"
+                        title="Benjamin Blue &amp; Skyy Knox">
+                        <strong>Benjamin Blue &amp; Skyy Knox</strong>
+                    </a>
+                    <a href="/gallery.php?id=2036&amp;type=vids&amp;" title="Benjamin Blue &amp; Skyy Knox">
+                        <img style="width: 100%;" src="https://cdn.cockyboys.com/content/contentthumbs/23221.jpg"
+                            alt="Benjamin Blue &amp; Skyy Knox">
+                    </a>
+                </div>
+                <div class="item" style="margin: 0.5%; width: 23%;">
+                    <a class="playArrow"
+                        style="background: url(https://cockyboys.com/images_v3/white/angelPlay.png) center 40% no-repeat; background-size: 50px"
+                        href="/gallery.php?id=2028&amp;type=vids&amp;"
+                        title="Austin Avery, Brock Banks &amp; Sharok">Play</a>
+
+                    <a class="sceneTitle gothamy" href="/gallery.php?id=2028&amp;type=vids&amp;"
+                        title="Austin Avery, Brock Banks &amp; Sharok">
+                        <strong>Austin Avery, Brock Banks &amp; Sharok</strong>
+                    </a>
+                    <a href="/gallery.php?id=2028&amp;type=vids&amp;" title="Austin Avery, Brock Banks &amp; Sharok">
+                        <img style="width: 100%;" src="https://cdn.cockyboys.com/content/contentthumbs/23199.jpg"
+                            alt="Austin Avery, Brock Banks &amp; Sharok">
+                    </a>
+                </div>
+                <div class="item" style="margin: 0.5%; width: 23%;">
+
+                    <a class="playArrow" href="/gallery.php?id=2026&amp;type=vids&amp;"
+                        title="Blake Mitchell &amp; Levi Karter">Play</a>
+
+                    <a class="sceneTitle gothamy" href="/gallery.php?id=2026&amp;type=vids&amp;"
+                        title="Blake Mitchell &amp; Levi Karter">
+                        <strong>Blake Mitchell &amp; Levi Karter</strong>
+                    </a>
+                    <a href="/gallery.php?id=2026&amp;type=vids&amp;" title="Blake Mitchell &amp; Levi Karter">
+                        <img style="width: 100%;" src="https://cdn.cockyboys.com/content/contentthumbs/23196.jpg"
+                            alt="Blake Mitchell &amp; Levi Karter">
+                    </a>
+                </div>
+                <div class="item" style="margin: 0.5%; width: 23%;">
+                    <a class="playArrow"
+                        style="background: url(https://cockyboys.com/images_v3/white/angelPlay.png) center 40% no-repeat; background-size: 50px"
+                        href="/gallery.php?id=1978&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine: Blake Mitchell &amp; Avery Jones ">Play</a>
+
+                    <a class="sceneTitle gothamy" href="/gallery.php?id=1978&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine: Blake Mitchell &amp; Avery Jones ">
+                        <strong>Hollywood &amp; Vine: Blake Mitchell &amp; Avery Jones </strong>
+                    </a>
+                    <a href="/gallery.php?id=1978&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine: Blake Mitchell &amp; Avery Jones ">
+                        <img style="width: 100%;" src="https://cdn.cockyboys.com/content/contentthumbs/23087.jpg"
+                            alt="Hollywood &amp; Vine: Blake Mitchell &amp; Avery Jones ">
+                    </a>
+                </div>
+                <div class="item" style="margin: 0.5%; width: 23%;">
+
+                    <a class="playArrow" href="/gallery.php?id=2016&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine Behind The Scenes w/Avery, Tayte, Blake &amp; Nico">Play</a>
+
+                    <a class="sceneTitle gothamy" href="/gallery.php?id=2016&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine Behind The Scenes w/Avery, Tayte, Blake &amp; Nico">
+                        <strong>Hollywood &amp; Vine Behind The Scenes w/Avery, Tayte, Blake &amp; Nico</strong>
+                    </a>
+                    <a href="/gallery.php?id=2016&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine Behind The Scenes w/Avery, Tayte, Blake &amp; Nico">
+                        <img style="width: 100%;" src="https://cdn.cockyboys.com/content/contentthumbs/23174.jpg"
+                            alt="Hollywood &amp; Vine Behind The Scenes w/Avery, Tayte, Blake &amp; Nico">
+                    </a>
+                </div>
+                <div class="item" style="margin: 0.5%; width: 23%;">
+                    <a class="playArrow"
+                        style="background: url(https://cockyboys.com/images_v3/white/angelPlay.png) center 40% no-repeat; background-size: 50px"
+                        href="/gallery.php?id=1982&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine: Nico Leon, Leo Grand &amp; Tayte Hanson ">Play</a>
+
+                    <a class="sceneTitle gothamy" href="/gallery.php?id=1982&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine: Nico Leon, Leo Grand &amp; Tayte Hanson ">
+                        <strong>Hollywood &amp; Vine: Nico Leon, Leo Grand &amp; Tayte Hanson </strong>
+                    </a>
+                    <a href="/gallery.php?id=1982&amp;type=vids&amp;"
+                        title="Hollywood &amp; Vine: Nico Leon, Leo Grand &amp; Tayte Hanson ">
+                        <img style="width: 100%;" src="https://cdn.cockyboys.com/content/contentthumbs/23104.jpg"
+                            alt="Hollywood &amp; Vine: Nico Leon, Leo Grand &amp; Tayte Hanson ">
+                    </a>
+                </div>
+                <div class="item" style="margin: 0.5%; width: 23%;">
+
+                    <a class="playArrow" href="/gallery.php?id=1934&amp;type=vids&amp;"
+                        title="Blake Mitchell &amp; Leo Grand">Play</a>
+
+                    <a class="sceneTitle gothamy" href="/gallery.php?id=1934&amp;type=vids&amp;"
+                        title="Blake Mitchell &amp; Leo Grand">
+                        <strong>Blake Mitchell &amp; Leo Grand</strong>
+                    </a>
+                    <a href="/gallery.php?id=1934&amp;type=vids&amp;" title="Blake Mitchell &amp; Leo Grand">
+                        <img style="width: 100%;" src="https://cdn.cockyboys.com/content/contentthumbs/22970.jpg"
+                            alt="Blake Mitchell &amp; Leo Grand">
+                    </a>
+                </div>
+            </div>
+            <span id="f4fAPI"></span>
+
+        </div>
+
+    </div>
+
+    <!-- bottom advertisement -->
+
+
+    <!-- commenting guidelines -->
+    <!--<div id="preventDownloads" style="display: none;">
+	<div>
+    	<a class="close" href="javascript:;"><i class="fa fa-times"></i></a>
+    	<h3><i class="fa fa-cloud-download"></i><strong>Help Us</strong> Prevent Piracy</h3>
+        <p>Piracy is a serious problem. Every time a member downloads a movie and illegally shares it, whether with their friends, or on a file sharing website for millions to watch for free, it makes it harder for us to stay in business.</p>
+        <p>The way that we give you&mdash;our members&mdash;a premium entertainment experience, pay our performers, pay our staff, and pay production overhead, is by selling memberships on our website. Despite being a small business, we do our best to provide quality incomes and benefits for our employees, and we pay our models some of the highest rates in the industry. Every time one of our films are shared and pirated, it makes it harder for us to continue creating the sum total that is the CockyBoys community.</p>
+        <p>So we ask for your patience and understanding while this episode remains exclusively streaming-only on CockyBoys for 30 days. After that period this episode will be available for download on your private computer. Please note that this policy is NOT for all scenes. This policy only applies select, feature productions. Questions or concerns? Please don't hesitate to contact us by <a href="/pages.php?id=account#contact">clicking here</a> or by visiting our Frequently Asked Questions page <a href="/pages.php?id=account#help">here.</a></p>
+        <p>Love Always,</p>
+        <p>The CockyBoys Team</p>
+    </div>
+</div>-->
+
+    <!-- affiliate sale pop-up for bonus updates-->
+
+
+    <style>
+        .callBanner {
+            marign-top: 10px;
+        }
+    </style>
+
+    <style>
+        .cta1 {
+            color: #003761;
+            font-family: 'Open Sans', sans-serif;
+            text-align: center;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-around;
+            align-items: center;
+            margin: 0 auto;
+            max-width: 1400px;
+            padding: 20px 0 40px;
+            height: 240px;
+        }
+
+        .darkmode .cta1,
+        .darkmode .cta1 h1,
+        .darkmode .cta1 h2 {
+            color: #fff;
+        }
+
+        .cta1 h1 {
+            font-size: 3em;
+            line-height: 1em;
+            font-weight: 400;
+            margin-top: 0;
+            color: #a92720;
+        }
+
+        .darkmode h1 {
+            color: #fff;
+        }
+
+        .cta1 h2 {
+            font-size: 1.9em;
+            line-height: 1.1em;
+            margin: 0 0 25px;
+            font-weight: 300;
+        }
+
+        .cta1>div {
+            width: 45%;
+            height: 100%;
+        }
+
+        .cta1 .watchButton {
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 1.6em;
+            padding: 14px 50px;
+            -o-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            -webkit-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            -moz-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            width: auto !important;
+        }
+
+        .cta1>div:last-child {
+            /*margin-top: 3%;*/
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cta1 div div {
+            display: flex !important;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            line-height: 1.3em;
+            font-weight: 600;
+            text-align: center;
+            width: 100%;
+            font-weight: 100;
+            top: 50% !important;
+            transform: translateY(-50%);
+            border: 5px solid #4da2cf;
+            padding: 40px 20px;
+        }
+
+        .darkmode .cta1 div div {
+            border: 0;
+            padding: 0;
+        }
+
+        .cta1 div div img {
+            height: 60px;
+        }
+
+        .cta1 div div p {
+            margin-bottom: 0;
+        }
+
+        .cta1 div div em {
+            display: inline-block;
+            margin: 0 5px;
+        }
+
+        @media only screen and (min-width: 1960px) {
+
+            .cta1 {
+                max-width: 2000px;
+            }
+
+            .cta1 h1 {
+                font-size: 3.6em;
+            }
+
+            .cta1 h2 {
+                font-size: 2.4em;
+            }
+
+            .cta1 div div {
+                font-size: 1.9em;
+            }
+
+            .cta1 div div img {
+                height: 80px;
+            }
+
+        }
+    </style>
+
+
+    <style>
+        .cta3 {
+            font-size: 23px;
+            margin: 0 auto 40px;
+            display: block;
+            width: 460px;
+            text-align: center;
+            padding: 17px 0;
+            -o-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            -webkit-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            -moz-text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.6);
+            margin: 50px auto 5px !important;
+        }
+
+        .darkmode .cta3 {
+            background: transparent linear-gradient(180deg, #feeeb8 0%, #b5884f 40%, #b5884f 100%) 0% 0% no-repeat padding-box;
+        }
+    </style>
+
+    <div class="callBanner">
+        <a href="/join.php" title="Join now to start watching">
+            <!--img src="https://cdn.cockyboys.com/banners/251001-3.jpg" alt="Join now to start watching"-->
+            <img src="https://cdn.cockyboys.com/banners/260309.jpg" alt="Join now to start watching">
+        </a>
+    </div>
+
+
+    <img src="https://cdn.cockyboys.com/nats/img/logo-black.png" alt="CockBoys Logo" class="darkToggle"
+        data-light="https://cdn.cockyboys.com/nats/img/logo-black.png"
+        data-dark="https://cdn.cockyboys.com/images_v4/logo.png" style="display: block;
+    margin: 30px auto -10px;
+    height: 50px;">
+
+
+    <a href="/join.php" class="grow watchButton cta2 cta3">Join Now to Start Watching</a>
+
+
+    <article class="newsTicker desktop" style="margin-top: 50px;">
+
+        <p><span>●</span> 2,500+ Hardcore Scenes <span>●</span> 200+ Top Pornstars <span>●</span> 100+ Industry Awards
+            <span>●</span> Multiple Weekly Updates <span>●</span> 100% Private &amp; Safe <span>●</span> Cancel Anytime
+            <!--span>●</span--></p>
+
+    </article>
+
+
+
+
+    <!-- closes "wrapper", which is opened in header.tpl -->
+
+
+    <!-- no javascript alert -->
+    <noscript>
+        <div id="javascript">
+            <div>
+                <h3><i class="fa fa-exclamation-triangle"></i><strong>Javascript</strong> Required</h3>
+                <p>Nowadays, almost all web pages contain JavaScript, a scripting programming language that allows
+                    robust web features, videos, and basically, all the things that can make a website experience
+                    awesome for you, the user.</p>
+                <p>So, to keep things working awesomely for you, and to enjoy the full experience and features of
+                    CockyBoys.com, you'll need to enable JavaScript in your web browser.</p>
+                <p>After enabling JavaScript, refresh this page and everything will be right again with the world (or at
+                    the very least, your porning experience).</p>
+                <a href="http://enable-javascript.com/" class="gothamy" target="_blank" title="Enable javascript">Learn
+                    How to Enable Javascript</a>
+                <a href="/pages.php?id=account#contact" class="gothamy" title="Contact us">Having Trouble? Contact
+                    Customer Service</a>
+            </div>
+        </div>
+    </noscript>
+
+    <div id="cookies" style="display: none;">
+        <p><i class="fa fa-exclamation-triangle"></i> Cookies must be enabled to enjoy the full features of this
+            website. Learn more about cookies and how to enable them by <a
+                href="http://www.wikihow.com/Enable-Cookies-in-Your-Internet-Web-Browser" target="_blank"
+                title="Enable cookies in your browser">clicking here.</a></p>
+    </div>
+
+    <div id="footer">
+
+        <div id="footerContainer">
+
+            <div id="footerManifesto">
+                <h4 style="text-align: center; margin-bottom: 10px;">The Manifesto</h4>
+                <div class="cycle-slideshow manifesto" data-cycle-pause-on-hover="true"
+                    data-cycle-auto-height="container" data-cycle-fx="fade" data-cycle-speed="1000"
+                    data-cycle-timeout="5000" data-cycle-slides=".slideBox" style="position: relative; height: 34px;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <!--div class="slideBox"><p class="manifestoItem" style="padding-top:15px">Oscar Wilde said it best – “Humanity takes itself too seriously. It is the world’s original sin. If the caveman had known how to laugh, history would have been different.”</p></div-->
+
+                    <div style="text-align: center; width:100%; position:absolute; bottom:-50px;" class="cycle-next">
+                        <img src="https://cockyboys.com/images_v3/white/navAngel.png" alt="CockyBoys halo logo"></div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 89; opacity: 0; display: block; visibility: hidden;">
+                        <p class="manifestoItem">Be proud!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 88; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">You are not a type. You are you.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 87; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">“Cocky” does not mean rude.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 86; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Gay sex is not shameful. It is a blessing like a fine wine, a great
+                            meal, or a roller coaster ride. It is part of life and should be enjoyed.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 85; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Be safe. Be smart in all that you do. When in doubt, use the head
+                            holding up your ears!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 84; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Negativity only invites and creates more negativity.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 100; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Mutual respect is the path to true power. Power = pride. Pride = loving
+                            yourself. Love yourself and you can love another.</p>
+                    </div>
+                    <div class="slideBox cycle-slide cycle-slide-active"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 99; visibility: visible; opacity: 1; display: block;">
+                        <p class="manifestoItem">Gay is good.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 97; visibility: hidden;">
+                        <p class="manifestoItem">CockyBoys are proud, confident men. At times funny, goofy, sometimes
+                            crazy, and shy.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 96; visibility: hidden;">
+                        <p class="manifestoItem">They have dark days along with good. They like being admired. They do
+                            not succumb to cowardice.<br>
+                            They love and want to be loved.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 95; visibility: hidden;">
+                        <p class="manifestoItem">I am a CockyBoy!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 94; visibility: hidden;">
+                        <p class="manifestoItem">I am a CockyBoy!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 93; visibility: hidden;">
+                        <p class="manifestoItem">Please check your high horse at the door.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 92; visibility: hidden;">
+                        <p class="manifestoItem">There is nothing wrong with being a “porn star.” It may not be your
+                            choice. Choice is freedom. So choose.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 91; visibility: hidden;">
+                        <p class="manifestoItem">When having a bad day… stop. Think of five things you are grateful
+                            for….feel better?</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 90; visibility: hidden;">
+                        <p class="manifestoItem">Love Always &amp; Be Nice,<br><br>
+                            <strong style="display:block">Jake Jaxson</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!--div id="press">
+
+			<div id="quote-1">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+                    
+                                        
+					    <img src="/images_v4/press3.jpg" class="logo darkToggle" alt="New York Magazine logo" data-light="/images_v4/press3.jpg" data-dark="/images_v4/press3w.jpg">
+                    
+                                        
+				</a>
+				<p><i class="fa fa-quote-left"></i> There is something about the CockyBoys aesthetic that gets porn wheels turning&mdash;an ironic touch that’s light enough not to compromise the simple pleasures of whacking off. <i class="fa fa-quote-right"></i></p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; New York Magazine</a></strong>
+			</div>
+
+			<div id="quote-2">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+                
+                                        
+                        <img src="/images_v4/press2.jpg" class="logo darkToggle" alt="Salon.com logo" data-light="/images_v4/press2.jpg" data-dark="/images_v4/press2w.jpg">
+                    
+                                            
+				</a>
+				<p>
+					<i class="fa fa-quote-left"></i>The Walt Whitman of gay porn.<i class="fa fa-quote-right"></i><br>
+					<i class="fa fa-quote-left"></i> Jake Jaxson wants to revolutionize porn with an erotic documentary inspired by great poets and celebrating life. <i class="fa fa-quote-right"></i>
+				</p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; Salon.com</a></strong>
+			</div>
+
+			<div id="quote-3">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+					<img src="/images_v4/press5.gif" class="logo" alt="Village Voice logo">
+				</a>
+				<p><i class="fa fa-quote-left"></i> In five short years, Jake Jaxson’s particular brand of arthouse erotica has propelled CockyBoys to the top of its industry. <i class="fa fa-quote-right"></i></p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; The Village Voice</a></strong>
+			</div>
+
+		</div-->
+
+            <div id="sendy">
+                <h4>Subscribe to Our Newsletter<br><i>Exclusive Offers + Free Video</i></h4>
+
+                <form action="https://sendy.cockyboys.com/subscribe" method="POST" accept-charset="utf-8">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email"><br>
+                    <div style="display:none;">
+                        <label for="hp">HP</label><br>
+                        <input type="text" name="hp" id="hp">
+                    </div>
+                    <input type="hidden" name="list" value="MhdwSleQW5WXxeUZb7XsTw">
+                    <input type="hidden" name="subform" value="yes">
+                    <input type="submit" name="submit" id="submit" value="Sign Up" class="grow">
+                </form>
+
+            </div>
+
+            <div id="footerSupport">
+
+                <div>
+
+                    <h4>Need Help?</h4>
+                    <div>
+                        <a href="/pages.php?id=account-sfw" title="Support center">
+                            <strong>Support Center</strong>
+                        </a>
+                    </div>
+                    <div>
+                        <a href="mailto:support@cockyboys.com" title="Contact Us" target="_blank">
+                            <strong>Contact Us</strong>
+                        </a>
+                    </div>
+                    <!--div>
+                	<a href="/pages.php?id=account-sfw#password" title="Reset password">
+                        <strong>Forgot Your Password?</strong>
+                	</a>
+				</div-->
+                    <!--div>
+                    <a href="/pages.php?id=model-application-sfw" title="Become a model">
+                        <strong>Become a Model</strong>
+                    </a>
+                </div-->
+                    <!--div>
+                    <a href="/pages.php?id=meet-the-morecocks-sfw" title="About us">
+                        <strong>About Us</strong>
+                    </a>
+                </div>
+            	<div>
+                    <a href="/pages.php?id=press-sfw" title="Press">
+                        <strong>Press</strong>
+                    </a>
+                </div-->
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+    <div id="footerFoot">
+
+        <img class="footerLogo" src="https://cdn.cockyboys.com/images/260311-logo-footer.png" alt="CockyBoys logo">
+
+        <ul>
+            <li>
+                <a href="/pages.php?id=meet-the-morecocks-sfw" class="fancyLink cboxElement" title="About Us">About
+                    Us</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=press-sfw" class="fancyLink cboxElement" title="Press">Press</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=terms-of-use-sfw" class="fancyLink cboxElement" title="Terms of use">Terms of
+                    Use</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=content-complaints-sfw" class="fancyLink cboxElement"
+                    title="Terms of use">Content Complaints</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=privacy-notice-sfw" class="fancyLink cboxElement"
+                    title="Privacy notice">Privacy</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=privacy-ca-sfw" class="fancyLink cboxElement" title="Privacy CA">Privacy CA</a>
+            </li>
+            <li>
+                <a href="http://gayhubnetwork.com/" target="_blank" title="Bigbling">Webmasters</a>
+            </li>
+            <!--li>
+            	<a href="/pages.php?id=account-sfw#help" class="fancyLink cboxElement" title="FAQ">FAQ</a>
+            </li-->
+
+
+            <!--li>
+            	<a href="/pages.php?id=copyright-policy-sfw" class="fancyLink cboxElement" title="Terms of use">Copyright</a>
+            </li-->
+        </ul>
+
+        <span id="footerFoot">
+            <a href="/pages.php?id=2257-sfw" title="2257 Record-Keeping" class="compliance fancyLink cboxElement">18
+                U.S.C 2257 Record-Keeping<br>Requirements Compliance Statement</a>;
+            <br>Copyright © <strong id="insertHere">2026</strong>
+            <script>
+                var d = new Date();
+                var el = document.getElementById('insertHere');
+                el.innerHTML = d.getFullYear();
+            </script>
+            HC Multimedia, LLC, Nevada, United States and<br>HC Media, s.r.o - Vodickova 791/41 Nove Mesto, 110 00 Praha
+            1, Czech Republic
+        </span>
+
+    </div>
+
+    <div class="content-alert adult-warning splash" style="display: none;">
+
+        <div class="alert">
+            <h2>You are entering the hottest Gay Adult Site on the Internet.</h2>
+            <p>CockyBoys.com is the most awarded gay studio, offering you unrivaled premium content with unlimited
+                streaming as well as limited downloads. 100% Secure and Privacy Guaranteed!</p>
+            <p class="under18year-frame">Please read and comply with the following conditions before you continue: This
+                website contains information, links, images and videos of sexually explicit material.If you are under
+                the age of 21, if such material offends you or if it's illegal to view such material in your community
+                please do not continue. Here is an excellent website to find something more to your tastes.Please read
+                and comply with the following conditions before you continue:I am at least 21 years of age.The sexually
+                explicit material I am viewing is for my own personal use and I will not expose minors to the material.
+                I desire to receive/view sexually explicit material. I believe that as an adult it is my inalienable
+                right to receive/view sexually explicit material. I believe that sexual acts between consenting adults
+                are neither offensive nor obscene. The viewing, reading and downloading of sexually explicit materials
+                does not violate the standards of my community, town, city, state or country. I am solely responsible
+                for any false disclosures or legal ramifications of viewing, reading or downloading any material in this
+                site. Furthermore this website nor its affiliates will be held responsible for any legal ramifications
+                arising from fraudulent entry into or use of this website.</p>
+            <a href="#" id="adult-continue" class="positive continue trackclick">Enter CockyBoys</a>
+
+        </div>
+        <div class="background-alert"></div>
+    </div>
+
+
+    <script>
+        //jquery cookie plugin
+        (function (e) { if (typeof define === "function" && define.amd) { define(["jquery"], e) } else if (typeof exports === "object") { e(require("jquery")) } else { e(jQuery) } })(function (e) { function n(e) { return u.raw ? e : encodeURIComponent(e) } function r(e) { return u.raw ? e : decodeURIComponent(e) } function i(e) { return n(u.json ? JSON.stringify(e) : String(e)) } function s(e) { if (e.indexOf('"') === 0) { e = e.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, "\\") } try { e = decodeURIComponent(e.replace(t, " ")); return u.json ? JSON.parse(e) : e } catch (n) { } } function o(t, n) { var r = u.raw ? t : s(t); return e.isFunction(n) ? n(r) : r } var t = /\+/g; var u = e.cookie = function (t, s, a) { if (s !== undefined && !e.isFunction(s)) { a = e.extend({}, u.defaults, a); if (typeof a.expires === "number") { var f = a.expires, l = a.expires = new Date; l.setTime(+l + f * 864e5) } return document.cookie = [n(t), "=", i(s), a.expires ? "; expires=" + a.expires.toUTCString() : "", a.path ? "; path=" + a.path : "", a.domain ? "; domain=" + a.domain : "", a.secure ? "; secure" : ""].join("") } var c = t ? undefined : {}; var h = document.cookie ? document.cookie.split("; ") : []; for (var p = 0, d = h.length; p < d; p++) { var v = h[p].split("="); var m = r(v.shift()); var g = v.join("="); if (t && t === m) { c = o(g, s); break } if (!t && (g = o(g)) !== undefined) { c[m] = g } } return c }; u.defaults = {}; e.removeCookie = function (t, n) { if (e.cookie(t) === undefined) { return false } e.cookie(t, "", e.extend({}, n, { expires: -1 })); return !e.cookie(t) } })
+
+        function Set_Cookie(name, value, expires_in_days, cookie_path, cookie_domain, secure) {
+            $.cookie(name, value, { expires: expires_in_days, path: cookie_path, domain: cookie_domain });
+        };
+
+        function cookieExists(cookiename) {
+            return (typeof $.cookie(cookiename) !== "undefined");
+        }
+
+        function getCookie(c_name) {
+            return $.cookie(c_name);
+        }
+
+    </script>
+
+
+
+    <!-- JavaScript at the bottom for fast page loading -->
+    <!-- ElevX -->
+    <script src="https://cdn.cockyboys.com/js/fancybox/jquery.fancybox.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.cockyboys.com/js/fancybox/jquery.fancybox.css">
+    <script src="https://cdn.cockyboys.com/js/fancybox/helpers/jquery.fancybox-thumbs.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.cockyboys.com/js/fancybox/helpers/jquery.fancybox-thumbs.css">
+    <!-- hover intent plugin -->
+    <script src="https://cdn.cockyboys.com/js_v2/hoverintent.js"></script>
+    <!-- cookies plugin -->
+    <script type="text/javascript" src="https://cdn.cockyboys.com/js_v3/js.cookie.js"></script>
+    <!--<script type="text/javascript" src="https://cdn.cockyboys.com/js_v3/jquery.cookie.js"></script>-->
+    <!--cycle2-->
+    <script src="https://cdn.cockyboys.com/js_v4/jquery.cycle2.min.js"></script>
+    <!-- custom scripts -->
+    <!--<script src="/js_v4/scripts_2311.js?35"></script>-->
+    <script src="https://cdn.cockyboys.com/js_v4/scripts_2603.js?1"></script>
+
+
+
+    <script>
+        //limit trailer views on tour
+        if ($('body').hasClass('tour') && $('body').hasClass('moviesPage')) {
+            if (!Cookies.get('trailerViews')) {
+                Cookies.set('trailerViews', 1, {
+                    'expires': 0.5
+                });
+            } else {
+                var trailerViews = Number(Cookies.get('trailerViews'));
+                var trailerViews = trailerViews + 1;
+                Cookies.set('trailerViews', trailerViews, {
+                    'expires': 0.5
+                });
+            }
+        }
+    </script>
+
+
+
+    <!-- adult warning -->
+
+    <script>
+        //Adult warning. Si no podem crear galetes no mostrem missatge.
+        if (!cookieExists('adultcheck')) {
+            $(".adult-warning a.continue").show();
+            $(".adult-warning").css("display", "block");
+        } else {
+            // en el cas que els idiomes siguin iguals només mostrem botó continue si és la primera vegada que entrem a la pàgina.
+            if (cookieExists('adultcheck')) {
+                adult_warning_cookie = getCookie('adultcheck');
+                //console.log("Ja tenim galeta adultcheck! No mostrem res.");
+            } else {
+                //no tenim galeta de adult warning per tant mostrem pantalla amb continue i li donem valor quan es fa click a algún dels botons
+                $(".adult-warning").css("display", "block");
+                //$(".adult-warning a.continue").prop("href", "adult-continue");
+                //console.log("Com que no tenim galeta adultcheck mostrem el popup amb només botó continue ja que els idiomes calculats i de customer són iguals.");
+            }
+        }
+
+        //Botó de la dreta per tant mantenim idioma.
+        $('div.adult-warning div.alert > a.alert-close, div.adult-warning div.alert > a.continue').click(function (e) {
+            e.preventDefault();
+            Set_Cookie('adultcheck', '1', 30, '/', 'cockyboys.com');
+            $(".adult-warning").css("display", "none");
+        });
+    </script>
+
+    <script>
+        //load it with jquery, to prevent initial page slowing, because the thumbs are so large
+        /*$('#f4fAPI').load('/js_v4/f4f-api2.php?code=ar2d9&template=slider');
+        $('#f4fNav').load('/js_v4/f4f-api2.php?code=ad6cd&template=nav');*/
+    </script>
+
+    <!-- flash sale animation on join now button in header -->
+
+    <!-- END flash sale animation on join now button in header -->
+
+
+    <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
+       chromium.org/developers/how-tos/chrome-frame-getting-started -->
+    <!--[if lt IE 7 ]>
+    <script src="https://ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+
+
+
+    <style>
+        #press {
+            display: none;
+        }
+    </style>
+    <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-1" tabindex="0"
+        style="display: none;"></ul><span role="status" aria-live="assertive" aria-relevant="additions"
+        class="ui-helper-hidden-accessible"></span>
+    <div class="nogiruka-btn-container"><button class="nogiruka-scroll-btn" data-direction="up"><svg
+                viewBox="0 0 384 512">
+                <path
+                    d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z">
+                </path>
+            </svg></button><button class="nogiruka-scroll-btn" data-direction="down"><svg viewBox="0 0 384 512">
+                <path
+                    d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.8L54.6 246.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5 32.8 0 45.3l160 160z">
+                </path>
+            </svg></button></div>
+</body>

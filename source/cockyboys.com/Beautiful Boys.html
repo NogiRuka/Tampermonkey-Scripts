@@ -1,0 +1,1288 @@
+<body class="	tour	
+	    
+    desktop
+    
+        
+    previewsOff
+    
+        
+    dvdPage
+    
+        ">
+
+    <div id="wrapper">
+
+        <header>
+
+
+            <section>
+
+
+
+                <style>
+                    header section {
+                        justify-content: space-between;
+                    }
+
+                    header section div:nth-child(2) {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        align-items: center;
+                        justify-content: flex-start;
+                    }
+
+                    header section div:last-child {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        align-items: center;
+                        justify-content: flex-end;
+                    }
+                </style>
+
+                <div>
+                    <a href="/" title="Home" id="logo">
+                        <!-- pride logo -->
+                        <!--<img src="https://cdn.cockyboys.com/images_v4/logoPride.png" alt="CockBoys Logo">-->
+
+                        <!-- default logo -->
+                        <img src="https://cdn.cockyboys.com/nats/img/logo-black.png" alt="CockyBoys Logo"
+                            class="darkToggle" data-light="https://cdn.cockyboys.com/nats/img/logo-black.png"
+                            data-dark="https://cockyboys.com/images_v4/logo.png">
+
+                        <!-- holiday logo -->
+                        <!--<img src="https://cdn.cockyboys.com/nats/img/logo-black-xmas2022.png" alt="CockyBoys Logo" class="darkToggle" data-light="https://cdn.cockyboys.com/nats/img/logo-black-xmas2022.png" data-dark="https://cdn.cockyboys.com/nats/img/logo-white-xmas2022.png">-->
+
+                    </a>
+
+
+                    <script>
+                        $().ready(function () {
+                            $("#autosuggest").autocomplete({
+                                source: function (req, add) {
+                                    $.get('/search_ajax.php?q=' + req.term, function (data) {
+
+                                        arrStor = [];
+
+                                        arrLabel = new Array();
+                                        arrURL = new Array();
+                                        var arg = data.split("\n");
+
+                                        for (var i = 0; i < arg.length; i++) {
+                                            ix = arg[i].split("|");
+
+                                            if (ix.length == 2) {
+                                                arrStor[arrStor.length] = { label: ix[0].trim(), value: ix[1].trim() }
+                                            }
+
+                                            if (arrStor.length >= 15) break;
+                                        }
+
+                                        add(arrStor);
+                                    });
+                                },
+                                select: function (event, ui) {
+                                    this.value = ui.item.value
+                                    var form = $(this).parents('form:first').submit();
+                                }
+
+
+                            });
+
+
+                        });
+                    </script>
+
+                    <form id="searchform" style="display: none;" action="/search.php" method="get">
+                        <!--<input src="images/icons/search_submit_button.png" type="image"/>-->
+                        <input id="autosuggest" class="input ui-autocomplete-input" name="query" value=""
+                            placeholder="What're you looking for?" type="text">
+                        <em>×</em><!---->
+
+                    </form>
+                    <script>
+                        $().ready(function () {
+                            $("#autosuggest").autocomplete({
+                                source: function (req, add) {
+                                    $.get('/search_ajax.php?q=' + req.term, function (data) {
+
+                                        arrStor = [];
+
+                                        arrLabel = new Array();
+                                        arrURL = new Array();
+                                        var arg = data.split("\n");
+
+                                        for (var i = 0; i < arg.length; i++) {
+                                            ix = arg[i].split("|");
+
+                                            if (ix.length == 2) {
+                                                arrStor[arrStor.length] = { label: ix[0].trim(), value: ix[1].trim() }
+                                            }
+
+                                            if (arrStor.length >= 15) break;
+                                        }
+
+                                        add(arrStor);
+                                    });
+                                },
+                                select: function (event, ui) {
+                                    this.value = ui.item.value
+                                    var form = $(this).parents('form:first').submit();
+                                }
+
+
+                            });
+
+
+                        });
+                    </script>
+
+
+                    <nav>
+
+                        <style>
+                            #darkmode {
+                                display: flex;
+                                flex-flow: row nowrap;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 0;
+                                margin-left: 10px;
+                            }
+
+                            #darkmode:hover {
+                                border-bottom: 0 !important;
+                            }
+
+                            #darkmode img {
+                                width: auto;
+                                height: 25px;
+                            }
+                        </style>
+
+
+
+                        <ul>
+                            <li><a href="/categories/movies_1_d.html" title="Scenes">Scenes</a></li>
+                            <li><a href="/models/models_p.html" title="Models">Models</a></li>
+                            <li><a href="/pages.php?id=feature-films-sfw" title="Mini-Series and Films">Movies</a></li>
+                            <li><a href="/pages.php?id=categories-sfw" title="Genres">Genres</a></li>
+                            <li><a href="https://cockyboysstore.com/?utm_source=cockyboys&amp;utm_medium=MenuLInk&amp;utm_campaign=dvdstore"
+                                    title="CockyBoys DVD Store" target="_blank">DVDs</a></li>
+                            <li><a href="javascript:;" id="search" title="Search">Search</a></li>
+
+
+                            <li><a href="javascript:;" title="Switch to dark mode" id="darkmode"><img
+                                        src="https://cdn.cockyboys.com/images/toggle-light2.png"
+                                        alt="Switch to dark mode" class="darkToggle"
+                                        data-light="https://cdn.cockyboys.com/images/toggle-light2.png"
+                                        data-dark="https://cdn.cockyboys.com/images/toggle-dark.png"></a></li>
+
+
+                        </ul>
+
+                    </nav>
+
+                </div>
+                <div>
+                    <a href="https://members.cockyboys.com" id="login" title="Log into CockyBoys">Log In</a>
+                    <a href="/join.php" class="join grow gothamy">Become a Member</a>
+                </div>
+
+            </section>
+
+        </header>
+
+
+        <div id="tabOverview" class="active">
+            <div class="movieDVDs">
+
+
+                <img src="https://cdn.cockyboys.com/content/contentthumbs/246-dvdasc.jpg" alt="Beautiful Boys">
+                <div>
+                    <em class="gothamy">4 Episodes in this series</em>
+                    <h1 class="gothamy">Beautiful Boys</h1>
+                    <!--
+                <a href="javascript:;" 
+				                    data-favId1="1804" 
+                                    data-favId2="1786" 
+                                    data-favId3="1779" 
+                                    data-favId4="1772" 
+                 class="watchButton two dvdFav favorite">Favorite All Episodes</a>
+                -->
+                    <a href="https://cockyboysstore.com/2575015/beautiful-boys-porn-movies.html?utm_source=cockyboys&amp;utm_medium=dvdpage&amp;utm_campaign=buydvd"
+                        class="watchButton grow" target="_blank" title="Buy the DVD"><i class="fa fa-shopping-cart"></i>
+                        Buy DVD</a>
+
+
+                    <p style="margin-top: 25px;" class="info"><strong>Director:</strong> Jake Jaxson</p>
+                    <p class="info"><strong>Featuring:</strong>
+                        <a href="/models/josh-moore.html" title="Josh Moore">Josh Moore</a>, <a
+                            href="/models/andreo-matteo.html" title="Andreo Matteo">Andreo Matteo</a>, <a
+                            href="/models/sean-ford.html" title="Sean Ford">Sean Ford</a>, <a
+                            href="/models/troy-accola.html" title="Troy Accola">Troy Accola</a>, <a
+                            href="/models/cory-kane.html" title="Cory Kane">Cory Kane</a>, <a
+                            href="/models/grayson-lange.html" title="Grayson Lange">Grayson Lange</a>, <a
+                            href="/models/levi-karter.html" title="Levi Karter">Levi Karter</a> &amp; <a
+                            href="/models/mateo-vice.html" title="">Mateo Vice</a>
+                    </p>
+                    <p clss="info"><strong>Description: </strong>We’ve put some of the most beautiful young men in this
+                        volume for the world to see! Newcomer Andreo Matteo is inducted by Josh Moore, Cory Kane’s big
+                        dick stretches Grayson’s tight hole &amp; Troy &amp; Sean have a flip-fuck for the ages. </p>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="tabEpisodes">
+            <p class="featuresNavContainer" style="margin-bottom: -35px; color: white;
+    text-align: left; padding-left: 30px; line-height: 45px; font-size: 25px;">
+                EPISODES
+            </p>
+            <div class="sceneList newReleases">
+                <div class="scene">
+                    <!--file found in old clip directory-->
+                    <section class="previewThumb  hasClip " id="1772" style="height: auto;">
+
+                        <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                            </svg>
+
+                            <span style="display: none;">Turn on instant previews</span>
+
+                        </a>
+
+                        <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                                    fill="currentColor"></path>
+                            </svg>
+
+                            <span style="display: none;">Turn off instant previews</span>
+
+                        </a>
+
+                        <a href="/scenes/josh-moore-andreo-matteo.html?type=vids" class="abso"
+                            title="Josh Moore &amp; Andreo Matteo">Watch Josh Moore &amp; Andreo Matteo</a>
+
+                        <div>
+
+                            <a href="/scenes/josh-moore-andreo-matteo.html?type=vids" rel="nofollow" class="thumbCover">
+                                <img src="https://cdn.cockyboys.com/content/contentthumbs/22566.jpg">
+                            </a>
+
+
+                            <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                                poster="https://cdn.cockyboys.com/content/contentthumbs/22566.jpg" id="thing-1772"
+                                class="vid  oldClip ">
+                                <source
+                                    src="https://cdn.cockyboys.com/content/upload/Josh-Moore-Andreo-Mateo/clip/josh_moore_andreo_mateo_preview.mp4">
+                            </video>
+
+
+                            <div style="display: none;"></div>
+
+                        </div>
+
+                        <p><strong>Josh Moore &amp; Andreo Matteo</strong>
+
+                            <span>
+
+                                <span>
+
+
+                                    <em style="color: #BD220F;">New Release</em>
+
+
+                                    | <em style="color: #262626;">21 minutes</em>
+
+                                </span>
+
+                                <span>
+                                    <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                            </span>
+
+                        </p>
+
+
+                    </section>
+                    <h2 class="gothamy"><a href="/scenes/josh-moore-andreo-matteo.html?type=vids"
+                            title="Josh Moore &amp; Andreo Matteo">Josh Moore &amp; Andreo Matteo</a></h2>
+
+
+
+
+
+                    <a class="watchButton grow" href="/scenes/josh-moore-andreo-matteo.html?type=vids"
+                        title="Watch Josh Moore &amp; Andreo Matteo"><i class="fa fa-play"></i> Watch Trailer</a>
+                    <a class="watchButton two grow" href="/join.php" rel="nofollow" title="Join now">Become a Member</a>
+
+                    <p class="info"><strong>Featuring: </strong>
+                        <a href="/sets.php?id=567" title="Andreo Matteo">Andreo Matteo</a> &amp; <a
+                            href="/sets.php?id=539" title="">Josh Moore</a>
+                    </p>
+                    <p class="info"><strong>Description: </strong>
+                        We're excited and happy to introduce Andreo Matteo as he makes his adult debut with CockyBoys!
+                        He's welcomed by Josh Moore with sweet, sensuous passion...and the dominance Andreo desires.
+                        Andreo starts on Josh's lap and they kiss as Josh's hands glide over his body and when the time
+                        is right Josh stands with Andreo's legs wrapped around him. Multi-tasker Josh unzips and takes
+                        out his cock and as he puts him down, Andreo takes the challenge and swallows him to the root.
+                        Josh is impressed by how Andreo pleases him and keeps on going deep-throating him through teary
+                        eyes.
+
+                        Josh gives Andreo a break and kindly wipes away his tears and kisses him before sucking him in
+                        return. But Andreo soon desires to again please Josh while acrobatically offering up his bubble
+                        butt. As Andreo continues to
+                        <a href="/scenes/josh-moore-andreo-matteo.html?type=vids"
+                            title="Josh Moore &amp; Andreo Matteo"> [more....]</a>
+                    </p>
+                </div>
+                <div class="scene">
+                    <!--file found in old clip directory-->
+                    <section class="previewThumb  hasClip " id="1779" style="height: auto;">
+
+                        <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                            </svg>
+
+                            <span style="display: none;">Turn on instant previews</span>
+
+                        </a>
+
+                        <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                                    fill="currentColor"></path>
+                            </svg>
+
+                            <span style="display: none;">Turn off instant previews</span>
+
+                        </a>
+
+                        <a href="/scenes/sean-ford-troy-accola.html?type=vids" class="abso"
+                            title="It's Summer At CockyBoys: Sean Ford &amp; Troy Accola">Watch It's Summer At
+                            CockyBoys: Sean Ford &amp; Troy Accola</a>
+
+                        <div>
+
+                            <a href="/scenes/sean-ford-troy-accola.html?type=vids" rel="nofollow" class="thumbCover">
+                                <img src="https://cdn.cockyboys.com/content/contentthumbs/22582.jpg">
+                            </a>
+
+
+                            <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                                poster="https://cdn.cockyboys.com/content/contentthumbs/22582.jpg" id="thing-1779"
+                                class="vid  oldClip ">
+                                <source
+                                    src="https://cdn.cockyboys.com/content/upload/Sean-Ford-Troy-Accola/clip/CB_SeanFord_TroyAccola_preview.mp4">
+                            </video>
+
+
+                            <div style="display: none;"></div>
+
+                        </div>
+
+                        <p><strong>It's Summer At CockyBoys: Sean Ford &amp; Troy Accola</strong>
+
+                            <span>
+
+                                <span>
+
+
+                                    <em style="color: #BD220F;">New Release</em>
+
+
+                                    | <em style="color: #262626;">33 minutes</em>
+
+                                </span>
+
+                                <span>
+                                    <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                            </span>
+
+                        </p>
+
+
+                    </section>
+                    <h2 class="gothamy"><a href="/scenes/sean-ford-troy-accola.html?type=vids"
+                            title="It's Summer At CockyBoys: Sean Ford &amp; Troy Accola">It's Summer At CockyBoys: Sean
+                            Ford &amp; Troy Accola</a></h2>
+
+
+
+
+
+                    <a class="watchButton grow" href="/scenes/sean-ford-troy-accola.html?type=vids"
+                        title="Watch It's Summer At CockyBoys: Sean Ford &amp; Troy Accola"><i class="fa fa-play"></i>
+                        Watch Trailer</a>
+                    <a class="watchButton two grow" href="/join.php" rel="nofollow" title="Join now">Become a Member</a>
+
+                    <p class="info"><strong>Featuring: </strong>
+                        <a href="/sets.php?id=543" title="Sean Ford">Sean Ford</a> &amp; <a href="/sets.php?id=558"
+                            title="">Troy Accola</a>
+                    </p>
+                    <p class="info"><strong>Description: </strong>
+                        For Troy Accola &amp; Sean Ford the carefree and often nostalgic joys of summer at Camp
+                        CockyBoys include afternoon naps. Troy is more than happy with this greeting especially as Sean
+                        unzips his shorts and indulges in full oral pleasure with Troy's cock and balls. While Troy
+                        luxuriates in this, he's also naturally compelled to reciprocate by kissing, undressing and
+                        lovingly sucking Sean.
+
+                        When Sean reaches over to finger Troy's warm hole deeply, it ignites Troy's even more passionate
+                        cocksucking and gives Sean ideas for his next move. And he spells it out by whispering to Troy
+                        "I wanna fuck you so bad". First though he lies Troy down to thoroughly rim his smooth hole and
+                        tease him with his cock. This excites both of them so much Sean eases right in to fucking Troy
+                        deep. Sean is totally
+                        <a href="/scenes/sean-ford-troy-accola.html?type=vids"
+                            title="It's Summer At CockyBoys: Sean Ford &amp; Troy Accola"> [more....]</a>
+                    </p>
+                </div>
+                <div class="scene">
+                    <!--file found in old clip directory-->
+                    <section class="previewThumb  hasClip " id="1786" style="height: auto;">
+
+                        <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                            </svg>
+
+                            <span style="display: none;">Turn on instant previews</span>
+
+                        </a>
+
+                        <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                                    fill="currentColor"></path>
+                            </svg>
+
+                            <span style="display: none;">Turn off instant previews</span>
+
+                        </a>
+
+                        <a href="/scenes/cory-kane-grayson-lange.html?type=vids" class="abso"
+                            title="It's Summer At CockyBoys: Cory Kane &amp; Grayson Lange ">Watch It's Summer At
+                            CockyBoys: Cory Kane &amp; Grayson Lange </a>
+
+                        <div>
+
+                            <a href="/scenes/cory-kane-grayson-lange.html?type=vids" rel="nofollow" class="thumbCover">
+                                <img src="https://cdn.cockyboys.com/content/contentthumbs/22598.jpg">
+                            </a>
+
+
+                            <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                                poster="https://cdn.cockyboys.com/content/contentthumbs/22598.jpg" id="thing-1786"
+                                class="vid  oldClip ">
+                                <source
+                                    src="https://cdn.cockyboys.com/content/upload/Cory-Kane-Grayson-Lange/clip/cory_cane_grayson_lange_preview.mp4">
+                            </video>
+
+
+                            <div style="display: none;"></div>
+
+                        </div>
+
+                        <p><strong>It's Summer At CockyBoys: Cory Kane &amp; Grayson Lange </strong>
+
+                            <span>
+
+                                <span>
+
+
+                                    <em style="color: #BD220F;">New Release</em>
+
+
+                                    | <em style="color: #262626;">22 minutes</em>
+
+                                </span>
+
+                                <span>
+                                    <img src="/images_v4/iconRatingHalf.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                            </span>
+
+                        </p>
+
+
+                    </section>
+                    <h2 class="gothamy"><a href="/scenes/cory-kane-grayson-lange.html?type=vids"
+                            title="It's Summer At CockyBoys: Cory Kane &amp; Grayson Lange ">It's Summer At CockyBoys:
+                            Cory Kane &amp; Grayson Lange </a></h2>
+
+
+
+
+
+                    <a class="watchButton grow" href="/scenes/cory-kane-grayson-lange.html?type=vids"
+                        title="Watch It's Summer At CockyBoys: Cory Kane &amp; Grayson Lange "><i
+                            class="fa fa-play"></i> Watch Trailer</a>
+                    <a class="watchButton two grow" href="/join.php" rel="nofollow" title="Join now">Become a Member</a>
+
+                    <p class="info"><strong>Featuring: </strong>
+                        <a href="/sets.php?id=520" title="Cory Kane">Cory Kane</a> &amp; <a href="/sets.php?id=561"
+                            title="">Grayson Lange</a>
+                    </p>
+                    <p class="info"><strong>Description: </strong>
+                        Summer At Cocky Boys includes the annual pool party bringing models from near and far to finally
+                        get the chance to meet each other. For Grayson Lange he has his eye on Cory Kane , but he has to
+                        wait until guests are leaving to get alone time with him. Grayson finds Cory in the sun porch
+                        playing with his cock and after a little spying on him, Cory invites him to join in. In no time
+                        Grayson opens up wide and take as much of Cory's thick cock and stroke the remaining inches with
+                        his hand.
+
+                        Cory enjoys Grayson's considerable efforts and gives back by having him sit on his face for deep
+                        rimming and cocksucking. Soon Grayson works his ass down Cory's body and, with a little effort,
+                        slide down on Cory's waiting cock. With his feet planted on Cory's thighs Grayson can ride his
+                        <a href="/scenes/cory-kane-grayson-lange.html?type=vids"
+                            title="It's Summer At CockyBoys: Cory Kane &amp; Grayson Lange "> [more....]</a>
+                    </p>
+                </div>
+                <div class="scene">
+                    <!--file found in old clip directory-->
+                    <section class="previewThumb  hasClip " id="1804" style="height: auto;">
+
+                        <a class="turnOn" href="javascript:;" title="Turn on instant previews">
+
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15 12.3301L9 16.6603L9 8L15 12.3301Z" fill="currentColor"></path>
+                            </svg>
+
+                            <span style="display: none;">Turn on instant previews</span>
+
+                        </a>
+
+                        <a class="turnOff" href="javascript:;" title="Turn off instant previews">
+
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="display: none;"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M6.2253 4.81108C5.83477 4.42056 5.20161 4.42056 4.81108 4.81108C4.42056 5.20161 4.42056 5.83477 4.81108 6.2253L10.5858 12L4.81114 17.7747C4.42062 18.1652 4.42062 18.7984 4.81114 19.1889C5.20167 19.5794 5.83483 19.5794 6.22535 19.1889L12 13.4142L17.7747 19.1889C18.1652 19.5794 18.7984 19.5794 19.1889 19.1889C19.5794 18.7984 19.5794 18.1652 19.1889 17.7747L13.4142 12L19.189 6.2253C19.5795 5.83477 19.5795 5.20161 19.189 4.81108C18.7985 4.42056 18.1653 4.42056 17.7748 4.81108L12 10.5858L6.2253 4.81108Z"
+                                    fill="currentColor"></path>
+                            </svg>
+
+                            <span style="display: none;">Turn off instant previews</span>
+
+                        </a>
+
+                        <a href="/scenes/levi-karter-mateo-vice.html?type=vids" class="abso"
+                            title="Levi Karter &amp; Mateo Vice Flip Fuck">Watch Levi Karter &amp; Mateo Vice Flip
+                            Fuck</a>
+
+                        <div>
+
+                            <a href="/scenes/levi-karter-mateo-vice.html?type=vids" rel="nofollow" class="thumbCover">
+                                <img src="https://cdn.cockyboys.com/content/contentthumbs/22632.jpg">
+                            </a>
+
+
+                            <video playsinline="" preload="metadata" loop="" muted="" style="display: none;"
+                                poster="https://cdn.cockyboys.com/content/contentthumbs/22632.jpg" id="thing-1804"
+                                class="vid  oldClip ">
+                                <source
+                                    src="https://cdn.cockyboys.com/content/upload/Levi-Karter-Mateo-Vice/clip/levi_karter_mateo_vice_preview.mp4">
+                            </video>
+
+
+                            <div style="display: none;"></div>
+
+                        </div>
+
+                        <p><strong>Levi Karter &amp; Mateo Vice Flip Fuck</strong>
+
+                            <span>
+
+                                <span>
+
+
+                                    <em style="color: #BD220F;">New Release</em>
+
+
+                                    | <em style="color: #262626;">29 minutes</em>
+
+                                </span>
+
+                                <span>
+                                    <img src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"><img
+                                        src="/images_v4/iconRating.png" height="20" alt="Rating"> </span>
+
+                            </span>
+
+                        </p>
+
+
+                    </section>
+                    <h2 class="gothamy"><a href="/scenes/levi-karter-mateo-vice.html?type=vids"
+                            title="Levi Karter &amp; Mateo Vice Flip Fuck">Levi Karter &amp; Mateo Vice Flip Fuck</a>
+                    </h2>
+
+
+
+
+
+                    <a class="watchButton grow" href="/scenes/levi-karter-mateo-vice.html?type=vids"
+                        title="Watch Levi Karter &amp; Mateo Vice Flip Fuck"><i class="fa fa-play"></i> Watch
+                        Trailer</a>
+                    <a class="watchButton two grow" href="/join.php" rel="nofollow" title="Join now">Become a Member</a>
+
+                    <p class="info"><strong>Featuring: </strong>
+                        <a href="/sets.php?id=307" title="Levi Karter">Levi Karter</a> &amp; <a href="/sets.php?id=574"
+                            title="">Mateo Vice</a>
+                    </p>
+                    <p class="info"><strong>Description: </strong>
+                        Mateo Vice makes his CockyBoys debut with Levi Karter and when they meet and chat it up there's
+                        a vivid connection and affectionate sexual chemistry that easily leads right into their scene
+                        and just grows stronger. As "host" Levi sits Mateo down and sucks him deep almost immediately
+                        and it isn't long before they switch places and Mateo is gagging on Levi's cock. But Levi
+                        gravitates back deep-throating Mateo and revving him up o start taking more control.
+
+                        After holding Levi's throat on his cock Mateo turns him around to rim his bubble butt and tease
+                        him with his cock. Levi is more than ready for it and Mateo gives him every inch. Mateo thrusts
+                        in hard and deep and seeing that Levi can take it, he kicks it up a notch with half-piledriver.
+                        Levi isn't even close to being done. He moves
+                        <a href="/scenes/levi-karter-mateo-vice.html?type=vids"
+                            title="Levi Karter &amp; Mateo Vice Flip Fuck"> [more....]</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="tabCast">
+            <p class="featuresNavContainer" style="margin-top: -55px; color: white;
+    text-align: left; padding-left: 30px; margin-bottom: 5px; line-height: 45px; font-size: 25px;">
+                CAST
+            </p>
+
+            <main style="padding-left: 2%">
+                <div>
+                    <a class="name gothamy" href="/models/andreo-matteo.html" title="Andreo Matteo"
+                        style="display: none;">Andreo Matteo</a>
+                    <a class="fade" href="/models/andreo-matteo.html" title="Andreo Matteo" style="opacity: 1;">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/2103-set.jpg" alt="Andreo Matteo">
+                    </a>
+                </div>
+
+                <div>
+                    <a class="name gothamy" href="/models/josh-moore.html" title="Josh Moore"
+                        style="display: none;">Josh Moore</a>
+                    <a class="fade" href="/models/josh-moore.html" title="Josh Moore" style="opacity: 1;">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/2329-set.jpg" alt="Josh Moore">
+                    </a>
+                </div>
+
+                <div>
+                    <a class="name gothamy" href="/models/sean-ford.html" title="Sean Ford" style="display: none;">Sean
+                        Ford</a>
+                    <a class="fade" href="/models/sean-ford.html" title="Sean Ford" style="opacity: 1;">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/2248-set.jpg" alt="Sean Ford">
+                    </a>
+                </div>
+
+                <div>
+                    <a class="name gothamy" href="/models/troy-accola.html" title="Troy Accola"
+                        style="display: none;">Troy Accola</a>
+                    <a class="fade" href="/models/troy-accola.html" title="Troy Accola" style="opacity: 1;">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/2199-set.jpg" alt="Troy Accola">
+                    </a>
+                </div>
+
+                <div>
+                    <a class="name gothamy" href="/models/cory-kane.html" title="Cory Kane" style="display: none;">Cory
+                        Kane</a>
+                    <a class="fade" href="/models/cory-kane.html" title="Cory Kane" style="opacity: 1;">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/2230-set.jpg" alt="Cory Kane">
+                    </a>
+                </div>
+
+                <div>
+                    <a class="name gothamy" href="/models/grayson-lange.html" title="Grayson Lange"
+                        style="display: none;">Grayson Lange</a>
+                    <a class="fade" href="/models/grayson-lange.html" title="Grayson Lange" style="opacity: 1;">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/2200-set.jpg" alt="Grayson Lange">
+                    </a>
+                </div>
+
+                <div>
+                    <a class="name gothamy" href="/models/levi-karter.html" title="Levi Karter"
+                        style="display: none;">Levi Karter</a>
+                    <a class="fade" href="/models/levi-karter.html" title="Levi Karter" style="opacity: 1;">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/2000-set.jpg" alt="Levi Karter">
+                    </a>
+                </div>
+
+                <div>
+                    <a class="name gothamy" href="/models/mateo-vice.html" title="Mateo Vice"
+                        style="display: none;">Mateo Vice</a>
+                    <a class="fade" href="/models/mateo-vice.html" title="Mateo Vice" style="opacity: 1;">
+                        <img src="https://cdn.cockyboys.com/content/contentthumbs/2241-set.jpg" alt="Mateo Vice">
+                    </a>
+                </div>
+
+            </main>
+
+        </div>
+
+        <div id="dvdComments" style="margin-bottom: 0px;">
+
+            <div class="leaveComment">
+                <h2 class="gothamy">Join the Conversation</h2>
+
+
+                <script>
+                    auto_approve = 1;
+
+                    function commentvalidate(v) {
+                        pss = new Object();
+                        pss.ajax = 2;
+                        pss.contenttype = v.contenttype.value;
+                        pss.itemid = v.itemid.value;
+                        pss.displayname = v.displayname.value;
+                        pss.commenttxt = v.commenttxt.value;
+
+                        $.ajax({
+                            type: "POST",
+                            url: "commentpost.php",
+                            dataType: "json",
+                            data: pss,
+                            success: function (data) {
+
+                                if (data.success == "1") {
+                                    v.commenttxt.value = "Write a Comment...";
+                                    if (auto_approve == 1) {
+                                        document.location.reload();
+                                        return;
+                                    }
+                                }
+
+                                alert(data.message);
+                                return;
+                            },
+                            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                                alert("There has been an error submitting your comment.\nPlease contact support if you continue to see this message.\n\nMessage:\n" + XMLHttpRequest.responseText);
+                            }
+                        });
+
+                        return false;
+                    }
+
+                    function comment_field_focus(v) {
+                        if (v.value == "Write a Comment...") {
+                            v.value = "";
+                        }
+                    }
+
+
+                </script>
+
+                <form method="post" action="commentpost.php" onsubmit="return commentvalidate(this)">
+                    <input type="hidden" name="contenttype" value="dvd">
+                    <input type="hidden" name="itemid" value="46">
+
+                    <input name="displayname" size="35" type="text" value="" style="box-sizing: border-box; width: 100%"
+                        placeholder="Choose your display name...">
+
+                    <p id="displayName" style="display: none;"></p>
+
+                    <textarea style="box-sizing: border-box; width: 100%" onfocus="comment_field_focus(this)"
+                        name="commenttxt" rows="6" placeholder="Write a Comment..."></textarea>
+
+                    <a href="/join.php" rel="nofollow" class="gothamy">Submit</a>
+
+                </form>
+            </div>
+            <h3 class="gothamy">0 Comments</h3>
+            <p id="comments">
+
+            </p>
+
+        </div>
+        <span id="f4fAPI"></span>
+        <style>
+            #press {
+                display: none;
+            }
+        </style>
+
+
+        <!-- Page Navigation Numbers -->
+
+
+
+
+
+
+        <div id="pagination">
+
+
+            <!-- Page Number Links for pages and to hilite the current page -->
+            <a href="javascript:;" class="active two">1</a>
+            <a href="https://cockyboys.com/dvds/dvds_page_2.html?s=p">2</a>
+
+            <!-- Next Page Link -->
+            <!-- if it's not the index page, bevel the right side -->
+            <a class="nextArrow" href="https://cockyboys.com/dvds/dvds_page_2.html?s=p">⟩</a>
+
+        </div>
+
+
+
+
+
+        <!-- closes "wrapper", which is opened in header.tpl -->
+    </div>
+
+    <!-- no javascript alert -->
+    <noscript>
+        <div id="javascript">
+            <div>
+                <h3><i class="fa fa-exclamation-triangle"></i><strong>Javascript</strong> Required</h3>
+                <p>Nowadays, almost all web pages contain JavaScript, a scripting programming language that allows
+                    robust web features, videos, and basically, all the things that can make a website experience
+                    awesome for you, the user.</p>
+                <p>So, to keep things working awesomely for you, and to enjoy the full experience and features of
+                    CockyBoys.com, you'll need to enable JavaScript in your web browser.</p>
+                <p>After enabling JavaScript, refresh this page and everything will be right again with the world (or at
+                    the very least, your porning experience).</p>
+                <a href="http://enable-javascript.com/" class="gothamy" target="_blank" title="Enable javascript">Learn
+                    How to Enable Javascript</a>
+                <a href="/pages.php?id=account#contact" class="gothamy" title="Contact us">Having Trouble? Contact
+                    Customer Service</a>
+            </div>
+        </div>
+    </noscript>
+
+    <div id="cookies" style="display: none;">
+        <p><i class="fa fa-exclamation-triangle"></i> Cookies must be enabled to enjoy the full features of this
+            website. Learn more about cookies and how to enable them by <a
+                href="http://www.wikihow.com/Enable-Cookies-in-Your-Internet-Web-Browser" target="_blank"
+                title="Enable cookies in your browser">clicking here.</a></p>
+    </div>
+
+    <div id="footer">
+
+        <div id="footerContainer">
+
+            <div id="footerManifesto">
+                <h4 style="text-align: center; margin-bottom: 10px;">The Manifesto</h4>
+                <div class="cycle-slideshow manifesto" data-cycle-pause-on-hover="true"
+                    data-cycle-auto-height="container" data-cycle-fx="fade" data-cycle-speed="1000"
+                    data-cycle-timeout="5000" data-cycle-slides=".slideBox" style="position: relative; height: 134px;">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    <!--div class="slideBox"><p class="manifestoItem" style="padding-top:15px">Oscar Wilde said it best – “Humanity takes itself too seriously. It is the world’s original sin. If the caveman had known how to laugh, history would have been different.”</p></div-->
+
+                    <div style="text-align: center; width:100%; position:absolute; bottom:-50px;" class="cycle-next">
+                        <img src="https://cockyboys.com/images_v3/white/navAngel.png" alt="CockyBoys halo logo"></div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 95; opacity: 0; display: block; visibility: hidden;">
+                        <p class="manifestoItem">Be proud!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 94; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">You are not a type. You are you.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 93; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">“Cocky” does not mean rude.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 92; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Gay sex is not shameful. It is a blessing like a fine wine, a great
+                            meal, or a roller coaster ride. It is part of life and should be enjoyed.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 91; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Be safe. Be smart in all that you do. When in doubt, use the head
+                            holding up your ears!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 90; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Negativity only invites and creates more negativity.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 89; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Mutual respect is the path to true power. Power = pride. Pride = loving
+                            yourself. Love yourself and you can love another.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 88; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Gay is good.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 87; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">CockyBoys are proud, confident men. At times funny, goofy, sometimes
+                            crazy, and shy.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 86; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">They have dark days along with good. They like being admired. They do
+                            not succumb to cowardice.<br>
+                            They love and want to be loved.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 85; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">I am a CockyBoy!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 84; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">I am a CockyBoy!</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 100; visibility: hidden; opacity: 0; display: block;">
+                        <p class="manifestoItem">Please check your high horse at the door.</p>
+                    </div>
+                    <div class="slideBox cycle-slide cycle-slide-active"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 99; visibility: visible; opacity: 1; display: block;">
+                        <p class="manifestoItem">There is nothing wrong with being a “porn star.” It may not be your
+                            choice. Choice is freedom. So choose.</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 97; visibility: hidden;">
+                        <p class="manifestoItem">When having a bad day… stop. Think of five things you are grateful
+                            for….feel better?</p>
+                    </div>
+                    <div class="slideBox cycle-slide"
+                        style="position: absolute; top: 0px; left: 0px; z-index: 96; visibility: hidden;">
+                        <p class="manifestoItem">Love Always &amp; Be Nice,<br><br>
+                            <strong style="display:block">Jake Jaxson</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!--div id="press">
+
+			<div id="quote-1">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+                    
+                                        
+					    <img src="/images_v4/press3.jpg" class="logo darkToggle" alt="New York Magazine logo" data-light="/images_v4/press3.jpg" data-dark="/images_v4/press3w.jpg">
+                    
+                                        
+				</a>
+				<p><i class="fa fa-quote-left"></i> There is something about the CockyBoys aesthetic that gets porn wheels turning&mdash;an ironic touch that’s light enough not to compromise the simple pleasures of whacking off. <i class="fa fa-quote-right"></i></p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; New York Magazine</a></strong>
+			</div>
+
+			<div id="quote-2">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+                
+                                        
+                        <img src="/images_v4/press2.jpg" class="logo darkToggle" alt="Salon.com logo" data-light="/images_v4/press2.jpg" data-dark="/images_v4/press2w.jpg">
+                    
+                                            
+				</a>
+				<p>
+					<i class="fa fa-quote-left"></i>The Walt Whitman of gay porn.<i class="fa fa-quote-right"></i><br>
+					<i class="fa fa-quote-left"></i> Jake Jaxson wants to revolutionize porn with an erotic documentary inspired by great poets and celebrating life. <i class="fa fa-quote-right"></i>
+				</p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; Salon.com</a></strong>
+			</div>
+
+			<div id="quote-3">
+				<a href="/pages.php?id=press" title="CockyBoys press">
+					<img src="/images_v4/press5.gif" class="logo" alt="Village Voice logo">
+				</a>
+				<p><i class="fa fa-quote-left"></i> In five short years, Jake Jaxson’s particular brand of arthouse erotica has propelled CockyBoys to the top of its industry. <i class="fa fa-quote-right"></i></p>
+				<strong><a href="/pages.php?id=press" title="CockyBoys press">&mdash; The Village Voice</a></strong>
+			</div>
+
+		</div-->
+
+            <div id="sendy">
+                <h4>Subscribe to Our Newsletter<br><i>Exclusive Offers + Free Video</i></h4>
+
+                <form action="https://sendy.cockyboys.com/subscribe" method="POST" accept-charset="utf-8">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" id="email"><br>
+                    <div style="display:none;">
+                        <label for="hp">HP</label><br>
+                        <input type="text" name="hp" id="hp">
+                    </div>
+                    <input type="hidden" name="list" value="MhdwSleQW5WXxeUZb7XsTw">
+                    <input type="hidden" name="subform" value="yes">
+                    <input type="submit" name="submit" id="submit" value="Sign Up" class="grow">
+                </form>
+
+            </div>
+
+            <div id="footerSupport">
+
+                <div>
+
+                    <h4>Need Help?</h4>
+                    <div>
+                        <a href="/pages.php?id=account-sfw" title="Support center">
+                            <strong>Support Center</strong>
+                        </a>
+                    </div>
+                    <div>
+                        <a href="mailto:support@cockyboys.com" title="Contact Us" target="_blank">
+                            <strong>Contact Us</strong>
+                        </a>
+                    </div>
+                    <!--div>
+                	<a href="/pages.php?id=account-sfw#password" title="Reset password">
+                        <strong>Forgot Your Password?</strong>
+                	</a>
+				</div-->
+                    <!--div>
+                    <a href="/pages.php?id=model-application-sfw" title="Become a model">
+                        <strong>Become a Model</strong>
+                    </a>
+                </div-->
+                    <!--div>
+                    <a href="/pages.php?id=meet-the-morecocks-sfw" title="About us">
+                        <strong>About Us</strong>
+                    </a>
+                </div>
+            	<div>
+                    <a href="/pages.php?id=press-sfw" title="Press">
+                        <strong>Press</strong>
+                    </a>
+                </div-->
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+
+
+    <div id="footerFoot">
+
+        <img class="footerLogo" src="https://cdn.cockyboys.com/images/260311-logo-footer.png" alt="CockyBoys logo">
+
+        <ul>
+            <li>
+                <a href="/pages.php?id=meet-the-morecocks-sfw" class="fancyLink cboxElement" title="About Us">About
+                    Us</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=press-sfw" class="fancyLink cboxElement" title="Press">Press</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=terms-of-use-sfw" class="fancyLink cboxElement" title="Terms of use">Terms of
+                    Use</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=content-complaints-sfw" class="fancyLink cboxElement"
+                    title="Terms of use">Content Complaints</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=privacy-notice-sfw" class="fancyLink cboxElement"
+                    title="Privacy notice">Privacy</a>
+            </li>
+            <li>
+                <a href="/pages.php?id=privacy-ca-sfw" class="fancyLink cboxElement" title="Privacy CA">Privacy CA</a>
+            </li>
+            <li>
+                <a href="http://gayhubnetwork.com/" target="_blank" title="Bigbling">Webmasters</a>
+            </li>
+            <!--li>
+            	<a href="/pages.php?id=account-sfw#help" class="fancyLink cboxElement" title="FAQ">FAQ</a>
+            </li-->
+
+
+            <!--li>
+            	<a href="/pages.php?id=copyright-policy-sfw" class="fancyLink cboxElement" title="Terms of use">Copyright</a>
+            </li-->
+        </ul>
+
+        <span id="footerFoot">
+            <a href="/pages.php?id=2257-sfw" title="2257 Record-Keeping" class="compliance fancyLink cboxElement">18
+                U.S.C 2257 Record-Keeping<br>Requirements Compliance Statement</a>;
+            <br>Copyright © <strong id="insertHere">2026</strong>
+            <script>
+                var d = new Date();
+                var el = document.getElementById('insertHere');
+                el.innerHTML = d.getFullYear();
+            </script>
+            HC Multimedia, LLC, Nevada, United States and<br>HC Media, s.r.o - Vodickova 791/41 Nove Mesto, 110 00 Praha
+            1, Czech Republic
+        </span>
+
+    </div>
+
+    <div class="content-alert adult-warning splash" style="display: none;">
+
+        <div class="alert">
+            <h2>You are entering the hottest Gay Adult Site on the Internet.</h2>
+            <p>CockyBoys.com is the most awarded gay studio, offering you unrivaled premium content with unlimited
+                streaming as well as limited downloads. 100% Secure and Privacy Guaranteed!</p>
+            <p class="under18year-frame">Please read and comply with the following conditions before you continue: This
+                website contains information, links, images and videos of sexually explicit material.If you are under
+                the age of 21, if such material offends you or if it's illegal to view such material in your community
+                please do not continue. Here is an excellent website to find something more to your tastes.Please read
+                and comply with the following conditions before you continue:I am at least 21 years of age.The sexually
+                explicit material I am viewing is for my own personal use and I will not expose minors to the material.
+                I desire to receive/view sexually explicit material. I believe that as an adult it is my inalienable
+                right to receive/view sexually explicit material. I believe that sexual acts between consenting adults
+                are neither offensive nor obscene. The viewing, reading and downloading of sexually explicit materials
+                does not violate the standards of my community, town, city, state or country. I am solely responsible
+                for any false disclosures or legal ramifications of viewing, reading or downloading any material in this
+                site. Furthermore this website nor its affiliates will be held responsible for any legal ramifications
+                arising from fraudulent entry into or use of this website.</p>
+            <a href="#" id="adult-continue" class="positive continue trackclick">Enter CockyBoys</a>
+
+        </div>
+        <div class="background-alert"></div>
+    </div>
+
+
+    <script>
+        //jquery cookie plugin
+        (function (e) { if (typeof define === "function" && define.amd) { define(["jquery"], e) } else if (typeof exports === "object") { e(require("jquery")) } else { e(jQuery) } })(function (e) { function n(e) { return u.raw ? e : encodeURIComponent(e) } function r(e) { return u.raw ? e : decodeURIComponent(e) } function i(e) { return n(u.json ? JSON.stringify(e) : String(e)) } function s(e) { if (e.indexOf('"') === 0) { e = e.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, "\\") } try { e = decodeURIComponent(e.replace(t, " ")); return u.json ? JSON.parse(e) : e } catch (n) { } } function o(t, n) { var r = u.raw ? t : s(t); return e.isFunction(n) ? n(r) : r } var t = /\+/g; var u = e.cookie = function (t, s, a) { if (s !== undefined && !e.isFunction(s)) { a = e.extend({}, u.defaults, a); if (typeof a.expires === "number") { var f = a.expires, l = a.expires = new Date; l.setTime(+l + f * 864e5) } return document.cookie = [n(t), "=", i(s), a.expires ? "; expires=" + a.expires.toUTCString() : "", a.path ? "; path=" + a.path : "", a.domain ? "; domain=" + a.domain : "", a.secure ? "; secure" : ""].join("") } var c = t ? undefined : {}; var h = document.cookie ? document.cookie.split("; ") : []; for (var p = 0, d = h.length; p < d; p++) { var v = h[p].split("="); var m = r(v.shift()); var g = v.join("="); if (t && t === m) { c = o(g, s); break } if (!t && (g = o(g)) !== undefined) { c[m] = g } } return c }; u.defaults = {}; e.removeCookie = function (t, n) { if (e.cookie(t) === undefined) { return false } e.cookie(t, "", e.extend({}, n, { expires: -1 })); return !e.cookie(t) } })
+
+        function Set_Cookie(name, value, expires_in_days, cookie_path, cookie_domain, secure) {
+            $.cookie(name, value, { expires: expires_in_days, path: cookie_path, domain: cookie_domain });
+        };
+
+        function cookieExists(cookiename) {
+            return (typeof $.cookie(cookiename) !== "undefined");
+        }
+
+        function getCookie(c_name) {
+            return $.cookie(c_name);
+        }
+
+    </script>
+
+
+
+    <!-- JavaScript at the bottom for fast page loading -->
+    <!-- ElevX -->
+    <script src="https://cdn.cockyboys.com/js/fancybox/jquery.fancybox.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.cockyboys.com/js/fancybox/jquery.fancybox.css">
+    <script src="https://cdn.cockyboys.com/js/fancybox/helpers/jquery.fancybox-thumbs.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://cdn.cockyboys.com/js/fancybox/helpers/jquery.fancybox-thumbs.css">
+    <!-- hover intent plugin -->
+    <script src="https://cdn.cockyboys.com/js_v2/hoverintent.js"></script>
+    <!-- cookies plugin -->
+    <script type="text/javascript" src="https://cdn.cockyboys.com/js_v3/js.cookie.js"></script>
+    <!--<script type="text/javascript" src="https://cdn.cockyboys.com/js_v3/jquery.cookie.js"></script>-->
+    <!--cycle2-->
+    <script src="https://cdn.cockyboys.com/js_v4/jquery.cycle2.min.js"></script>
+    <!-- custom scripts -->
+    <!--<script src="/js_v4/scripts_2311.js?35"></script>-->
+    <script src="https://cdn.cockyboys.com/js_v4/scripts_2603.js?1"></script>
+
+
+
+
+    <!-- adult warning -->
+
+    <script>
+        //Adult warning. Si no podem crear galetes no mostrem missatge.
+        if (!cookieExists('adultcheck')) {
+            $(".adult-warning a.continue").show();
+            $(".adult-warning").css("display", "block");
+        } else {
+            // en el cas que els idiomes siguin iguals només mostrem botó continue si és la primera vegada que entrem a la pàgina.
+            if (cookieExists('adultcheck')) {
+                adult_warning_cookie = getCookie('adultcheck');
+                //console.log("Ja tenim galeta adultcheck! No mostrem res.");
+            } else {
+                //no tenim galeta de adult warning per tant mostrem pantalla amb continue i li donem valor quan es fa click a algún dels botons
+                $(".adult-warning").css("display", "block");
+                //$(".adult-warning a.continue").prop("href", "adult-continue");
+                //console.log("Com que no tenim galeta adultcheck mostrem el popup amb només botó continue ja que els idiomes calculats i de customer són iguals.");
+            }
+        }
+
+        //Botó de la dreta per tant mantenim idioma.
+        $('div.adult-warning div.alert > a.alert-close, div.adult-warning div.alert > a.continue').click(function (e) {
+            e.preventDefault();
+            Set_Cookie('adultcheck', '1', 30, '/', 'cockyboys.com');
+            $(".adult-warning").css("display", "none");
+        });
+    </script>
+
+    <script>
+        //load it with jquery, to prevent initial page slowing, because the thumbs are so large
+        /*$('#f4fAPI').load('/js_v4/f4f-api2.php?code=ar2d9&template=slider');
+        $('#f4fNav').load('/js_v4/f4f-api2.php?code=ad6cd&template=nav');*/
+    </script>
+
+    <!-- flash sale animation on join now button in header -->
+
+    <!-- END flash sale animation on join now button in header -->
+
+
+    <!-- Prompt IE 6 users to install Chrome Frame. Remove this if you want to support IE 6.
+       chromium.org/developers/how-tos/chrome-frame-getting-started -->
+    <!--[if lt IE 7 ]>
+    <script src="https://ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+
+
+    <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-1" tabindex="0"
+        style="display: none;"></ul><span role="status" aria-live="assertive" aria-relevant="additions"
+        class="ui-helper-hidden-accessible"></span>
+    <div class="nogiruka-btn-container"><button class="nogiruka-scroll-btn" data-direction="up"><svg
+                viewBox="0 0 384 512">
+                <path
+                    d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L160 141.2V448c0 17.7 14.3 32 32 32s32-14.3 32-32V141.2L329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z">
+                </path>
+            </svg></button><button class="nogiruka-scroll-btn" data-direction="down"><svg viewBox="0 0 384 512">
+                <path
+                    d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8V64c0-17.7-14.3-32-32-32s-32 14.3-32 32v306.8L54.6 246.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5 32.8 0 45.3l160 160z">
+                </path>
+            </svg></button></div>
+</body>

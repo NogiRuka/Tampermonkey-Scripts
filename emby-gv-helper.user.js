@@ -5,32 +5,17 @@
 // @description  Emby GV helper for Pornolab and IAFD metadata copy
 // @author       乃木流架
 // @icon         https://github.com/NogiRuka/Tampermonkey-Scripts/blob/main/favicons/lustfulboy.png?raw=true
-// @match        https://pornolab.net/forum/viewtopic.php*
-// @match        https://*.iafd.com/title.rme/*
-// @match        https://*.lustfulboy.com/web/index.html*
-// @match        https://*.games-video.co.jp/*
-// @match        https://*.fratx.com/*
-// @match        https://*.daiichisouko.com/*
-// @match        https://*.trance-video.com/*
-// @match        https://*.hunk-ch.com/*
-// @match        https://*.sayuncle.com/*
-// @match        https://*.boy-studio.com/*
-// @match        https://*.latinboyz.com/*
-// @match        https://*.gayerdar.com/*
-// @match        https://*.gokumen.jp/*
-// @match        https://*.str8boys2023.com/*
-// @match        https://*.helixstudios.com/*
-// @match        https://*.englishlads.com/*
-// @match        https://*.men.com/*
-// @match        https://*.ck-download.com/*
-// @match        https://*.sketchysex.com/*
-// @match        https://*.clips4sale.com/*
-// @match        https://*.jgvdata.com/*
+// @match        *://*/*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
 // @grant        GM_xmlhttpRequest
+// @grant        GM_download
 // @connect      lustfulboy.com
+// @connect      hunk-ch.com
+// @connect      *.hunk-ch.com
+// @connect      ck-download.com
+// @connect      *.ck-download.com
 // @connect      self
 // @require      file://D:\Projects\Tampermonkey Scripts\emby-gv-helper.user.js
 // ==/UserScript==
@@ -43,6 +28,11 @@
   const lang = savedLang === 'auto' ? browserLang : savedLang;
   let shortcut = GM_getValue('shortcut', 'ctrl+shift+m');
   let themeColor = GM_getValue('themeColor', '#ff69b4');
+  let hunkChPosterFilename = GM_getValue('hunkChPosterFilename', 'poster.jpg');
+  let hunkChDownloadMode = GM_getValue('hunkChDownloadMode', 'direct');
+  let fourHorLoverImgWidth = parseInt(GM_getValue('fourHorLoverImgWidth', 200), 10);
+  if (!Number.isFinite(fourHorLoverImgWidth) || fourHorLoverImgWidth <= 0) fourHorLoverImgWidth = 200;
+  fourHorLoverImgWidth = Math.max(50, Math.min(800, fourHorLoverImgWidth));
 
   const defaultMetadataConfigs = {
     actors: {
@@ -84,6 +74,9 @@
       metadataActorsCopy: '复制演员',
       metadataGenresCopy: '复制标签',
       metadataDescriptionCopy: '复制简介',
+      actorPreview: '预览',
+      actorNames: '名单',
+      actorNameCopied: '演员名已复制',
       metadataCopied: '元数据已复制到剪贴板',
       metadataCopyFailed: '复制失败，请检查模板或控制台日志',
       metadataParseFailed: '未能从页面解析出元数据',
@@ -94,9 +87,21 @@
       resourceBaseLabel: '资源站基址（例如：https://example.com/filebrowser/files/media/lustfulboy）',
       resourceBasePlaceholder: '请输入资源站根路径',
       resourceOpenButton: '打开资源目录',
+      hunkChSettings: 'Hunk-Ch 设置',
+      hunkChPosterFilenameLabel: '大图下载文件名（默认 poster.jpg）',
+      hunkChPosterFilenamePlaceholder: '例如：poster.jpg',
+      hunkChDownloadModeLabel: '下载方式（默认直接下载）',
+      hunkChDownloadModeDirect: '直接下载',
+      hunkChDownloadModeSaveAs: '弹出另存为',
+      hunkChDownloadImage: '下载图片',
+      hunkChDownloading: '开始下载图片…',
+      hunkChDownloadOk: '图片已开始下载',
+      hunkChDownloadFailed: '下载失败',
       embyApiSettings: 'Emby API 设置',
       embyApiUrlLabel: 'Emby 服务器地址 (例如 https://lustfulboy.com/emby)',
       embyApiTokenLabel: 'Emby API 密钥 (X-Emby-Token)',
+      fourHorLoverSettings: '4horlover 设置',
+      fourHorLoverImageWidthLabel: '列表图片宽度（px，默认 200）',
       uploadImage: '修改图片',
       uploadSuccess: '图片上传成功，请手动刷新页面',
       uploadFailed: '图片上传失败',
@@ -126,6 +131,9 @@
       metadataActorsCopy: 'Copy actors',
       metadataGenresCopy: 'Copy genres',
       metadataDescriptionCopy: 'Copy description',
+      actorPreview: 'Preview',
+      actorNames: 'Names',
+      actorNameCopied: 'Actor name copied',
       metadataCopied: 'Metadata copied to clipboard',
       metadataCopyFailed: 'Copy failed, please check template or console log',
       metadataParseFailed: 'Failed to parse metadata from page',
@@ -136,9 +144,21 @@
       resourceBaseLabel: 'Resource base URL (e.g. https://example.com/filebrowser/files/media/lustfulboy)',
       resourceBasePlaceholder: 'Enter resource root URL',
       resourceOpenButton: 'Open resource folder',
+      hunkChSettings: 'Hunk-Ch Settings',
+      hunkChPosterFilenameLabel: 'Download filename for large image (default poster.jpg)',
+      hunkChPosterFilenamePlaceholder: 'e.g. poster.jpg',
+      hunkChDownloadModeLabel: 'Download mode (default direct)',
+      hunkChDownloadModeDirect: 'Direct download',
+      hunkChDownloadModeSaveAs: 'Save as dialog',
+      hunkChDownloadImage: 'Download image',
+      hunkChDownloading: 'Downloading image…',
+      hunkChDownloadOk: 'Download started',
+      hunkChDownloadFailed: 'Download failed',
       embyApiSettings: 'Emby API Settings',
       embyApiUrlLabel: 'Emby Server URL (e.g. https://lustfulboy.com/emby)',
       embyApiTokenLabel: 'Emby API Key (X-Emby-Token)',
+      fourHorLoverSettings: '4horlover Settings',
+      fourHorLoverImageWidthLabel: 'List image width (px, default 200)',
       uploadImage: 'Upload Image',
       uploadSuccess: 'Image uploaded successfully, please refresh manually',
       uploadFailed: 'Image upload failed',
@@ -186,6 +206,176 @@
         }
       }, 200);
     }, 3000);
+  }
+
+  function enableUniversalCopyUnlock() {
+    const root = document.documentElement;
+    if (root && root.dataset && root.dataset.embyCopyUnlockReady === '1') return;
+    if (root && root.dataset) root.dataset.embyCopyUnlockReady = '1';
+
+    const ensureStyle = () => {
+      if (!document.head) return;
+      if (document.getElementById('emby-copy-unlock-style')) return;
+      const style = document.createElement('style');
+      style.id = 'emby-copy-unlock-style';
+      style.textContent = `
+        * {
+          user-select: text !important;
+          -webkit-user-select: text !important;
+          -moz-user-select: text !important;
+          -ms-user-select: text !important;
+        }
+      `;
+      document.head.appendChild(style);
+    };
+
+    const nullifyInlineHandlers = () => {
+      if (document.body) {
+        document.body.oncopy = null;
+        document.body.oncut = null;
+        document.body.onpaste = null;
+        document.body.onselectstart = null;
+        document.body.oncontextmenu = null;
+      }
+      document.oncopy = null;
+      document.oncut = null;
+      document.onpaste = null;
+      document.onselectstart = null;
+      document.oncontextmenu = null;
+    };
+
+    const stop = (e) => {
+      try { e.stopImmediatePropagation(); } catch (_) {}
+      try { e.stopPropagation(); } catch (_) {}
+    };
+
+    ensureStyle();
+    nullifyInlineHandlers();
+
+    const events = ['copy', 'cut', 'paste', 'selectstart', 'contextmenu', 'dragstart'];
+    events.forEach(type => document.addEventListener(type, stop, true));
+
+    document.addEventListener('keydown', (e) => {
+      const key = String(e.key || '').toLowerCase();
+      const isCmd = !!(e.ctrlKey || e.metaKey);
+      if (isCmd && (key === 'c' || key === 'x' || key === 'v' || key === 'a')) stop(e);
+    }, true);
+
+    if (!document.head || !document.body) {
+      window.addEventListener('DOMContentLoaded', () => {
+        ensureStyle();
+        nullifyInlineHandlers();
+      }, { once: true });
+    }
+  }
+
+  function getHunkChPosterFilenameSetting() {
+    const v = (typeof GM_getValue === 'function')
+      ? GM_getValue('hunkChPosterFilename', hunkChPosterFilename || 'poster.jpg')
+      : (hunkChPosterFilename || 'poster.jpg');
+    const s = (v || '').trim();
+    return s || 'poster.jpg';
+  }
+
+  function getHunkChSaveAsSetting() {
+    const v = (typeof GM_getValue === 'function')
+      ? GM_getValue('hunkChDownloadMode', hunkChDownloadMode || 'direct')
+      : (hunkChDownloadMode || 'direct');
+    const modeRaw = (v || '').trim() || 'direct';
+    const mode = modeRaw === 'prompt' ? 'saveAs' : modeRaw;
+    return mode === 'saveAs';
+  }
+
+  function createDownloadFabButton({ title, right = 12, left = null, bottom = 12, zIndex = 30, size = 50 } = {}) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'emby-hunkch-download-btn';
+    btn.title = title || '';
+    btn.setAttribute('aria-label', title || '');
+    btn.style.cssText = [
+      'position:absolute',
+      (Number.isFinite(left) ? ('left:' + left + 'px') : ('right:' + right + 'px')),
+      'bottom:' + bottom + 'px',
+      'z-index:' + zIndex,
+      'width:' + size + 'px',
+      'height:' + size + 'px',
+      'padding:0',
+      'display:flex',
+      'align-items:center',
+      'justify-content:center',
+      'border-radius:999px',
+      'border:1px solid rgba(255,255,255,.22)',
+      'background:' + themeColor,
+      'color:#fff',
+      'cursor:pointer',
+      'box-shadow:0 6px 18px rgba(0,0,0,.45)'
+    ].join(';');
+    btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 11l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+    return btn;
+  }
+
+  function downloadByUrl(url, filename, saveAs, options = {}) {
+    if (!url) {
+      showToast(t.hunkChDownloadFailed);
+      return;
+    }
+
+    showToast(t.hunkChDownloading);
+    if (typeof GM_download === 'function') {
+      const safeOptions = (options && typeof options === 'object') ? options : {};
+      const headers = (safeOptions.headers && typeof safeOptions.headers === 'object') ? safeOptions.headers : undefined;
+      const timeout = Number.isFinite(safeOptions.timeout) ? safeOptions.timeout : undefined;
+
+      const buildErrText = (err) => {
+        if (!err) return '';
+        if (typeof err === 'string') return err;
+        if (typeof err === 'object') {
+          const parts = [];
+          if (err.error) parts.push(String(err.error));
+          if (err.details) parts.push(String(err.details));
+          if (err.status) parts.push(String(err.status));
+          if (err.statusText) parts.push(String(err.statusText));
+          if (err.finalUrl) parts.push(String(err.finalUrl));
+          if (parts.length) return parts.join(' | ');
+          try {
+            return JSON.stringify(err).slice(0, 160);
+          } catch (_) {
+            return String(err);
+          }
+        }
+        return String(err);
+      };
+
+      try {
+        GM_download({
+          url,
+          name: filename,
+          saveAs: !!saveAs,
+          headers,
+          timeout,
+          onload: () => showToast(t.hunkChDownloadOk),
+          onerror: (err) => {
+            console.error('[emby-gv-helper] download failed', { url, filename, saveAs, err });
+            const extra = buildErrText(err);
+            showToast(extra ? (t.hunkChDownloadFailed + ': ' + extra) : t.hunkChDownloadFailed);
+          }
+        });
+      } catch (err) {
+        console.error('[emby-gv-helper] GM_download threw', { url, filename, saveAs, err });
+        const extra = (err && err.message) ? err.message : String(err || '');
+        showToast(extra ? (t.hunkChDownloadFailed + ': ' + extra) : t.hunkChDownloadFailed);
+      }
+      return;
+    }
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    showToast(t.hunkChDownloadOk);
   }
 
   function copyToClipboard(text) {
@@ -427,6 +617,87 @@
 
     content.appendChild(resourceBlock);
 
+    const hunkChBlock = document.createElement('div');
+    hunkChBlock.style.cssText = 'margin-top:14px;padding:10px 12px;background:#1c1c1c;border-radius:6px;border:1px solid #333;';
+
+    const hunkChTitle = document.createElement('div');
+    hunkChTitle.textContent = t.hunkChSettings;
+    hunkChTitle.style.cssText = 'font-size:12px;color:' + themeColor + ';margin-bottom:8px;font-weight:600;';
+    hunkChBlock.appendChild(hunkChTitle);
+
+    const posterFilenameLabel = document.createElement('div');
+    posterFilenameLabel.textContent = t.hunkChPosterFilenameLabel;
+    posterFilenameLabel.style.cssText = 'font-size:11px;color:#ccc;margin-bottom:4px;';
+    hunkChBlock.appendChild(posterFilenameLabel);
+
+    const posterFilenameInput = document.createElement('input');
+    posterFilenameInput.type = 'text';
+    posterFilenameInput.value = (hunkChPosterFilename || 'poster.jpg');
+    posterFilenameInput.placeholder = t.hunkChPosterFilenamePlaceholder;
+    posterFilenameInput.style.cssText = 'width:100%;padding:6px 8px;border-radius:4px;border:1px solid #3a3a3a;background:#111;color:#eee;font-size:12px;';
+    hunkChBlock.appendChild(posterFilenameInput);
+
+    const downloadModeLabel = document.createElement('div');
+    downloadModeLabel.textContent = t.hunkChDownloadModeLabel;
+    downloadModeLabel.style.cssText = 'font-size:11px;color:#ccc;margin:10px 0 6px;';
+    hunkChBlock.appendChild(downloadModeLabel);
+
+    const modeRow = document.createElement('div');
+    modeRow.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;';
+
+    const modeName = 'hunkch-download-mode';
+    const makeModeOption = (value, text) => {
+      const label = document.createElement('label');
+      label.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 10px;background:#111;border:1px solid #3a3a3a;border-radius:999px;cursor:pointer;font-size:12px;color:#eee;';
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = modeName;
+      input.value = value;
+      input.checked = (hunkChDownloadMode || 'direct') === value;
+      input.style.accentColor = themeColor;
+      const span = document.createElement('span');
+      span.textContent = text;
+      label.appendChild(input);
+      label.appendChild(span);
+      return { label, input };
+    };
+
+    const normalizedMode = (hunkChDownloadMode === 'prompt') ? 'saveAs' : (hunkChDownloadMode || 'direct');
+    const directOpt = makeModeOption('direct', t.hunkChDownloadModeDirect);
+    directOpt.input.checked = normalizedMode === 'direct';
+    const saveAsOpt = makeModeOption('saveAs', t.hunkChDownloadModeSaveAs);
+    saveAsOpt.input.checked = normalizedMode === 'saveAs';
+    modeRow.appendChild(directOpt.label);
+    modeRow.appendChild(saveAsOpt.label);
+    hunkChBlock.appendChild(modeRow);
+
+    content.appendChild(hunkChBlock);
+
+    const fourHorLoverBlock = document.createElement('div');
+    fourHorLoverBlock.style.cssText = 'margin-top:14px;padding:10px 12px;background:#1c1c1c;border-radius:6px;border:1px solid #333;';
+
+    const fourHorLoverTitle = document.createElement('div');
+    fourHorLoverTitle.textContent = t.fourHorLoverSettings;
+    fourHorLoverTitle.style.cssText = 'font-size:12px;color:' + themeColor + ';margin-bottom:8px;font-weight:600;';
+    fourHorLoverBlock.appendChild(fourHorLoverTitle);
+
+    const fourHorLoverWidthLabel = document.createElement('div');
+    fourHorLoverWidthLabel.textContent = t.fourHorLoverImageWidthLabel;
+    fourHorLoverWidthLabel.style.cssText = 'font-size:11px;color:#ccc;margin-bottom:4px;';
+    fourHorLoverBlock.appendChild(fourHorLoverWidthLabel);
+
+    const fourHorLoverImgWidthInput = document.createElement('input');
+    fourHorLoverImgWidthInput.type = 'number';
+    fourHorLoverImgWidthInput.min = '50';
+    fourHorLoverImgWidthInput.max = '800';
+    fourHorLoverImgWidthInput.step = '10';
+    fourHorLoverImgWidthInput.value = String(fourHorLoverImgWidth || 200);
+    fourHorLoverImgWidthInput.placeholder = '200';
+    fourHorLoverImgWidthInput.style.cssText = 'width:100%;padding:6px 8px;border-radius:4px;border:1px solid #3a3a3a;background:#111;color:#eee;font-size:12px;';
+    fourHorLoverBlock.appendChild(fourHorLoverImgWidthInput);
+
+    content.appendChild(fourHorLoverBlock);
+
     // Emby API Settings Block
     const apiBlock = document.createElement('div');
     apiBlock.style.cssText = 'margin-top:14px;padding:10px 12px;background:#1c1c1c;border-radius:6px;border:1px solid #333;';
@@ -479,6 +750,17 @@
       GM_setValue('resourceBaseUrl', resourceInput.value.trim());
       GM_setValue('embyApiUrl', apiUrlInput.value.trim());
       GM_setValue('embyApiToken', apiTokenInput.value.trim());
+      const rawPoster = posterFilenameInput.value.trim() || 'poster.jpg';
+      const safePoster = rawPoster.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim();
+      GM_setValue('hunkChPosterFilename', safePoster || 'poster.jpg');
+      const selectedMode = (directOpt.input.checked ? 'direct' : (saveAsOpt.input.checked ? 'saveAs' : 'direct'));
+      GM_setValue('hunkChDownloadMode', selectedMode);
+      hunkChDownloadMode = selectedMode;
+      const nextImgWidthRaw = parseInt(fourHorLoverImgWidthInput.value, 10);
+      const nextImgWidth = Number.isFinite(nextImgWidthRaw) ? nextImgWidthRaw : 200;
+      const nextClampedImgWidth = Math.max(50, Math.min(800, nextImgWidth));
+      GM_setValue('fourHorLoverImgWidth', nextClampedImgWidth);
+      fourHorLoverImgWidth = nextClampedImgWidth;
       const nextTheme = themeText.value.trim();
       if (/^#[0-9a-fA-F]{6}$/.test(nextTheme)) {
         GM_setValue('themeColor', nextTheme);
@@ -527,6 +809,27 @@
     }
   });
 
+  function normalizeNameValue(v) {
+    if (v === null || v === undefined) return '';
+    if (typeof v === 'string') return v.replace(/\s+/g, ' ').trim();
+    if (typeof v === 'object') {
+      const name = typeof v.name === 'string' ? v.name : (typeof v.Name === 'string' ? v.Name : '');
+      if (name) return name.replace(/\s+/g, ' ').trim();
+    }
+    return String(v).replace(/\s+/g, ' ').trim();
+  }
+
+  function normalizeNameList(list) {
+    if (!list) return [];
+    const arr = Array.isArray(list) ? list : Array.from(list);
+    const out = [];
+    for (const it of arr) {
+      const s = normalizeNameValue(it);
+      if (s) out.push(s);
+    }
+    return out;
+  }
+
   function renderWithTemplate(meta, tpl, type) {
     if (!tpl || !meta) return '';
     let result = tpl;
@@ -535,7 +838,7 @@
       result = result.replace(
         new RegExp(`{{#${field}}}([\\s\\S]*?){{\\/${field}}}`, 'g'),
         (_, block) => {
-          const arr = meta[field];
+          const arr = normalizeNameList(meta[field]);
           if (!arr || !arr.length) return '';
           return arr.map(name => {
             let chunk = block;
@@ -547,7 +850,7 @@
     });
 
     if ((type === 'actors' || type === 'genres') && result.includes('{{name}}')) {
-      const arr = meta[type];
+      const arr = normalizeNameList(meta[type]);
       if (!arr || !arr.length) return '';
       result = arr.map(name => {
         let chunk = tpl;
@@ -556,8 +859,8 @@
       }).join('');
     }
 
-    const genresText = meta.genres && meta.genres.length ? meta.genres.join(', ') : '';
-    const actorsText = meta.actors && meta.actors.length ? meta.actors.join(', ') : '';
+    const genresText = normalizeNameList(meta.genres).join(', ');
+    const actorsText = normalizeNameList(meta.actors).join(', ');
     const map = {
       title: meta.title || '',
       year: meta.year || '',
@@ -631,6 +934,67 @@
     panel.appendChild(btnRow);
     overlay.appendChild(panel);
     
+    document.body.appendChild(overlay);
+  }
+
+  function showTextPreview(titleText, contentText, names) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100000;display:flex;align-items:center;justify-content:center;';
+
+    const panel = document.createElement('div');
+    panel.style.cssText = 'background:#181818;color:#f5f5f5;border-radius:10px;padding:14px;width:780px;max-width:92vw;max-height:88vh;display:flex;flex-direction:column;gap:12px;border:1px solid #333;box-shadow:0 10px 40px rgba(0,0,0,0.55);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;';
+
+    const header = document.createElement('div');
+    header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:10px;';
+
+    const title = document.createElement('div');
+    title.textContent = titleText || '';
+    title.style.cssText = 'font-size:15px;font-weight:700;color:' + themeColor + ';';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = 'width:32px;height:32px;border-radius:8px;border:1px solid #333;background:#111;color:#ddd;cursor:pointer;font-size:20px;line-height:28px;';
+    closeBtn.onclick = () => document.body.removeChild(overlay);
+
+    header.appendChild(title);
+    header.appendChild(closeBtn);
+
+    const textarea = document.createElement('textarea');
+    textarea.value = contentText || '';
+    textarea.readOnly = true;
+    textarea.style.cssText = 'width:100%;height:260px;background:#0f0f0f;color:#eee;border:1px solid #333;border-radius:8px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:12px;resize:vertical;outline:none;';
+    textarea.onfocus = () => { textarea.style.borderColor = themeColor; };
+    textarea.onblur = () => { textarea.style.borderColor = '#333'; };
+
+    const list = document.createElement('div');
+    list.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;max-height:220px;overflow:auto;padding:2px;';
+
+    const normalized = normalizeNameList(names);
+    normalized.forEach((n) => {
+      const b = document.createElement('button');
+      b.textContent = n;
+      b.style.cssText = 'padding:6px 10px;border-radius:999px;border:1px solid #333;background:#111;color:#eee;cursor:pointer;font-size:12px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+      b.onmouseover = () => { b.style.borderColor = themeColor; };
+      b.onmouseout = () => { b.style.borderColor = '#333'; };
+      b.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        copyToClipboard(n)
+          .then(() => showToast(t.actorNameCopied))
+          .catch(() => showToast(t.metadataCopyFailed));
+      };
+      list.appendChild(b);
+    });
+
+    panel.appendChild(header);
+    panel.appendChild(textarea);
+    if (normalized.length) panel.appendChild(list);
+    overlay.appendChild(panel);
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) document.body.removeChild(overlay);
+    });
+
     document.body.appendChild(overlay);
   }
 
@@ -776,7 +1140,7 @@
       const input = document.createElement('input');
       input.type = 'text';
       input.placeholder = 'Item ID';
-      input.style.cssText = 'width:60px;padding:1px 4px;font-size:11px;border:1px solid #666;border-radius:4px;background:#222;color:#fff;margin-left:4px;height:20px;';
+      input.style.cssText = 'width:60px;box-sizing:border-box;padding:0 6px;font-size:11px;border:1px solid #666;border-radius:4px;background:#222;color:#fff;margin:0 0 0 4px;height:20px;line-height:20px;';
       input.onclick = (e) => e.stopPropagation();
       input.onkeydown = (e) => e.stopPropagation();
 
@@ -788,7 +1152,7 @@
         e.preventDefault();
         e.stopPropagation();
         // Pass current input value as itemId, but don't skip preview
-        addTagsToEmby(input.value.trim(), meta.genres, false);
+        addTagsToEmby(input.value.trim(), normalizeNameList(meta.genres), false);
       };
 
       const addBtn = document.createElement('button');
@@ -801,7 +1165,7 @@
         const val = input.value.trim();
         if (val) {
           // Skip preview if we have an ID
-          addTagsToEmby(val, meta.genres, true);
+          addTagsToEmby(val, normalizeNameList(meta.genres), true);
         } else {
           showToast(t.missingItemId);
           input.focus();
@@ -811,6 +1175,73 @@
       container.appendChild(input);
       container.appendChild(jsonBtn);
       container.appendChild(addBtn);
+    }
+
+    if (type === 'actors') {
+      const namesBtn = document.createElement('button');
+      namesBtn.textContent = t.actorNames;
+      namesBtn.style.cssText = 'padding:2px 6px;border-radius:4px;background-color:#333;color:#fff;border:1px solid #444;font-size:11px;cursor:pointer;line-height:1.5;vertical-align:middle;';
+      namesBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const names = normalizeNameList(meta.actors);
+        if (!names.length) return;
+
+        const existing = container.querySelector('.emby-actor-names-panel');
+        if (existing) {
+          existing.remove();
+          return;
+        }
+
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+
+        const panel = document.createElement('div');
+        panel.className = 'emby-actor-names-panel';
+        panel.style.cssText = 'position:absolute;top:100%;right:0;margin-top:6px;min-width:160px;max-width:260px;max-height:240px;overflow:auto;background:#0f0f0f;border:1px solid #333;border-radius:10px;padding:8px;box-shadow:0 12px 32px rgba(0,0,0,0.65);z-index:99999;display:flex;flex-direction:column;gap:6px;';
+
+        names.forEach((n) => {
+          const b = document.createElement('button');
+          b.textContent = n;
+          b.style.cssText = 'text-align:left;padding:6px 8px;border-radius:8px;border:1px solid #333;background:#151515;color:#eee;cursor:pointer;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+          b.onmouseover = () => { b.style.borderColor = themeColor; };
+          b.onmouseout = () => { b.style.borderColor = '#333'; };
+          b.onclick = (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
+            copyToClipboard(n)
+              .then(() => showToast(t.actorNameCopied))
+              .catch(() => showToast(t.metadataCopyFailed));
+          };
+          panel.appendChild(b);
+        });
+
+        container.appendChild(panel);
+
+        const onDocClick = (ev) => {
+          if (ev.target === namesBtn) return;
+          if (panel.contains(ev.target)) return;
+          panel.remove();
+          document.removeEventListener('click', onDocClick, true);
+        };
+        document.addEventListener('click', onDocClick, true);
+      };
+
+      const previewBtn = document.createElement('button');
+      previewBtn.textContent = t.actorPreview;
+      previewBtn.style.cssText = 'padding:2px 6px;border-radius:4px;background-color:#1f1f1f;color:#fff;border:1px solid #444;font-size:11px;cursor:pointer;line-height:1.5;vertical-align:middle;';
+      previewBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const names = normalizeNameList(meta.actors);
+        const text = renderWithTemplate(meta, conf.template, type);
+        showTextPreview(t.metadataActorsTitle, text, names);
+      };
+
+      container.appendChild(namesBtn);
+      container.appendChild(previewBtn);
     }
 
     return container;
@@ -1933,6 +2364,59 @@
 
     function initHunkCh() {
     if (!location.host.includes('hunk-ch.com')) return;
+    if (location.pathname.includes('search.php')) {
+      const anchors = document.querySelectorAll('a[href*="movie_detail.php?code="]');
+      if (anchors.length === 0) return;
+
+      function getContrastTextColor(hex) {
+        const m = /^#?([0-9a-fA-F]{6})$/.exec((hex || '').trim());
+        if (!m) return '#fff';
+        const n = m[1];
+        const r = parseInt(n.slice(0, 2), 16) / 255;
+        const g = parseInt(n.slice(2, 4), 16) / 255;
+        const b = parseInt(n.slice(4, 6), 16) / 255;
+        const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        return lum > 0.6 ? '#111' : '#fff';
+      }
+
+      const fg = getContrastTextColor(themeColor);
+      anchors.forEach(a => {
+        if (a.classList.contains('button_movie_detail')) return;
+        if (a.querySelector('img')) return;
+        if (a.querySelector('.emby-hunkch-code-badge')) return;
+
+        let code = '';
+        try {
+          const u = new URL(a.href, location.href);
+          code = u.searchParams.get('code') || '';
+        } catch (_) {
+          return;
+        }
+        code = code.trim();
+        if (!code) return;
+
+        const badge = document.createElement('span');
+        badge.className = 'emby-hunkch-code-badge';
+        badge.textContent = code;
+        badge.style.cssText = [
+          'display:inline-block',
+          'margin-right:6px',
+          'padding:1px 6px',
+          'border-radius:4px',
+          `background:${themeColor}`,
+          `color:${fg}`,
+          'font-weight:800',
+          'font-size:12px',
+          'line-height:16px',
+          'border:1px solid rgba(255,255,255,.22)',
+          'box-shadow:0 1px 6px rgba(0,0,0,.35)'
+        ].join(';');
+
+        a.insertBefore(badge, a.firstChild);
+      });
+      return;
+    }
+
     if (!location.pathname.includes('movie_detail.php')) return;
 
     const meta = {
@@ -1951,6 +2435,83 @@
     const titleEl = document.querySelector('div.product_detail_centre h2');
     if (titleEl) {
       meta.title = titleEl.textContent.trim();
+    }
+
+    const slider = document.querySelector('.flexslider2');
+    if (slider) {
+      const attachDownloadBtn = () => {
+        const viewport = slider.querySelector('.flex-viewport');
+        if (!viewport) return false;
+
+        const existingBtns = slider.querySelectorAll('.emby-hunkch-download-btn');
+        existingBtns.forEach(b => {
+          if (b.parentNode !== viewport) {
+            b.remove();
+          }
+        });
+
+        if (viewport.querySelector('.emby-hunkch-download-btn')) return true;
+
+        if (getComputedStyle(viewport).position === 'static') {
+          viewport.style.position = 'relative';
+        }
+
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+        viewport.appendChild(btn);
+
+        const getActiveImg = () => {
+          return slider.querySelector('ul.slides li.flex-active-slide img') || slider.querySelector('ul.slides li img');
+        };
+
+        const resolveActiveUrl = () => {
+          const img = getActiveImg();
+          if (!img) return '';
+          const src = img.currentSrc || img.getAttribute('src') || img.src || '';
+          if (!src) return '';
+          try {
+            return new URL(src, location.href).href;
+          } catch (_) {
+            return '';
+          }
+        };
+
+        const updateBtnVisibility = () => {
+          const url = resolveActiveUrl();
+          console.log(debugPrefix, url);
+          btn.style.display = url ? 'flex' : 'none';
+          btn.dataset.url = url;
+        };
+
+        const triggerDownload = (url) => {
+          const filename = getHunkChPosterFilenameSetting();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs);
+        };
+
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          triggerDownload(btn.dataset.url || resolveActiveUrl());
+        });
+
+        updateBtnVisibility();
+
+        const slides = slider.querySelector('ul.slides');
+        if (slides) {
+          const obs = new MutationObserver(() => updateBtnVisibility());
+          obs.observe(slides, { subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
+        }
+
+        slider.addEventListener('click', () => setTimeout(updateBtnVisibility, 0), true);
+        window.addEventListener('resize', () => setTimeout(updateBtnVisibility, 0));
+        return true;
+      };
+
+      if (!attachDownloadBtn()) {
+        setTimeout(() => attachDownloadBtn(), 500);
+      }
+      const rootObs = new MutationObserver(() => attachDownloadBtn());
+      rootObs.observe(slider, { childList: true, subtree: true });
     }
 
     let introP = null;
@@ -2040,34 +2601,1004 @@
     }
   }
 
+  function init4HorLover() {
+    if (!location.host.includes('4horlover.com')) return;
+
+    const getDownloadedKey = (postId) => `4hlDownloaded:${String(postId || '').trim()}`;
+    const getDownloaded = (postId) => {
+      const key = getDownloadedKey(postId);
+      if (typeof GM_getValue === 'function') return !!GM_getValue(key, false);
+      try { return localStorage.getItem(key) === '1'; } catch (_) { return false; }
+    };
+    const setDownloaded = (postId) => {
+      const key = getDownloadedKey(postId);
+      if (typeof GM_setValue === 'function') GM_setValue(key, true);
+      else {
+        try { localStorage.setItem(key, '1'); } catch (_) {}
+      }
+    };
+    const getPostIdFromArticle = (article) => {
+      if (!article) return '';
+      const id = String(article.getAttribute('id') || '').trim();
+      const m = id.match(/^post-(\d+)$/);
+      if (m) return m[1];
+      const a = article.querySelector('.entry-title a[href*="?p="]');
+      const href = a ? (a.getAttribute('href') || a.href || '') : '';
+      const m2 = href.match(/[?&]p=(\d+)/);
+      return m2 ? m2[1] : '';
+    };
+
+    const autoPassAgeGate = () => {
+      const form = document.querySelector('form.age-gate-form') || document.querySelector('form[action*="age_gate_submit"]');
+      if (!form) return false;
+      if (document.body && document.body.dataset && document.body.dataset.emby4hlAgeGateDone === '1') return true;
+
+      const d = document.getElementById('age-gate-d') || form.querySelector('input[name="age_gate[d]"]');
+      const m = document.getElementById('age-gate-m') || form.querySelector('input[name="age_gate[m]"]');
+      const y = document.getElementById('age-gate-y') || form.querySelector('input[name="age_gate[y]"]');
+      if (!d || !m || !y) return false;
+
+      const setVal = (input, value) => {
+        input.focus();
+        input.value = value;
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        input.blur();
+      };
+
+      setVal(d, '09');
+      setVal(m, '09');
+      setVal(y, '1999');
+
+      const remember = form.querySelector('input[type="checkbox"][name="age_gate[remember]"]');
+      if (remember) remember.checked = true;
+
+      if (document.body && document.body.dataset) document.body.dataset.emby4hlAgeGateDone = '1';
+
+      const submitBtn = form.querySelector('input[type="submit"], button[type="submit"], .age-gate-submit');
+      setTimeout(() => {
+        try {
+          if (submitBtn && typeof submitBtn.click === 'function') {
+            submitBtn.click();
+          } else if (typeof form.requestSubmit === 'function') {
+            form.requestSubmit();
+          } else if (typeof form.submit === 'function') {
+            form.submit();
+          }
+        } catch (e) {
+          console.error(debugPrefix, '4horlover age gate submit failed', e);
+        }
+      }, 50);
+      return true;
+    };
+
+    if (autoPassAgeGate()) return;
+
+    const ensureStyle = () => {
+      if (document.getElementById('emby-4horlover-style')) return;
+      const style = document.createElement('style');
+      style.id = 'emby-4horlover-style';
+      style.textContent = `
+        #post-70776 { display:none !important; }
+        #custom_html-7, #media_image-2 { display:none !important; }
+        #custom_html-2 { display:none !important; }
+
+        #page { width: calc(100% - 24px) !important; max-width: 1700px !important; margin: 0 auto !important; }
+        #content { padding: 0 0 24px !important; }
+        .site-header { padding: 0 !important; margin: 0 0 0.5em !important; }
+        #masthead .site-header-inner { padding: 0.5em 0 !important; }
+
+        article { margin: 0 !important; padding: 0 !important; padding-left: 0 !important; border-bottom: 1px solid rgba(255,255,255,.08) !important; }
+        article.emby-4hl-downloaded .entry-content { background: rgba(255,255,255,.035) !important; border-color: rgba(255,255,255,.18) !important; }
+        article.emby-4hl-downloaded .entry-content { border-radius: 10px !important; }
+        @media (prefers-color-scheme: light) {
+          article.emby-4hl-downloaded .entry-content { background: rgba(46, 204, 113, .10) !important; border-color: rgba(46, 204, 113, .25) !important; }
+        }
+        .entry-header { margin: 0 0 8px !important; }
+
+        .entry-content { border: 1px solid rgba(255,255,255,.12) !important; }
+
+
+        .entry-title { margin: 0 !important; line-height: 1.2 !important; }
+        .entry-title { --wpdm-link-hover-color: ${themeColor}; }
+        .entry-title, .entry-title a { color: ${themeColor} !important; }
+        .entry-title a:hover, .entry-title a:focus, .entry-title a:active { color: ${themeColor} !important; filter: none !important; }
+        html.wp-dark-mode-active:not([data-wp-dark-mode-preset="0"]) body .entry-title a:hover,
+        html[data-wp-dark-mode-active]:not([data-wp-dark-mode-preset="0"]) body .entry-title a:hover,
+        html[data-wp-dark-mode-loading]:not([data-wp-dark-mode-preset="0"]) body .entry-title a:hover { color: ${themeColor} !important; filter: none !important; }
+        .entry-meta { margin: 0 0 6px !important; font-size: 12px !important; opacity: .9 !important; }
+        .entry-content p { margin: 6px 0 !important; }
+        .entry-content img { width: ${fourHorLoverImgWidth}px !important; max-width: 100% !important; height: auto !important; }
+        .entry-content iframe { max-width: 100% !important; }
+        .entry-content img { cursor: zoom-in !important; }
+
+        .emby-4hl-lightbox { position: fixed !important; inset: 0 !important; display: none !important; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,.92) !important; z-index: 2147483647 !important; cursor: zoom-out !important; padding: 0 !important; margin: 0 !important; }
+        .emby-4hl-lightbox[aria-hidden="false"] { display: flex !important; }
+        .emby-4hl-lightbox img { max-width: 96vw !important; max-height: 96vh !important; width: auto !important; height: auto !important; object-fit: contain !important; display: block !important; }
+        body.emby-4hl-lightbox-open { overflow: hidden !important; }
+
+        #main.site-main { display: grid !important; grid-template-columns: 1fr !important; gap: 12px 16px !important; align-items: start !important; }
+        #main.site-main > * { min-width: 0 !important; }
+        #main.site-main > nav.navigation.pagination { grid-column: 1 / -1 !important; }
+
+        .sidebar #primary { padding-right: 20px !important; }
+        #secondary { padding-left: 0 !important; }
+        #secondary .widget { margin: 0 0 0 !important; }
+        #secondary iframe { width: 100% !important; }
+        #custom_html-4 iframe { height: 650px !important; }
+
+        #secondary .widget h3.widget-title, #colophon .widget h3.widget-title { margin-bottom: 0 !important; }
+        @media (min-width: 980px) {
+          #custom_html-5 .textwidget.custom-html-widget { display: flex !important; align-items: center !important; flex-wrap: nowrap !important; }
+          #custom_html-5 .textwidget.custom-html-widget > center { flex: 1 1 49% !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; white-space: nowrap !important; }
+          #custom_html-5 .textwidget.custom-html-widget > center:nth-of-type(2) { flex: 0 0 2% !important; }
+        }
+
+
+        .site-footer { margin-top: 0 !important; padding-top: 0 !important; padding-bottom: 1em !important;}
+        .site-info { margin-top: 1em !important;}
+        .pagination { margin-top: 1em !important;}
+
+        @media (min-width: 980px) {
+          #main.site-main { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+        }
+
+        @media (min-width: 1100px) {
+          #primary { width: calc(100% - 480px) !important; }
+          #secondary { width: 460px !important; }
+          body.emby-4hl-secondary-sticky #secondary { position: sticky !important; top: 12px !important; align-self: start !important; }
+        }
+      `;
+      document.head.appendChild(style);
+    };
+
+    const safeRemove = (el) => {
+      try {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      } catch (_) {}
+    };
+
+    const setupArchivesCollapse = () => {
+      const aside = document.getElementById('archives-2');
+      if (!aside || aside.dataset.embyArchivesReady === '1') return;
+      const title = aside.querySelector('.widget-title') || aside.querySelector('h3');
+      const ul = aside.querySelector('ul');
+      if (!title || !ul) return;
+
+      aside.dataset.embyArchivesReady = '1';
+      const storageKey = '4hlArchivesExpanded';
+      const getExpanded = () => (typeof GM_getValue === 'function') ? !!GM_getValue(storageKey, false) : false;
+      const setExpanded = (expanded) => {
+        if (typeof GM_setValue === 'function') GM_setValue(storageKey, !!expanded);
+      };
+
+      const setSecondarySticky = (sticky) => {
+        if (!document.body) return;
+        document.body.classList.toggle('emby-4hl-secondary-sticky', !!sticky);
+      };
+
+      ul.hidden = !getExpanded();
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'emby-4horlover-archives-toggle';
+      btn.textContent = ul.hidden ? '展开' : '收起';
+      btn.setAttribute('aria-expanded', ul.hidden ? 'false' : 'true');
+      btn.style.cssText = [
+        'margin-left:auto',
+        'padding:4px 10px',
+        'border-radius:999px',
+        'border:1px solid rgba(255,255,255,.18)',
+        'background:rgba(0,0,0,.25)',
+        'color:#fff',
+        'cursor:pointer',
+        'font-size:12px',
+        'line-height:18px'
+      ].join(';');
+
+      title.style.display = 'flex';
+      title.style.alignItems = 'center';
+      title.style.gap = '10px';
+      title.appendChild(btn);
+
+      setSecondarySticky(ul.hidden);
+
+      btn.onclick = () => {
+        const willExpand = ul.hidden;
+        ul.hidden = !willExpand;
+        btn.textContent = willExpand ? '收起' : '展开';
+        btn.setAttribute('aria-expanded', willExpand ? 'true' : 'false');
+        setExpanded(willExpand);
+        setSecondarySticky(ul.hidden);
+      };
+    };
+
+    const setupImageLightbox = () => {
+      if (document.body.dataset.emby4hlLightboxReady === '1') return;
+      document.body.dataset.emby4hlLightboxReady = '1';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'emby-4hl-lightbox';
+      overlay.setAttribute('aria-hidden', 'true');
+      const viewerImg = document.createElement('img');
+      viewerImg.alt = '';
+      overlay.appendChild(viewerImg);
+      document.body.appendChild(overlay);
+
+      const close = () => {
+        overlay.setAttribute('aria-hidden', 'true');
+        viewerImg.removeAttribute('src');
+        document.body.classList.remove('emby-4hl-lightbox-open');
+      };
+
+      const open = (url) => {
+        if (!url) return;
+        viewerImg.src = url;
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('emby-4hl-lightbox-open');
+      };
+
+      overlay.addEventListener('click', () => close(), true);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close();
+      }, true);
+
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        if (overlay.getAttribute('aria-hidden') === 'false' && overlay.contains(target)) return;
+        const img = target.closest('.entry-content img');
+        if (!img) return;
+
+        const link = img.closest('a');
+        let url = (img.currentSrc || img.src || '').trim();
+        if (link) {
+          const href = (link.getAttribute('href') || link.href || '').trim();
+          if (href) url = href;
+        }
+
+        if (!url) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (overlay.getAttribute('aria-hidden') === 'false') {
+          close();
+          return;
+        }
+        open(url);
+      }, true);
+    };
+
+    const setupDownloadedTracking = () => {
+      if (!document.body || document.body.dataset.emby4hlDownloadedReady === '1') return;
+      document.body.dataset.emby4hlDownloadedReady = '1';
+
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        const a = target.closest('a');
+        if (!a) return;
+        const text = (a.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+        if (text !== 'download file') return;
+        const article = a.closest('article[id^="post-"]');
+        if (!article) return;
+        const postId = getPostIdFromArticle(article);
+        if (!postId) return;
+        setDownloaded(postId);
+        article.classList.add('emby-4hl-downloaded');
+      }, true);
+    };
+
+    const applyDownloadedIndicator = () => {
+      const articles = document.querySelectorAll('article[id^="post-"]');
+      if (!articles.length) return;
+      articles.forEach(article => {
+        const postId = getPostIdFromArticle(article);
+        if (!postId) return;
+        article.classList.toggle('emby-4hl-downloaded', getDownloaded(postId));
+      });
+    };
+
+    const apply = () => {
+      ensureStyle();
+      safeRemove(document.getElementById('post-70776'));
+      safeRemove(document.getElementById('custom_html-7'));
+      safeRemove(document.getElementById('media_image-2'));
+      setupArchivesCollapse();
+      setupImageLightbox();
+      setupDownloadedTracking();
+      applyDownloadedIndicator();
+    };
+
+    apply();
+    const obs = new MutationObserver(() => apply());
+    obs.observe(document.body, { childList: true, subtree: true });
+  }
+
+  function initAdultContentsFc2() {
+    if (!location.host.includes('adult.contents.fc2.com')) return;
+
+    const requestHeaders = { Referer: location.href, Origin: location.origin };
+
+    const toAbsUrl = (raw, baseHref = location.href) => {
+      const s = String(raw || '').trim();
+      if (!s) return '';
+      try {
+        return new URL(s, baseHref).href;
+      } catch (_) {
+        return s;
+      }
+    };
+
+    const normalizeFc2ImageUrl = (raw, baseHref = location.href) => {
+      const abs = toAbsUrl(raw, baseHref);
+      if (!abs) return '';
+      try {
+        const u = new URL(abs);
+        const host = (u.hostname || '').toLowerCase();
+        const isThumb = /(^|\.)contents-thumbnail\d*\.fc2\.com$/.test(host);
+        if (!isThumb) return u.href;
+        const m = u.pathname.match(/^\/w\d+\/storage(\d+)\.contents\.fc2\.com(\/.+)$/i);
+        if (!m) return u.href;
+        const storageId = m[1];
+        const restPath = m[2];
+        return `https://storage${storageId}.contents.fc2.com${restPath}`;
+      } catch (_) {
+        return abs;
+      }
+    };
+
+    const isFc2ContentImageUrl = (raw, baseHref = location.href) => {
+      const abs = toAbsUrl(raw, baseHref);
+      if (!abs) return false;
+      try {
+        const u = new URL(abs);
+        const host = (u.hostname || '').toLowerCase();
+        return /(^|\.)contents-thumbnail\d*\.fc2\.com$/.test(host) || /(^|\.)storage\d+\.contents\.fc2\.com$/.test(host);
+      } catch (_) {
+        return false;
+      }
+    };
+
+    const pickImgUrl = (img) => {
+      if (!img) return '';
+      const candidates = [
+        img.currentSrc,
+        img.getAttribute('src'),
+        img.src,
+        img.getAttribute('data-src'),
+        img.getAttribute('data-original'),
+        img.getAttribute('data-lazy'),
+        img.getAttribute('data-image'),
+        img.getAttribute('data-img')
+      ];
+      for (const c of candidates) {
+        const s = String(c || '').trim();
+        if (s) return s;
+      }
+      return '';
+    };
+
+    const ensureBtnIconVisible = (btn) => {
+      if (!btn) return;
+      btn.style.setProperty('color', '#fff', 'important');
+      const svg = btn.querySelector('svg');
+      if (svg) svg.style.setProperty('display', 'block', 'important');
+      btn.querySelectorAll('path').forEach(p => {
+        p.style.setProperty('stroke', '#fff', 'important');
+        p.style.setProperty('stroke-width', '2', 'important');
+        p.style.setProperty('fill', 'none', 'important');
+      });
+    };
+
+    const ensureStyle = () => {
+      if (document.getElementById('emby-fc2-style')) return;
+      const style = document.createElement('style');
+      style.id = 'emby-fc2-style';
+      style.textContent = `
+        .items_article_left img { cursor: zoom-in !important; }
+
+        .emby-fc2-lightbox { position: fixed !important; inset: 0 !important; display: none !important; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,.92) !important; z-index: 2147483647 !important; cursor: zoom-out !important; padding: 0 !important; margin: 0 !important; }
+        .emby-fc2-lightbox[aria-hidden="false"] { display: flex !important; }
+        .emby-fc2-lightbox img { max-width: 96vw !important; max-height: 96vh !important; width: auto !important; height: auto !important; object-fit: contain !important; display: block !important; }
+        body.emby-fc2-lightbox-open { overflow: hidden !important; }
+      `;
+      document.head.appendChild(style);
+    };
+
+    const setupImageLightbox = () => {
+      if (!document.body || document.body.dataset.embyFc2LightboxReady === '1') return;
+      document.body.dataset.embyFc2LightboxReady = '1';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'emby-fc2-lightbox';
+      overlay.setAttribute('aria-hidden', 'true');
+      const viewerImg = document.createElement('img');
+      viewerImg.alt = '';
+      overlay.appendChild(viewerImg);
+      document.body.appendChild(overlay);
+
+      const close = () => {
+        overlay.setAttribute('aria-hidden', 'true');
+        viewerImg.removeAttribute('src');
+        document.body.classList.remove('emby-fc2-lightbox-open');
+      };
+
+      const open = (url) => {
+        if (!url) return;
+        viewerImg.src = url;
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('emby-fc2-lightbox-open');
+      };
+
+      window.__embyFc2LightboxOpen = open;
+      window.__embyFc2LightboxClose = close;
+
+      overlay.addEventListener('click', () => close(), true);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close();
+      }, true);
+
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        if (overlay.getAttribute('aria-hidden') === 'false' && overlay.contains(target)) return;
+
+        const img = target.closest('.items_article_left img');
+        if (!img) return;
+
+        const link = img.closest('a');
+        let raw = pickImgUrl(img);
+        if (link) {
+          const href = (link.getAttribute('href') || link.href || '').trim();
+          if (href) raw = href;
+        }
+
+        if (!raw) return;
+        if (!isFc2ContentImageUrl(raw)) return;
+        const url = normalizeFc2ImageUrl(raw);
+        if (!url) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (overlay.getAttribute('aria-hidden') === 'false') {
+          close();
+          return;
+        }
+        open(url);
+      }, true);
+    };
+
+    const enhanceDescriptionIframes = () => {
+      const iframes = document.querySelectorAll('iframe[data-iframe="description"], iframe[src*="/widget/article/"][src*="/description"]');
+      if (!iframes.length) return false;
+
+      const openTopLightbox = (fromDoc, url) => {
+        if (!url) return false;
+        try {
+          const topDoc = fromDoc && fromDoc.defaultView && fromDoc.defaultView.top ? fromDoc.defaultView.top.document : document;
+          const overlay = topDoc.querySelector('.emby-fc2-lightbox');
+          const viewerImg = overlay ? overlay.querySelector('img') : null;
+          if (!overlay || !viewerImg) return false;
+
+          const isOpen = overlay.getAttribute('aria-hidden') === 'false';
+          if (isOpen) {
+            overlay.setAttribute('aria-hidden', 'true');
+            viewerImg.removeAttribute('src');
+            topDoc.body.classList.remove('emby-fc2-lightbox-open');
+            return true;
+          }
+
+          viewerImg.src = url;
+          overlay.setAttribute('aria-hidden', 'false');
+          topDoc.body.classList.add('emby-fc2-lightbox-open');
+          return true;
+        } catch (_) {
+          return false;
+        }
+      };
+
+      const ensureIframeStyle = (doc) => {
+        if (!doc || !doc.head) return;
+        if (doc.getElementById('emby-fc2-iframe-style')) return;
+        const style = doc.createElement('style');
+        style.id = 'emby-fc2-iframe-style';
+        style.textContent = `
+          img { cursor: zoom-in !important; }
+        `;
+        doc.head.appendChild(style);
+      };
+
+      const createDownloadFabButtonInDoc = (doc, { title, right = 12, left = null, bottom = 12, zIndex = 30, size = 50 } = {}) => {
+        const btn = doc.createElement('button');
+        btn.type = 'button';
+        btn.className = 'emby-hunkch-download-btn';
+        btn.title = title || '';
+        btn.setAttribute('aria-label', title || '');
+        btn.style.cssText = [
+          'position:absolute',
+          (Number.isFinite(left) ? ('left:' + left + 'px') : ('right:' + right + 'px')),
+          'bottom:' + bottom + 'px',
+          'z-index:' + zIndex,
+          'width:' + size + 'px',
+          'height:' + size + 'px',
+          'padding:0',
+          'display:flex',
+          'align-items:center',
+          'justify-content:center',
+          'border-radius:999px',
+          'border:1px solid rgba(255,255,255,.22)',
+          'background:' + themeColor,
+          'color:#fff',
+          'cursor:pointer',
+          'box-shadow:0 6px 18px rgba(0,0,0,.45)'
+        ].join(';');
+        btn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 11l4 4 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+        btn.style.setProperty('position', 'absolute', 'important');
+        if (Number.isFinite(left)) {
+          btn.style.setProperty('left', left + 'px', 'important');
+        } else {
+          btn.style.setProperty('right', right + 'px', 'important');
+        }
+        btn.style.setProperty('bottom', bottom + 'px', 'important');
+        btn.style.setProperty('z-index', String(zIndex), 'important');
+        return btn;
+      };
+
+      const isCandidateDescImage = (img) => {
+        if (!img) return false;
+        const src = pickImgUrl(img);
+        if (!src) return false;
+        const rect = img.getBoundingClientRect ? img.getBoundingClientRect() : null;
+        const w = rect ? rect.width : (img.naturalWidth || 0);
+        const h = rect ? rect.height : (img.naturalHeight || 0);
+        if (w && h && w < 40 && h < 40) return false;
+        return true;
+      };
+
+      const ensureWrapperForTargetInDoc = (doc, target, imgForSizing) => {
+        if (!doc || !doc.body || !target) return null;
+        const existing = target.closest && target.closest('.emby-fc2-img-wrap');
+        if (existing) return existing;
+
+        const wrap = doc.createElement('span');
+        wrap.className = 'emby-fc2-img-wrap';
+        wrap.style.setProperty('position', 'relative', 'important');
+        wrap.style.setProperty('display', 'inline-block', 'important');
+        wrap.style.setProperty('max-width', '100%', 'important');
+        wrap.style.setProperty('line-height', '0', 'important');
+
+        try {
+          const img = imgForSizing || (target.tagName === 'IMG' ? target : target.querySelector && target.querySelector('img'));
+          const imgStyle = (img && doc.defaultView) ? doc.defaultView.getComputedStyle(img) : null;
+          if (imgStyle && (imgStyle.display === 'block' || imgStyle.width === '100%')) {
+            wrap.style.setProperty('display', 'block', 'important');
+            wrap.style.setProperty('width', '100%', 'important');
+            wrap.style.setProperty('line-height', 'normal', 'important');
+          }
+        } catch (_) {}
+
+        const parent = target.parentNode;
+        if (!parent) return null;
+        parent.insertBefore(wrap, target);
+        wrap.appendChild(target);
+        return wrap;
+      };
+
+      const injectDownloadBtnsInDoc = (doc) => {
+        if (!doc || !doc.body) return false;
+        const imgs = doc.querySelectorAll('img');
+        if (!imgs.length) return false;
+
+        let injected = false;
+        imgs.forEach(img => {
+          if (!isCandidateDescImage(img)) return;
+          const link = img.closest('a');
+          const target = link || img;
+          const wrap = ensureWrapperForTargetInDoc(doc, target, img);
+          if (!wrap) return;
+          if (wrap.querySelector('.emby-hunkch-download-btn.emby-fc2-img-download')) return;
+
+          const raw = (() => {
+            const href = link ? (link.getAttribute('href') || link.href || '') : '';
+            return String(href || '').trim() || pickImgUrl(img);
+          })();
+          if (!raw) return;
+
+          const baseHref = (() => {
+            try {
+              return doc.location && doc.location.href ? doc.location.href : location.href;
+            } catch (_) {
+              return location.href;
+            }
+          })();
+
+          const url = isFc2ContentImageUrl(raw, baseHref) ? normalizeFc2ImageUrl(raw, baseHref) : toAbsUrl(raw, baseHref);
+          if (!url) return;
+
+          const btn = createDownloadFabButtonInDoc(doc, { title: t.hunkChDownloadImage, right: 10, bottom: 10, zIndex: 30, size: 40 });
+          btn.classList.add('emby-fc2-img-download');
+          ensureBtnIconVisible(btn);
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const filename = getHunkChPosterFilenameSetting();
+            const saveAs = getHunkChSaveAsSetting();
+            downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+          });
+
+          wrap.appendChild(btn);
+          injected = true;
+        });
+        return injected;
+      };
+
+      const setupLightboxInDoc = (doc) => {
+        if (!doc || !doc.body) return false;
+        if (doc.body.dataset.embyFc2DescLightboxReady === '1') return true;
+        doc.body.dataset.embyFc2DescLightboxReady = '1';
+
+        doc.addEventListener('click', (e) => {
+          const target = e.target;
+          if (!(target instanceof doc.defaultView.Element)) return;
+          if (target.closest('.emby-hunkch-download-btn')) return;
+
+          const img = target.closest('img');
+          if (!img) return;
+          if (!isCandidateDescImage(img)) return;
+
+          const raw = (() => {
+            const link = img.closest('a');
+            const href = link ? (link.getAttribute('href') || link.href || '') : '';
+            return String(href || '').trim() || pickImgUrl(img);
+          })();
+          if (!raw) return;
+
+          const baseHref = (() => {
+            try {
+              return doc.location && doc.location.href ? doc.location.href : location.href;
+            } catch (_) {
+              return location.href;
+            }
+          })();
+
+          const url = isFc2ContentImageUrl(raw, baseHref) ? normalizeFc2ImageUrl(raw, baseHref) : toAbsUrl(raw, baseHref);
+          if (!url) return;
+
+          e.preventDefault();
+          e.stopPropagation();
+
+          openTopLightbox(doc, url);
+        }, true);
+
+        return true;
+      };
+
+      const enhanceIframe = (iframe) => {
+        if (!iframe) return false;
+        let doc = null;
+        let href = '';
+        try {
+          doc = iframe.contentDocument;
+          href = iframe.contentWindow && iframe.contentWindow.location ? (iframe.contentWindow.location.href || '') : '';
+        } catch (_) {
+          return false;
+        }
+        if (!doc) return false;
+        if (iframe.dataset.embyFc2DocHref === href && iframe.dataset.embyFc2Enhanced === '1') return true;
+
+        ensureIframeStyle(doc);
+        setupLightboxInDoc(doc);
+        injectDownloadBtnsInDoc(doc);
+
+        iframe.dataset.embyFc2Enhanced = '1';
+        iframe.dataset.embyFc2DocHref = href;
+
+        if (doc.body && doc.body.dataset.embyFc2DescObs !== '1') {
+          doc.body.dataset.embyFc2DescObs = '1';
+          const obs = new MutationObserver(() => {
+            try {
+              injectDownloadBtnsInDoc(doc);
+            } catch (_) {}
+          });
+          obs.observe(doc.body, { childList: true, subtree: true });
+        }
+
+        return true;
+      };
+
+      let ok = false;
+      iframes.forEach(iframe => {
+        iframe.addEventListener('load', () => enhanceIframe(iframe), true);
+        ok = enhanceIframe(iframe) || ok;
+      });
+      return ok;
+    };
+
+    const injectDownloadBtns = () => {
+      const root = document.querySelector('.items_article_left');
+      if (!root) return false;
+
+      const imgs = root.querySelectorAll('img');
+      if (!imgs.length) return false;
+
+      let injected = false;
+      imgs.forEach(img => {
+        const rect = img.getBoundingClientRect ? img.getBoundingClientRect() : null;
+        const small = rect ? (rect.width < 40 && rect.height < 40) : false;
+
+        const link = img.closest('a');
+        let raw = link ? (link.getAttribute('href') || link.href || '') : '';
+        raw = String(raw || '').trim() || pickImgUrl(img);
+        if (!raw) return;
+        if (!isFc2ContentImageUrl(raw)) return;
+        if (small && !img.closest('.items_article_MainitemThumb, .items_article_SampleImagesArea')) return;
+
+        const container = img.closest('a') || img.parentElement;
+        if (!container) return;
+        if (container.querySelector('.emby-hunkch-download-btn.emby-fc2-img-download')) return;
+
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 10, bottom: 10, zIndex: 30, size: 40 });
+        btn.classList.add('emby-fc2-img-download');
+        ensureBtnIconVisible(btn);
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          const link = img.closest('a');
+          let raw = link ? (link.getAttribute('href') || link.href || '') : '';
+          raw = String(raw || '').trim() || pickImgUrl(img);
+          if (!raw) return;
+          if (!isFc2ContentImageUrl(raw)) return;
+          const url = normalizeFc2ImageUrl(raw);
+          if (!url) return;
+
+          const filename = getHunkChPosterFilenameSetting();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        container.appendChild(btn);
+        injected = true;
+      });
+
+      return injected;
+    };
+
+    const injectTagControls = () => {
+      const tagArea = document.querySelector('.items_article_TagArea');
+      if (!tagArea) return false;
+      if (tagArea.querySelector('.emby-fc2-genres-controls')) return true;
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'JP',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: '',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      const titleEl = document.querySelector('.items_article_headerInfo h3');
+      if (titleEl) meta.title = (titleEl.textContent || '').replace(/\s+/g, ' ').trim();
+
+      tagArea.querySelectorAll('a.tagTag, a[data-tag]').forEach(a => {
+        const v = (a.getAttribute('data-tag') || a.textContent || '').replace(/\s+/g, ' ').trim();
+        if (v) meta.genres.push(v);
+      });
+      meta.genres = Array.from(new Set(normalizeNameList(meta.genres)));
+
+      if (!meta.genres.length) return false;
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+      const type = 'genres';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (!conf || !conf.enabled) return false;
+
+      const text = renderWithTemplate(meta, conf.template, type);
+      if (!text || !text.trim()) return false;
+
+      const controls = createMetadataControls(type, meta, conf);
+      controls.style.marginTop = '8px';
+      controls.style.display = 'block';
+      controls.classList.add('emby-metadata-controls', 'emby-fc2-genres-controls');
+
+      const h3 = tagArea.querySelector('h3');
+      if (h3 && h3.parentNode) {
+        h3.parentNode.insertBefore(controls, h3.nextSibling);
+      } else {
+        tagArea.appendChild(controls);
+      }
+
+      return true;
+    };
+
+    const apply = () => {
+      ensureStyle();
+      setupImageLightbox();
+      injectDownloadBtns();
+      injectTagControls();
+      enhanceDescriptionIframes();
+    };
+
+    apply();
+    {
+      let tries = 0;
+      const maxTries = 20;
+      const interval = setInterval(() => {
+        tries++;
+        try {
+          injectDownloadBtns();
+          injectTagControls();
+        } catch (_) {}
+        if (tries >= maxTries) clearInterval(interval);
+      }, 1000);
+    }
+  }
+
+  function initMensRushTv() {
+    if (!location.host.includes('mensrush.tv')) return;
+
+    const nextElement = (el) => {
+      let cur = el ? el.nextSibling : null;
+      while (cur && cur.nodeType !== 1) cur = cur.nextSibling;
+      return cur && cur.nodeType === 1 ? cur : null;
+    };
+
+    const run = () => {
+      const requestHeaders = { Referer: location.href, Origin: location.origin };
+      const playerEl = document.querySelector('#playerElement');
+      const videoEl = playerEl ? playerEl.querySelector('video') : null;
+
+      const posterImgEl = document.querySelector('#movie_area img.no-save, #movie_area .player img, #movie_area img');
+      const posterUrl = (() => {
+        const v = videoEl ? ((videoEl.getAttribute('poster') || videoEl.poster || '').trim()) : '';
+        if (v) return v;
+        const i = posterImgEl;
+        if (!i) return '';
+        return String(i.currentSrc || i.getAttribute('src') || i.src || '').trim();
+      })();
+
+      const posterContainer = (() => {
+        if (playerEl) return playerEl;
+        if (!posterImgEl) return null;
+        return posterImgEl.closest('a') || posterImgEl.parentElement;
+      })();
+
+      const codeInput = document.querySelector('input[name="fid"][value], input[name="id"][value]');
+      const code = codeInput ? (codeInput.getAttribute('value') || '').trim() : '';
+
+      if (posterContainer && !posterContainer.querySelector('.emby-hunkch-download-btn.emby-mensrush-poster-download')) {
+        if (getComputedStyle(posterContainer).position === 'static') posterContainer.style.position = 'relative';
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 10, bottom: 10, zIndex: 50, size: 46 });
+        btn.classList.add('emby-mensrush-poster-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const url = posterUrl;
+          if (!url) return;
+          const saveAs = getHunkChSaveAsSetting();
+          const filename = getHunkChPosterFilenameSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        posterContainer.appendChild(btn);
+      }
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'Japan',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'MensRush',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      const titleEl = document.querySelector('.detail_title h2');
+      if (titleEl) meta.title = titleEl.textContent.replace(/\s+/g, ' ').trim();
+
+      if (code) meta.extra += `Code: ${code}\n`;
+
+      const movieDetail = document.querySelector('.movie_detail');
+      if (movieDetail) {
+        const makerLink = movieDetail.querySelector('a[href*="maid="]');
+        if (makerLink) meta.studio = makerLink.textContent.replace(/\s+/g, ' ').trim() || meta.studio;
+
+        const durationP = Array.from(movieDetail.querySelectorAll('p')).find(p => p.textContent && p.textContent.includes('再生時間'));
+        if (durationP) {
+          const m = durationP.textContent.match(/(\d+)\s*分/);
+          if (m) meta.duration = `${m[1]} min`;
+        }
+
+        const genreP = Array.from(movieDetail.querySelectorAll('p')).find(p => (p.textContent || '').includes('ジャンル') && p.querySelector('a[href*="geid="]'));
+        if (genreP) {
+          genreP.querySelectorAll('a[href*="geid="]').forEach(a => {
+            const g = a.textContent.replace(/\s+/g, ' ').trim();
+            if (g) meta.genres.push(g);
+          });
+        }
+
+        const detailH3 = Array.from(movieDetail.querySelectorAll('h3')).find(h3 => h3.textContent && h3.textContent.replace(/\s+/g, ' ').trim() === '作品詳細');
+        if (detailH3) {
+          let p = nextElement(detailH3);
+          while (p && p.tagName !== 'P') p = nextElement(p);
+          if (p) meta.description = p.textContent.replace(/\s+/g, ' ').trim();
+        }
+      }
+
+      meta.genres = Array.from(new Set(normalizeNameList(meta.genres)));
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+      let injected = false;
+
+      const genreP = movieDetail
+        ? Array.from(movieDetail.querySelectorAll('p')).find(p => (p.textContent || '').includes('ジャンル') && p.querySelector('a[href*="geid="]'))
+        : null;
+      if (genreP && meta.genres.length > 0) {
+        if (!genreP.querySelector('.emby-metadata-controls.emby-mensrush-genres')) {
+          const type = 'genres';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginLeft = '10px';
+              controls.style.display = 'inline-flex';
+              controls.classList.add('emby-metadata-controls', 'emby-mensrush-genres');
+              genreP.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (movieDetail && meta.description) {
+        const detailH3 = Array.from(movieDetail.querySelectorAll('h3')).find(h3 => h3.textContent && h3.textContent.replace(/\s+/g, ' ').trim() === '作品詳細');
+        if (detailH3) {
+          let p = nextElement(detailH3);
+          while (p && p.tagName !== 'P') p = nextElement(p);
+          if (p && !p.parentNode.querySelector('.emby-metadata-controls.emby-mensrush-desc')) {
+            const type = 'description';
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+              const text = renderWithTemplate(meta, conf.template, type);
+              if (text && text.trim()) {
+                const controls = createMetadataControls(type, meta, conf);
+                controls.style.marginTop = '10px';
+                controls.style.display = 'block';
+                controls.classList.add('emby-metadata-controls', 'emby-mensrush-desc');
+                if (p.parentNode) p.parentNode.insertBefore(controls, p.nextSibling);
+                injected = true;
+              }
+            }
+          } else if (p) {
+            injected = true;
+          }
+        }
+      }
+
+      return injected;
+    };
+
+    run();
+    setInterval(run, 1000);
+  }
+
   function initBoyStudio() {
     if (!location.host.includes('boy-studio.com')) return;
-
-    // Enable Text Selection/Copy
-    const enableCopy = () => {
-        const style = document.createElement('style');
-        style.innerHTML = `
-            * {
-                user-select: text !important;
-                -webkit-user-select: text !important;
-                -moz-user-select: text !important;
-                -ms-user-select: text !important;
-            }
-        `;
-        document.head.appendChild(style);
-        
-        document.body.oncopy = null;
-        document.body.onselectstart = null;
-        document.oncontextmenu = null;
-        
-        // Remove event listeners that might block selection
-        const events = ['copy', 'cut', 'paste', 'selectstart', 'contextmenu', 'mousedown', 'mouseup', 'keydown', 'keyup'];
-        events.forEach(event => {
-            document.addEventListener(event, (e) => {
-                e.stopPropagation();
-            }, true);
-        });
-    };
     
     // Auto-expand details
     const expandDetails = () => {
@@ -2084,11 +3615,61 @@
         });
     };
 
+    const injectPlayerPosterDownloadBtn = () => {
+        const iframe = document.querySelector('iframe.video-player-iframe[src*="cloudflarestream.com"][src*="poster="]');
+        if (!iframe) return;
+
+        const container = iframe.closest('.item__sample-player') || iframe.parentElement;
+        if (!container) return;
+        if (container.querySelector('.emby-hunkch-download-btn.emby-boystudio-player-poster-download')) return;
+
+        const src = (iframe.getAttribute('src') || iframe.src || '').trim();
+        if (!src) return;
+
+        let posterUrl = '';
+        try {
+          const u = new URL(src, location.href);
+          posterUrl = (u.searchParams.get('poster') || '').trim();
+        } catch (_) {
+          const m = src.match(/[?&]poster=([^&]+)/i);
+          posterUrl = m ? m[1] : '';
+          try {
+            posterUrl = decodeURIComponent(posterUrl);
+          } catch (_) {}
+          posterUrl = String(posterUrl || '').trim();
+        }
+        if (!posterUrl) return;
+        if (/%[0-9a-f]{2}/i.test(posterUrl)) {
+          try {
+            posterUrl = decodeURIComponent(posterUrl);
+          } catch (_) {}
+        }
+        if (!posterUrl) return;
+
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+        btn.classList.add('emby-boystudio-player-poster-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const requestHeaders = { Referer: location.href, Origin: location.origin };
+          const filename = getHunkChPosterFilenameSetting();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(posterUrl, filename, saveAs, { headers: requestHeaders });
+        });
+        container.appendChild(btn);
+    };
+
     // Run enhancements
-    enableCopy();
     expandDetails();
+    injectPlayerPosterDownloadBtn();
     // Re-run periodically for dynamic content
-    setInterval(expandDetails, 2000);
+    setInterval(() => {
+      expandDetails();
+      injectPlayerPosterDownloadBtn();
+    }, 2000);
 
     const meta = {
       title: '',
@@ -2160,12 +3741,13 @@
       return s && s.textContent.includes('商品説明を読む');
     });
 
-    let descP = null;
+    let descContainer = null;
     if (descDetails) {
-      descP = descDetails.querySelector('div > p');
-      if (descP) {
-        meta.description = descP.textContent.trim();
-      }
+      descContainer = descDetails.querySelector('div') || descDetails;
+      const ps = Array.from(descContainer.querySelectorAll('p'))
+        .map(p => (p.textContent || '').trim())
+        .filter(Boolean);
+      if (ps.length > 0) meta.description = ps.join('\n\n');
     }
 
     const config = (metadataConfigs && typeof metadataConfigs === 'object') ? metadataConfigs : defaultMetadataConfigs;
@@ -2173,7 +3755,8 @@
     // Inject Controls
 
     // Description Controls
-    if (descP && meta.description) {
+    if (descContainer && meta.description) {
+      if (descContainer.querySelector('.emby-metadata-controls.emby-boystudio-desc')) return;
       const type = 'description';
       const conf = (config && config[type]) || defaultMetadataConfigs[type];
       if (conf && conf.enabled) {
@@ -2182,9 +3765,8 @@
           const controls = createMetadataControls(type, meta, conf);
           controls.style.marginTop = '10px';
           controls.style.display = 'block';
-          if (descP.parentNode) {
-            descP.parentNode.insertBefore(controls, descP.nextSibling);
-          }
+          controls.classList.add('emby-metadata-controls', 'emby-boystudio-desc');
+          descContainer.appendChild(controls);
         }
       }
     }
@@ -2392,72 +3974,177 @@
         meta.extra += `Release Date: ${value}\n`;
         const match = value.match(/(\d{4})/);
         if (match) meta.year = match[1];
-      } else if (label.includes('TIME')) {
+      } else if (label.includes('TIME') || label.includes('タイム')) {
         meta.duration = value;
       }
     });
 
     // 3. Description
-    const descEl = document.querySelector('.detailtextblock .cp_container p');
-    if (descEl) meta.description = descEl.textContent.trim();
-
-    // 4. Inject Controls
-    // Inject after MODEL TYPE, PLAY LIST, or SERIES for genres
-    let targetDl = null;
-    dls.forEach(dl => {
-        const dt = dl.querySelector('dt');
-        if (dt && (dt.textContent.includes('MODEL TYPE') || dt.textContent.includes('PLAY LIST') || dt.textContent.includes('SERIES'))) {
-            targetDl = dl; // Prefer the last one found
-        }
-    });
-
-    if (targetDl && meta.genres.length > 0) {
-        const type = 'genres';
-        const conf = (metadataConfigs && metadataConfigs[type]) || defaultMetadataConfigs[type];
-        if (conf && conf.enabled) {
-            const controls = createMetadataControls(type, meta, conf);
-            controls.style.marginTop = '5px';
-            controls.classList.add('emby-metadata-controls');
-            if (targetDl.parentNode) {
-                targetDl.parentNode.appendChild(controls);
-            }
+    const descEls = document.querySelectorAll('.detailtextblock .cp_container p');
+    for (const p of descEls) {
+        const txt = p.textContent.trim();
+        if (txt) {
+            meta.description = txt;
+            break;
         }
     }
     
-    // Inject Description Copy
-    if (descEl && meta.description) {
-         const type = 'description';
-         const conf = (metadataConfigs && metadataConfigs[type]) || defaultMetadataConfigs[type];
-         if (conf && conf.enabled) {
-             const controls = createMetadataControls(type, meta, conf);
-             controls.style.marginTop = '10px';
-             controls.classList.add('emby-metadata-controls');
-             if (descEl.parentNode) {
-                 descEl.parentNode.appendChild(controls);
-             }
-         }
-    }
+    meta.genres = [...new Set(meta.genres)];
+    meta.actors = [...new Set(meta.actors)];
 
-    // Inject Actors Copy
-    let actorDl = null;
-    dls.forEach(dl => {
-        const dt = dl.querySelector('dt');
-        if (dt && dt.textContent.includes('MODEL NAME')) {
-            actorDl = dl;
+    // 4. Inject Controls
+    const lists = document.querySelectorAll('ul.detail-table-list');
+
+    lists.forEach(ul => {
+        const localDls = ul.querySelectorAll('li dl');
+        let targetDl = null;
+        let actorDl = null;
+
+        localDls.forEach(dl => {
+            const dt = dl.querySelector('dt');
+            if (!dt) return;
+            const label = dt.textContent.trim();
+            if (label.includes('MODEL TYPE') || label.includes('PLAY LIST') || label.includes('SERIES')) {
+                targetDl = dl;
+            }
+            if (label.includes('MODEL NAME')) {
+                actorDl = dl;
+            }
+        });
+
+        if (targetDl && meta.genres.length > 0) {
+            const type = 'genres';
+            const conf = (metadataConfigs && metadataConfigs[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                const parent = targetDl.parentNode;
+                if (parent && !parent.querySelector(`.emby-metadata-controls[data-type="${type}"]`)) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.dataset.type = type;
+                    controls.style.marginTop = '5px';
+                    controls.classList.add('emby-metadata-controls');
+                    parent.appendChild(controls);
+                }
+            }
+        }
+
+        if (actorDl && meta.actors.length > 0) {
+            const type = 'actors';
+            const conf = (metadataConfigs && metadataConfigs[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                const parent = actorDl.parentNode;
+                if (parent && !parent.querySelector(`.emby-metadata-controls[data-type="${type}"]`)) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.dataset.type = type;
+                    controls.style.marginTop = '5px';
+                    controls.classList.add('emby-metadata-controls');
+                    parent.appendChild(controls);
+                }
+            }
         }
     });
 
-    if (actorDl && meta.actors.length > 0) {
-        const type = 'actors';
+    if (descEls.length > 0 && meta.description) {
+        const type = 'description';
         const conf = (metadataConfigs && metadataConfigs[type]) || defaultMetadataConfigs[type];
         if (conf && conf.enabled) {
-            const controls = createMetadataControls(type, meta, conf);
-            controls.style.marginTop = '5px';
-            controls.classList.add('emby-metadata-controls');
-            if (actorDl.parentNode) {
-                actorDl.parentNode.appendChild(controls);
-            }
+            descEls.forEach(p => {
+                const parent = p.parentNode;
+                if (parent && !parent.querySelector(`.emby-metadata-controls[data-type="${type}"]`)) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.dataset.type = type;
+                    controls.style.marginTop = '10px';
+                    controls.classList.add('emby-metadata-controls');
+                    parent.appendChild(controls);
+                }
+            });
         }
+    }
+
+    const coverAnchors = Array.from(document.querySelectorAll('.detailleft a.popup-img[href]'));
+    let coverAnchor = coverAnchors.find(a => {
+      const href = (a.getAttribute('href') || a.href || '').trim();
+      return /\/0\.(jpg|jpeg|png|webp)(?:$|\?)/i.test(href);
+    });
+    if (!coverAnchor) {
+      coverAnchor = document.querySelector('.detailleft .MainPhotoblock a.popup-img[href]') || document.querySelector('.MainPhotoblock a.popup-img[href]') || null;
+    }
+    if (coverAnchor && !coverAnchor.dataset.embyCoverDlReady) {
+      coverAnchor.dataset.embyCoverDlReady = '1';
+
+      const getCoverUrl = () => {
+        const img = coverAnchor.querySelector('img');
+        const fromImg = img ? ((img.currentSrc || img.getAttribute('src') || img.src || '').trim()) : '';
+        const raw = fromImg || (coverAnchor.getAttribute('href') || coverAnchor.href || '').trim();
+        if (!raw) return '';
+        try {
+          return new URL(raw, location.href).href;
+        } catch (_) {
+          return raw;
+        }
+      };
+
+      const guessFilename = (url) => {
+        let ext = '.jpg';
+        try {
+          const u = new URL(url);
+          const name = (u.pathname.split('/').pop() || '').trim();
+          const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+          if (m) ext = '.' + m[1].toLowerCase();
+        } catch (_) {}
+
+        const codeMatch = (meta.extra || '').match(/^\s*Code:\s*(.+)\s*$/m);
+        const code = codeMatch ? codeMatch[1].trim() : '';
+        const safeCode = code.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim();
+        if (safeCode) return `${safeCode}-cover${ext}`;
+        return `cover${ext}`;
+      };
+
+      const getConfiguredFilename = (url) => {
+        const configured = getHunkChPosterFilenameSetting();
+        const raw = (configured || '').trim();
+        if (!raw) return guessFilename(url);
+
+        const codeMatch = (meta.extra || '').match(/^\s*Code:\s*(.+)\s*$/m);
+        const code = codeMatch ? codeMatch[1].trim() : '';
+        const safeCode = code.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim();
+
+        let ext = 'jpg';
+        try {
+          const u = new URL(url);
+          const name = (u.pathname.split('/').pop() || '').trim();
+          const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+          if (m) ext = m[1].toLowerCase();
+        } catch (_) {}
+
+        const resolved = raw
+          .replace(/{{\s*code\s*}}/gi, safeCode || 'cover')
+          .replace(/{{\s*ext\s*}}/gi, ext);
+        const safeResolved = resolved.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim();
+        return safeResolved || guessFilename(url);
+      };
+
+      const triggerDownload = (url) => {
+        if (!url) {
+          showToast(t.hunkChDownloadFailed);
+          return;
+        }
+        const filename = getConfiguredFilename(url);
+        const saveAs = getHunkChSaveAsSetting();
+        downloadByUrl(url, filename, saveAs);
+      };
+
+      if (getComputedStyle(coverAnchor).position === 'static') {
+        coverAnchor.style.position = 'relative';
+      }
+
+      const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+      btn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        triggerDownload(getCoverUrl());
+      };
+
+      coverAnchor.appendChild(btn);
     }
   }
 
@@ -2781,7 +4468,7 @@
                         meta.extra += `Code: ${value}\n`;
                     } else if (key === 'メーカー') {
                         meta.studio = value;
-                    } else if (key === 'レーベル') {
+                    } else if (key.includes('レーベル')) {
                         // User wants label in tags too
                         const labelLink = td.querySelector('a');
                         const labelName = labelLink ? labelLink.textContent.trim() : value;
@@ -2796,6 +4483,8 @@
             });
         });
     }
+
+    meta.genres = [...new Set(meta.genres)];
 
     const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
 
@@ -2836,6 +4525,128 @@
                  }
              }
         }
+    }
+
+    const slider = document.querySelector('.photo_flexslider');
+    if (slider) {
+      const requestHeaders = { Referer: location.href, Origin: location.origin };
+      const attachDownloadBtn = () => {
+        const viewport = slider.querySelector('.flex-viewport');
+        if (!viewport) return false;
+
+        const existingBtns = slider.querySelectorAll('.emby-hunkch-download-btn');
+        existingBtns.forEach(b => {
+          if (b.parentNode !== viewport) b.remove();
+        });
+        if (viewport.querySelector('.emby-hunkch-download-btn')) return true;
+
+        if (getComputedStyle(viewport).position === 'static') {
+          viewport.style.position = 'relative';
+        }
+
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+        viewport.appendChild(btn);
+
+        const resolveActiveUrl = () => {
+          const img = slider.querySelector('ul.slides li.flex-active-slide img') || slider.querySelector('ul.slides li img');
+          if (!img) return '';
+          const src = (img.currentSrc || img.getAttribute('src') || img.src || '').trim();
+          if (!src) return '';
+          try {
+            return new URL(src, location.href).href;
+          } catch (_) {
+            return src;
+          }
+        };
+
+        const updateBtnVisibility = () => {
+          const url = resolveActiveUrl();
+          btn.style.display = url ? 'flex' : 'none';
+          btn.dataset.url = url;
+        };
+
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const url = btn.dataset.url || resolveActiveUrl();
+          const filename = getHunkChPosterFilenameSetting();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+
+        updateBtnVisibility();
+
+        const slides = slider.querySelector('ul.slides');
+        if (slides) {
+          const obs = new MutationObserver(() => updateBtnVisibility());
+          obs.observe(slides, { subtree: true, attributes: true, attributeFilter: ['class', 'style'] });
+        }
+
+        slider.addEventListener('click', () => setTimeout(updateBtnVisibility, 0), true);
+        window.addEventListener('resize', () => setTimeout(updateBtnVisibility, 0));
+        return true;
+      };
+
+      if (!attachDownloadBtn()) {
+        setTimeout(() => attachDownloadBtn(), 500);
+      }
+      const rootObs = new MutationObserver(() => attachDownloadBtn());
+      rootObs.observe(slider, { childList: true, subtree: true });
+    } else {
+      const attachStaticDownloadBtn = () => {
+        const img = document.querySelector('.set_photo img') || document.querySelector('.title_photo img');
+        if (!img) return false;
+
+        const container = img.closest('.inbox') || img.parentElement;
+        if (!container) return false;
+
+        const existingBtns = container.querySelectorAll('.emby-hunkch-download-btn');
+        existingBtns.forEach(b => b.remove());
+
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+        container.appendChild(btn);
+
+        const resolveUrl = () => {
+          const targetImg = document.querySelector('.set_photo img') || document.querySelector('.title_photo img');
+          if (!targetImg) return '';
+          const src = (targetImg.currentSrc || targetImg.getAttribute('src') || targetImg.src || '').trim();
+          if (!src) return '';
+          try {
+            return new URL(src, location.href).href;
+          } catch (_) {
+            return src;
+          }
+        };
+
+        const updateBtnVisibility = () => {
+          const url = resolveUrl();
+          btn.style.display = url ? 'flex' : 'none';
+          btn.dataset.url = url;
+        };
+
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const url = btn.dataset.url || resolveUrl();
+          const filename = getHunkChPosterFilenameSetting();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: { Referer: location.href, Origin: location.origin } });
+        });
+
+        updateBtnVisibility();
+
+        const obs = new MutationObserver(() => updateBtnVisibility());
+        obs.observe(img, { attributes: true, attributeFilter: ['src', 'srcset'] });
+        return true;
+      };
+
+      if (!attachStaticDownloadBtn()) {
+        setTimeout(() => attachStaticDownloadBtn(), 500);
+      }
     }
   }
 
@@ -3016,6 +4827,1700 @@
             console.error('initMenCom error', e);
         }
     }, 1000);
+  }
+
+  function initSeanCody() {
+    if (!location.host.includes('seancody.com')) return;
+
+    const run = () => {
+      const requestHeaders = { Referer: location.href, Origin: location.origin };
+
+      const attachPosterDownloadBtn = () => {
+        const playBtn = document.querySelector('button[aria-label="Play"]');
+        let container = playBtn ? playBtn.parentElement : null;
+        let img = container ? container.querySelector('img') : null;
+
+        if (!img) {
+          img = document.querySelector('img[alt*="Scene Poster"]');
+          container = img ? (img.parentElement || null) : null;
+        }
+
+        if (!img || !container) return false;
+
+        const existing = container.querySelector('.emby-hunkch-download-btn.emby-seancody-poster-download');
+        if (existing) return true;
+
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+
+        const resolvePosterUrl = () => {
+          const direct = (img.currentSrc || img.src || '').trim();
+          if (direct) return direct;
+          const srcset = (img.getAttribute('srcset') || '').trim();
+          if (!srcset) return '';
+          const last = srcset.split(',').map(s => s.trim()).filter(Boolean).pop() || '';
+          return (last.split(/\s+/)[0] || '').trim();
+        };
+
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+        btn.classList.add('emby-seancody-poster-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const url = resolvePosterUrl();
+          const filename = getHunkChPosterFilenameSetting();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+
+        container.appendChild(btn);
+        return true;
+      };
+
+      attachPosterDownloadBtn();
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'SeanCody',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      const h2s = Array.from(document.querySelectorAll('h2'));
+      const dateRegex = /^[A-Z][a-z]+ \d{1,2}, \d{4}$/;
+      let headerSection = null;
+
+      for (let i = 0; i < h2s.length; i++) {
+        const h2 = h2s[i];
+        const text = h2.textContent.trim();
+        if (!dateRegex.test(text)) continue;
+        const date = new Date(text);
+        if (isNaN(date.getTime())) continue;
+
+        meta.year = date.getFullYear().toString();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        meta.extra += `Date: ${date.getFullYear()}-${mm}-${dd}\n`;
+
+        let next = h2.nextElementSibling;
+        while (next && next.tagName !== 'H2') {
+          next = next.nextElementSibling;
+        }
+        if (next && next.tagName === 'H2') {
+          meta.title = next.textContent.trim();
+        }
+
+        headerSection = h2.closest('section') || null;
+        break;
+      }
+
+      if (!meta.title) {
+        meta.title = document.title.replace(/\s*[–-]\s*seancody\b.*$/i, '').trim();
+      }
+
+      const descSection = document.querySelector('section[data-cy="description"]');
+      if (descSection) {
+        const p = descSection.querySelector('p');
+        if (p) meta.description = p.textContent.trim();
+      }
+
+      const divs = Array.from(document.querySelectorAll('div'));
+      const tagsLabelDiv = divs.find(d => d.textContent.trim() === 'Tags');
+      const tagsContainer = tagsLabelDiv ? tagsLabelDiv.nextElementSibling : null;
+      if (tagsContainer) {
+        const tagSet = new Set();
+        tagsContainer.querySelectorAll('a[href*="tags="]').forEach(a => {
+          const tag = a.textContent.trim();
+          if (tag && !tagSet.has(tag)) {
+            tagSet.add(tag);
+            meta.genres.push(tag);
+          }
+        });
+      }
+
+      const actorScope = headerSection || (meta.title ? h2s.find(h => h.textContent.trim() === meta.title)?.closest('section') : null) || document;
+      const actorSet = new Set();
+      actorScope.querySelectorAll('a[href^="/model/"]').forEach(a => {
+        const name = a.textContent.trim();
+        if (name && !actorSet.has(name)) {
+          actorSet.add(name);
+          meta.actors.push(name);
+        }
+      });
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+      let injected = false;
+
+      if (descSection && meta.description) {
+        if (!descSection.parentNode.querySelector('.emby-metadata-controls.emby-seancody-desc')) {
+          const type = 'description';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '8px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-seancody-desc');
+              if (descSection.parentNode) {
+                descSection.parentNode.insertBefore(controls, descSection.nextSibling);
+                injected = true;
+              }
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (tagsContainer && meta.genres.length > 0) {
+        if (!tagsContainer.querySelector('.emby-metadata-controls.emby-seancody-genres')) {
+          const type = 'genres';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '6px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-seancody-genres');
+              tagsContainer.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (meta.actors.length > 0) {
+        const firstActorLink = actorScope.querySelector('a[href^="/model/"]');
+        if (firstActorLink) {
+          const container = firstActorLink.closest('h2') || firstActorLink.parentElement;
+          if (container && container.parentElement) {
+            if (!container.parentElement.querySelector('.emby-metadata-controls.emby-seancody-actors')) {
+              const type = 'actors';
+              const conf = (config && config[type]) || defaultMetadataConfigs[type];
+              if (conf && conf.enabled) {
+                const text = renderWithTemplate(meta, conf.template, type);
+                if (text && text.trim()) {
+                  const controls = createMetadataControls(type, meta, conf);
+                  controls.style.marginTop = '6px';
+                  controls.style.display = 'block';
+                  controls.classList.add('emby-metadata-controls', 'emby-seancody-actors');
+                  container.parentElement.insertBefore(controls, container.nextSibling);
+                  injected = true;
+                }
+              }
+            } else {
+              injected = true;
+            }
+          }
+        }
+      }
+
+      return injected;
+    };
+
+    run();
+    setInterval(run, 1000);
+  }
+
+  function initCockyBoysStore() {
+    if (!location.host.includes('cockyboysstore.com')) return;
+
+    const run = () => {
+      const requestHeaders = { Referer: location.href, Origin: location.origin };
+
+      const safeFilenameBase = (raw) => {
+        const s = (raw || '').replace(/\s+/g, ' ').trim();
+        return s.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim() || 'image';
+      };
+
+      const guessExt = (url) => {
+        try {
+          const u = new URL(url, location.origin);
+          const name = (u.pathname.split('/').pop() || '').trim();
+          const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+          if (m) return m[1].toLowerCase();
+        } catch (_) {}
+        return 'jpg';
+      };
+
+      const resolveBestFromSrcset = (srcset) => {
+        const s = (srcset || '').trim();
+        if (!s) return '';
+        const parts = s.split(',').map(x => x.trim()).filter(Boolean);
+        let bestUrl = '';
+        let bestW = -1;
+        for (const part of parts) {
+          const seg = part.split(/\s+/).filter(Boolean);
+          const url = (seg[0] || '').trim();
+          const w = seg.length > 1 ? parseInt(seg[1].replace(/w$/i, ''), 10) : NaN;
+          if (!url) continue;
+          if (Number.isFinite(w)) {
+            if (w > bestW) {
+              bestW = w;
+              bestUrl = url;
+            }
+          } else {
+            bestUrl = url;
+          }
+        }
+        return bestUrl;
+      };
+
+      const attachBoxcoverDownloadBtns = () => {
+        const roots = [];
+        const toast = document.querySelector('#carttoastboxcover');
+        if (toast) roots.push(toast);
+        const details = document.querySelector('#video-container-details');
+        if (details) roots.push(details);
+
+        const boxcovers = roots.flatMap(root => Array.from(root.querySelectorAll ? root.querySelectorAll('.boxcover') : []))
+          .concat(toast ? [toast] : [])
+          .filter(el => el && el.querySelector && el.querySelector('img.boxcover-image'));
+
+        boxcovers.forEach(container => {
+          const img = container.querySelector('img.boxcover-image');
+          if (!img) return;
+          if (container.querySelector('.emby-hunkch-download-btn.emby-cockyboys-boxcover-download')) return;
+
+          if (getComputedStyle(container).position === 'static') {
+            container.style.position = 'relative';
+          }
+
+          const resolveUrl = () => {
+            const dataSrc = (img.getAttribute('data-src') || img.dataset.src || '').trim();
+            const dataSrcset = (img.getAttribute('data-srcset') || img.dataset.srcset || '').trim();
+            const srcset = (img.getAttribute('srcset') || '').trim();
+            const best = resolveBestFromSrcset(dataSrcset || srcset);
+            const direct = (img.currentSrc || img.src || '').trim();
+            return best || dataSrc || direct;
+          };
+
+          const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+          btn.classList.add('emby-cockyboys-boxcover-download');
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const url = resolveUrl();
+            const filename = getHunkChPosterFilenameSetting();
+            const saveAs = getHunkChSaveAsSetting();
+            downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+          });
+          container.appendChild(btn);
+        });
+      };
+
+      const attachPerformerDownloadBtns = () => {
+        const performers = document.querySelectorAll('.video-performer');
+        performers.forEach(card => {
+          const a = card.querySelector('a');
+          if (!a) return;
+          if (a.querySelector('.emby-hunkch-download-btn.emby-cockyboys-performer-download')) return;
+
+          const name = (card.querySelector('.performer-name')?.textContent || a.getAttribute('title') || '').trim();
+          if (!name) return;
+
+          const img = a.querySelector('img');
+          const fromData = img ? (img.getAttribute('data-bgsrc') || img.dataset.bgsrc || '') : '';
+          const styleVal = img ? (img.style.backgroundImage || '') : '';
+          const fromStyle = (() => {
+            const m = styleVal.match(/url\((['"]?)(.*?)\1\)/i);
+            return m ? m[2] : '';
+          })();
+          const url = (fromData || fromStyle || '').trim();
+          if (!url) return;
+
+          if (getComputedStyle(a).position === 'static') {
+            a.style.position = 'relative';
+          }
+
+          const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 6, bottom: 6, zIndex: 10, size: 36 });
+          btn.classList.add('emby-cockyboys-performer-download');
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const ext = guessExt(url);
+            const filename = `${safeFilenameBase(name)}.${ext}`;
+            const saveAs = getHunkChSaveAsSetting();
+            downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+          });
+          a.appendChild(btn);
+        });
+      };
+
+      attachBoxcoverDownloadBtns();
+      attachPerformerDownloadBtns();
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'CockyBoysStore',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      const titleEl = document.querySelector('h1.description');
+      if (titleEl) meta.title = titleEl.textContent.trim();
+
+      const synopsisP = document.querySelector('.synopsis p');
+      if (synopsisP) meta.description = synopsisP.textContent.trim();
+
+      const studioA = document.querySelector('.studio a');
+      if (studioA) meta.studio = studioA.textContent.trim() || meta.studio;
+
+      const directorDiv = document.querySelector('.director');
+      if (directorDiv) {
+        const names = Array.from(directorDiv.querySelectorAll('a')).map(a => a.textContent.trim()).filter(Boolean);
+        if (names.length) meta.director = names.join(', ');
+      }
+
+      const releaseDivs = Array.from(document.querySelectorAll('.release-date'));
+      const releasedRow = releaseDivs.find(d => /Released:/i.test(d.textContent || ''));
+      if (releasedRow) {
+        const txt = releasedRow.textContent.replace(/\s+/g, ' ').trim();
+        const m = txt.match(/Released:\s*(.+)$/i);
+        const rawDate = m ? m[1].trim() : '';
+        if (rawDate) {
+          const date = new Date(rawDate);
+          if (!isNaN(date.getTime())) {
+            meta.year = date.getFullYear().toString();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            meta.extra += `Date: ${date.getFullYear()}-${mm}-${dd}\n`;
+          } else {
+            meta.extra += `Released: ${rawDate}\n`;
+          }
+        }
+      }
+
+      const lengthRow = releaseDivs.find(d => /Length:/i.test(d.textContent || ''));
+      if (lengthRow) {
+        const txt = lengthRow.textContent.replace(/\s+/g, ' ').trim();
+        const m = txt.match(/Length:\s*(.+)$/i);
+        if (m && m[1]) meta.duration = m[1].trim();
+      }
+
+      const categoriesDiv = document.querySelector('.categories');
+      if (categoriesDiv) {
+        const set = new Set();
+        categoriesDiv.querySelectorAll('a').forEach(a => {
+          const g = a.textContent.replace(/\s+/g, ' ').trim();
+          if (g && !set.has(g)) set.add(g);
+        });
+        meta.genres = Array.from(set);
+      }
+
+      const actorSet = new Set();
+      document.querySelectorAll('.video-performer .performer-name').forEach(el => {
+        const n = el.textContent.replace(/\s+/g, ' ').trim();
+        if (n && !actorSet.has(n)) {
+          actorSet.add(n);
+          meta.actors.push(n);
+        }
+      });
+      document.querySelectorAll('.video-details a[data-label="Performer"]').forEach(a => {
+        const n = a.textContent.replace(/\s+/g, ' ').trim();
+        if (n && !actorSet.has(n)) {
+          actorSet.add(n);
+          meta.actors.push(n);
+        }
+      });
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+      let injected = false;
+
+      if (synopsisP && meta.description) {
+        if (!synopsisP.parentNode.querySelector('.emby-metadata-controls.emby-cockyboys-desc')) {
+          const type = 'description';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '8px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-cockyboys-desc');
+              synopsisP.parentNode.insertBefore(controls, synopsisP.nextSibling);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (categoriesDiv && meta.genres.length > 0) {
+        if (!categoriesDiv.querySelector('.emby-metadata-controls.emby-cockyboys-genres')) {
+          const type = 'genres';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '8px';
+              controls.style.display = 'inline-flex';
+              controls.classList.add('emby-metadata-controls', 'emby-cockyboys-genres');
+              categoriesDiv.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (meta.actors.length > 0) {
+        const videoDetails = document.querySelector('.video-details');
+        if (videoDetails && !videoDetails.querySelector('.emby-metadata-controls.emby-cockyboys-actors')) {
+          const type = 'actors';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '8px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-cockyboys-actors');
+              videoDetails.insertBefore(controls, videoDetails.firstChild);
+              injected = true;
+            }
+          }
+        } else if (videoDetails) {
+          injected = true;
+        }
+      }
+
+      return injected;
+    };
+
+    run();
+    setInterval(run, 1000);
+  }
+
+  function initCockyBoysCom() {
+    if (!location.host.includes('cockyboys.com')) return;
+    if (location.host.includes('cockyboysstore.com')) return;
+
+    const run = () => {
+      const requestHeaders = { Referer: location.href, Origin: location.origin };
+
+      if (!document.head.querySelector('style[data-emby-cockyboys-underplayer]')) {
+        const style = document.createElement('style');
+        style.setAttribute('data-emby-cockyboys-underplayer', '1');
+        style.textContent = '.underPlayer{display:block!important;}';
+        document.head.appendChild(style);
+      }
+
+      const safeFilenameBase = (raw) => {
+        const s = (raw || '').replace(/\s+/g, ' ').trim();
+        return s.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim() || 'image';
+      };
+
+      const guessExt = (url) => {
+        try {
+          const u = new URL(url, location.origin);
+          const name = (u.pathname.split('/').pop() || '').trim();
+          const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+          if (m) return m[1].toLowerCase();
+        } catch (_) {}
+        return 'jpg';
+      };
+
+      const resolveImgUrl = (img) => {
+        if (!img) return '';
+        const direct = (img.currentSrc || img.src || '').trim();
+        if (direct) return direct;
+        const srcset = (img.getAttribute('srcset') || '').trim();
+        if (!srcset) return '';
+        const last = srcset.split(',').map(s => s.trim()).filter(Boolean).pop() || '';
+        return (last.split(/\s+/)[0] || '').trim();
+      };
+
+      const attachDownloadBtn = ({ container, className, resolveUrl, resolveFilename, size = 36, right = 6, left = null, bottom = 6, zIndex = 10 }) => {
+        if (!container) return;
+        if (container.querySelector(`.emby-hunkch-download-btn.${className}`)) return;
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right, left, bottom, zIndex, size });
+        btn.classList.add(className);
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const url = resolveUrl();
+          const filename = resolveFilename(url);
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        container.appendChild(btn);
+      };
+
+      const attachConfiguredDownloadBtns = (root, imgSelector, className, opts = {}) => {
+        if (!root) return;
+        root.querySelectorAll(imgSelector).forEach(img => {
+          const container = img.closest('a') || img.parentElement;
+          if (!container) return;
+          attachDownloadBtn({
+            container,
+            className,
+            resolveUrl: () => resolveImgUrl(img),
+            resolveFilename: () => getHunkChPosterFilenameSetting(),
+            ...opts
+          });
+        });
+      };
+
+      const attachModelThumbDownloadBtn = () => {
+        const img = document.querySelector('#modelInfo img.thumb');
+        if (!img) return;
+        const container = img.closest('#modelInfo') || img.parentElement;
+        if (!container) return;
+        attachDownloadBtn({
+          container,
+          className: 'emby-cockyboys-model-thumb-download',
+          resolveUrl: () => resolveImgUrl(img),
+          resolveFilename: (url) => {
+            const name = (img.getAttribute('alt') || document.querySelector('#movieHeader h1')?.textContent || '').trim();
+            const ext = guessExt(url);
+            return `${safeFilenameBase(name)}.${ext}`;
+          },
+          size: 50,
+          right: 12,
+          bottom: 12,
+          zIndex: 30
+        });
+      };
+
+      const attachYouMightAlsoLikeDownloadBtns = () => {
+        attachConfiguredDownloadBtns(document, '.horizontal.alsolike .item img', 'emby-cockyboys-alsolike-download');
+      };
+
+      const attachModelPageDownloadBtns = () => {
+        const tabInfo = document.querySelector('#tabInfo');
+        attachConfiguredDownloadBtns(tabInfo, '.modelScenes img', 'emby-cockyboys-model-scenes-download');
+        attachConfiguredDownloadBtns(tabInfo, '.modelDVDs img', 'emby-cockyboys-model-dvds-download');
+
+        const tabScenes = document.querySelector('#tabScenes');
+        attachConfiguredDownloadBtns(tabScenes, '.thumbCover img', 'emby-cockyboys-model-tabscenes-download');
+      };
+
+      const attachDvdPageDownloadBtns = () => {
+        attachConfiguredDownloadBtns(document, '#tabOverview .movieDVDs > img', 'emby-cockyboys-dvd-cover-download', {
+          size: 50,
+          left: 12,
+          bottom: 12,
+          zIndex: 30
+        });
+        attachConfiguredDownloadBtns(document, '#tabEpisodes .thumbCover img', 'emby-cockyboys-dvd-episodes-download');
+      };
+
+      const attachDvdCastDownloadBtns = () => {
+        const tabCast = document.querySelector('#tabCast');
+        if (!tabCast) return;
+        tabCast.querySelectorAll('a.fade img').forEach(img => {
+          const a = img.closest('a.fade') || img.parentElement;
+          if (!a) return;
+          attachDownloadBtn({
+            container: a,
+            className: 'emby-cockyboys-dvd-cast-download',
+            resolveUrl: () => resolveImgUrl(img),
+            resolveFilename: (url) => {
+              const name = (img.getAttribute('alt') || a.getAttribute('title') || '').trim();
+              const ext = guessExt(url);
+              return `${safeFilenameBase(name)}.${ext}`;
+            }
+          });
+        });
+      };
+
+      const attachSearchPageDownloadBtns = () => {
+        attachConfiguredDownloadBtns(
+          document,
+          '.sceneList.newReleases.responsive .thumbCover img, .sceneList.newReleases .thumbCover img',
+          'emby-cockyboys-search-download'
+        );
+      };
+
+      attachModelThumbDownloadBtn();
+      attachYouMightAlsoLikeDownloadBtns();
+      attachModelPageDownloadBtns();
+      attachDvdPageDownloadBtns();
+      attachDvdCastDownloadBtns();
+      attachSearchPageDownloadBtns();
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'CockyBoys',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      const titleEl = document.querySelector('h1.sectionTitle');
+      if (titleEl) meta.title = titleEl.textContent.replace(/\s+/g, ' ').trim();
+
+      const tagsDiv = document.querySelector('#tags');
+      if (tagsDiv) {
+        tagsDiv.querySelectorAll('a').forEach(a => {
+          const name = a.textContent.replace(/\s+/g, ' ').trim();
+          if (!name) return;
+          const href = (a.getAttribute('href') || '').trim();
+          if (/\/sets\.php\b/i.test(href)) meta.actors.push(name);
+          else meta.genres.push(name);
+        });
+      }
+
+      const info = document.querySelector('#info');
+      if (info) {
+        const spans = Array.from(info.querySelectorAll('span'));
+        const released = spans.find(s => /Released:/i.test(s.textContent || ''));
+        if (released) {
+          const txt = released.textContent.replace(/\s+/g, ' ').trim();
+          const m = txt.match(/Released:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i);
+          if (m && m[1]) {
+            const parts = m[1].split('/');
+            const mm = parts[0].padStart(2, '0');
+            const dd = parts[1].padStart(2, '0');
+            const yy = parts[2];
+            meta.year = yy;
+            meta.extra += `Date: ${yy}-${mm}-${dd}\n`;
+          }
+        }
+
+        const categorized = spans.find(s => /Categorized Under:/i.test(s.textContent || ''));
+        if (categorized) {
+          categorized.querySelectorAll('a').forEach(a => {
+            const g = a.textContent.replace(/\s+/g, ' ').trim();
+            if (g) meta.genres.push(g);
+          });
+        }
+
+        const featuring = spans.find(s => /Featuring:/i.test(s.textContent || ''));
+        if (featuring) {
+          featuring.querySelectorAll('a[href*="sets.php"]').forEach(a => {
+            const n = a.textContent.replace(/\s+/g, ' ').trim();
+            if (n) meta.actors.push(n);
+          });
+        }
+      }
+
+      const featuredDvdNameEl = document.querySelector('.movieDVDs p a[href^="/dvds.php"]');
+      if (featuredDvdNameEl && !document.querySelector('#tabOverview .movieDVDs')) {
+        const dvdName = featuredDvdNameEl.textContent.replace(/\s+/g, ' ').trim();
+        if (dvdName) meta.genres.push(dvdName);
+      }
+
+      let dvdFeaturingP = null;
+      let dvdDescP = null;
+      const dvdOverview = document.querySelector('#tabOverview .movieDVDs');
+      if (dvdOverview) {
+        const dvdTitle = dvdOverview.querySelector('h1');
+        if (dvdTitle && !meta.title) meta.title = dvdTitle.textContent.replace(/\s+/g, ' ').trim();
+
+        dvdOverview.querySelectorAll('p').forEach(p => {
+          const t0 = p.textContent.replace(/\s+/g, ' ').trim();
+          if (/^Director:/i.test(t0)) {
+            meta.director = t0.replace(/^Director:\s*/i, '').trim();
+          } else if (/^Featuring:/i.test(t0)) {
+            dvdFeaturingP = p;
+            p.querySelectorAll('a[href^="/models/"]').forEach(a => {
+              const n = a.getAttribute('title') || a.textContent;
+              const name = (n || '').replace(/\s+/g, ' ').trim();
+              if (name) meta.actors.push(name);
+            });
+          } else if (/^Description:/i.test(t0)) {
+            dvdDescP = p;
+            meta.description = t0.replace(/^Description:\s*/i, '').trim();
+          }
+        });
+      }
+
+      const descBox = document.querySelector('.movieLeft .movieDesc');
+      if (descBox) {
+        let txt = descBox.textContent.replace(/\s+/g, ' ').trim();
+        txt = txt.replace(/^Description\b\s*/i, '');
+        if (txt) meta.description = txt;
+      } else {
+        const topDesc = document.querySelector('.movieTop .movieDesc');
+        if (topDesc) meta.description = topDesc.textContent.replace(/\s+/g, ' ').trim();
+      }
+
+      meta.genres = Array.from(new Set(normalizeNameList(meta.genres)));
+      meta.actors = Array.from(new Set(normalizeNameList(meta.actors)));
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+      let injected = false;
+
+      if (tagsDiv && meta.actors.length > 0) {
+        if (!tagsDiv.querySelector('.emby-metadata-controls.emby-cockyboyscom-actors')) {
+          const type = 'actors';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'inline-flex';
+              controls.classList.add('emby-metadata-controls', 'emby-cockyboyscom-actors');
+              tagsDiv.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (tagsDiv && meta.genres.length > 0) {
+        if (!tagsDiv.querySelector('.emby-metadata-controls.emby-cockyboyscom-genres')) {
+          const type = 'genres';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'inline-flex';
+              controls.classList.add('emby-metadata-controls', 'emby-cockyboyscom-genres');
+              tagsDiv.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (descBox && meta.description) {
+        if (!descBox.querySelector('.emby-metadata-controls.emby-cockyboyscom-desc')) {
+          const type = 'description';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-cockyboyscom-desc');
+              descBox.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (dvdFeaturingP && meta.actors.length > 0) {
+        if (!dvdFeaturingP.querySelector('.emby-metadata-controls.emby-cockyboyscom-dvd-actors')) {
+          const type = 'actors';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'inline-flex';
+              controls.classList.add('emby-metadata-controls', 'emby-cockyboyscom-dvd-actors');
+              dvdFeaturingP.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (dvdDescP && meta.description) {
+        if (!dvdDescP.querySelector('.emby-metadata-controls.emby-cockyboyscom-dvd-desc')) {
+          const type = 'description';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'inline-flex';
+              controls.classList.add('emby-metadata-controls', 'emby-cockyboyscom-dvd-desc');
+              dvdDescP.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      return injected;
+    };
+
+    run();
+    setInterval(run, 1000);
+  }
+
+  function initGayDvdEmpire() {
+    if (!location.host.includes('gaydvdempire.com')) return;
+
+    const run = () => {
+      const requestHeaders = { Referer: location.href, Origin: location.origin };
+
+      const boxcover = document.querySelector('#Boxcover');
+      if (boxcover && !boxcover.querySelector('.emby-hunkch-download-btn.emby-gaydvdempire-boxcover-download')) {
+        if (getComputedStyle(boxcover).position === 'static') boxcover.style.position = 'relative';
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 50, size: 50 });
+        btn.classList.add('emby-gaydvdempire-boxcover-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const active = boxcover.querySelector('a.fancy.active') || boxcover.querySelector('a#front-cover') || boxcover.querySelector('a.fancy');
+          const img = active ? active.querySelector('img') : null;
+          const url = (active && (active.getAttribute('data-href') || active.getAttribute('href') || active.href)) || (img && (img.currentSrc || img.src)) || '';
+          const filename = getHunkChPosterFilenameSetting();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        boxcover.appendChild(btn);
+      }
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'GayDVDEmpire',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      const titleEl = document.querySelector('h1.movie-page__heading__title');
+      if (titleEl) {
+        const clone = titleEl.cloneNode(true);
+        clone.querySelectorAll('span').forEach(s => s.remove());
+        meta.title = clone.textContent.replace(/\s+/g, ' ').trim();
+      }
+
+      const infoEl = document.querySelector('.movie-page__heading__movie-info');
+      if (infoEl) {
+        const studioA = infoEl.querySelector('a');
+        if (studioA) meta.studio = studioA.textContent.replace(/\s+/g, ' ').trim() || meta.studio;
+        const yearEl = infoEl.querySelector('small');
+        if (yearEl) {
+          const m = yearEl.textContent.match(/(\d{4})/);
+          if (m) meta.year = m[1];
+        }
+      }
+
+      const performers = document.querySelector('.movie-page__content-tags__performers');
+      if (performers) {
+        performers.querySelectorAll('a').forEach(a => {
+          const hover = a.querySelector('.hover-popover-container');
+          const raw = hover && hover.childNodes && hover.childNodes[0] && hover.childNodes[0].textContent
+            ? hover.childNodes[0].textContent
+            : a.textContent;
+          const name = (raw || '').replace(/\s+/g, ' ').trim();
+          if (name) meta.actors.push(name);
+        });
+      }
+
+      const categories = document.querySelector('.movie-page__content-tags__categories');
+      if (categories) {
+        categories.querySelectorAll('a').forEach(a => {
+          const g = a.textContent.replace(/\s+/g, ' ').trim();
+          if (g) meta.genres.push(g);
+        });
+      }
+
+      const synopsis = document.querySelector('#synopsis-container .synopsis-content');
+      if (synopsis) {
+        const txt = synopsis.textContent.replace(/\s+/g, ' ').trim();
+        if (txt) meta.description = txt;
+      }
+
+      meta.genres = Array.from(new Set(normalizeNameList(meta.genres)));
+      meta.actors = Array.from(new Set(normalizeNameList(meta.actors)));
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+      let injected = false;
+
+      if (performers && meta.actors.length > 0) {
+        if (!performers.querySelector('.emby-metadata-controls.emby-gaydvdempire-actors')) {
+          const type = 'actors';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginLeft = '8px';
+              controls.style.display = 'inline-flex';
+              controls.classList.add('emby-metadata-controls', 'emby-gaydvdempire-actors');
+              performers.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      if (categories && meta.genres.length > 0) {
+        if (!categories.querySelector('.emby-metadata-controls.emby-gaydvdempire-genres')) {
+          const type = 'genres';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginLeft = '8px';
+              controls.style.display = 'inline-flex';
+              controls.classList.add('emby-metadata-controls', 'emby-gaydvdempire-genres');
+              categories.appendChild(controls);
+              injected = true;
+            }
+          }
+        } else {
+          injected = true;
+        }
+      }
+
+      return injected;
+    };
+
+    run();
+    setInterval(run, 1000);
+  }
+
+  function initGaywire() {
+    if (!location.host.includes('gaywire.com')) return;
+
+    let retries = 0;
+    const maxRetries = 20;
+
+    function getCleanText(el) {
+        if (!el) return '';
+        const clone = el.cloneNode(true);
+        clone.querySelectorAll('label, svg, title').forEach(n => n.remove());
+        return clone.textContent.replace(/\s+/g, ' ').trim();
+    }
+
+    function expandDescription() {
+        const inputs = document.querySelectorAll('section[data-cy="description"] input[type="checkbox"][id^="desc-"]');
+        if (inputs.length === 0) return false;
+        inputs.forEach(input => {
+            if (!input.checked) {
+                input.checked = true;
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+        return true;
+    }
+
+    function expandInformation() {
+        const infoHeader = Array.from(document.querySelectorAll('h2')).find(h2 => h2.textContent.trim() === 'Information');
+        if (!infoHeader || !infoHeader.parentElement) return false;
+        const headerRow = infoHeader.parentElement;
+        const toggleBtn = headerRow.querySelector('button');
+        const content = headerRow.nextElementSibling;
+        if (!toggleBtn || !content) return false;
+
+        const collapsed = content.clientHeight === 0 || (content.scrollHeight > 0 && content.clientHeight < 10);
+        if (collapsed) toggleBtn.click();
+        return true;
+    }
+
+    function run() {
+        expandDescription();
+        expandInformation();
+
+        const meta = {
+            title: '',
+            year: '',
+            country: 'USA',
+            genres: [],
+            duration: '',
+            director: '',
+            studio: 'Gaywire',
+            actors: [],
+            description: '',
+            extra: ''
+        };
+
+        const h2s = Array.from(document.querySelectorAll('h2'));
+        const dateRegex = /^[A-Z][a-z]+ \d{1,2}, \d{4}$/;
+        let mainTitleH2 = null;
+        for (let i = 0; i < h2s.length; i++) {
+            const h2 = h2s[i];
+            const text = h2.textContent.trim();
+            if (!dateRegex.test(text)) continue;
+
+            const date = new Date(text);
+            if (isNaN(date.getTime())) continue;
+
+            meta.year = date.getFullYear().toString();
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const dd = String(date.getDate()).padStart(2, '0');
+            meta.extra += `Date: ${date.getFullYear()}-${mm}-${dd}\n`;
+
+            let next = h2.nextElementSibling;
+            while (next && next.tagName !== 'H2') next = next.nextElementSibling;
+            if (next && next.tagName === 'H2') {
+                mainTitleH2 = next;
+                meta.title = next.textContent.trim();
+            }
+            break;
+        }
+
+        if (!meta.title) {
+            meta.title = document.title.replace(/\s*\|\s*Gaywire.*$/i, '').trim();
+        }
+
+        const descSection = document.querySelector('section[data-cy="description"]');
+        const descP = descSection ? descSection.querySelector('p') : null;
+        if (descP) meta.description = getCleanText(descP);
+
+        let actorScope = null;
+        if (mainTitleH2) {
+            let node = mainTitleH2.nextElementSibling;
+            let steps = 0;
+            while (node && steps < 8) {
+                if (node.querySelectorAll && node.querySelectorAll('a[href^="/model/"]').length > 0) {
+                    actorScope = node;
+                    break;
+                }
+                node = node.nextElementSibling;
+                steps++;
+            }
+        }
+
+        const actorLinks = actorScope ? actorScope.querySelectorAll('a[href^="/model/"]') : document.querySelectorAll('a[href^="/model/"]');
+        const actorSet = new Set();
+        actorLinks.forEach(a => {
+            const name = a.textContent.trim();
+            if (name && !actorSet.has(name)) {
+                actorSet.add(name);
+                meta.actors.push({ name });
+            }
+        });
+
+        const infoHeader = Array.from(document.querySelectorAll('h2')).find(h2 => h2.textContent.trim() === 'Information');
+        const infoContent = (infoHeader && infoHeader.parentElement) ? infoHeader.parentElement.nextElementSibling : null;
+
+        const subsiteLink = infoContent ? infoContent.querySelector('a[href^="/videos/site/"]') : document.querySelector('a[href^="/videos/site/"]');
+        if (subsiteLink) {
+            const subsite = subsiteLink.textContent.trim();
+            if (subsite) meta.studio = `Gaywire (${subsite})`;
+        }
+
+        const tagLinks = infoContent ? infoContent.querySelectorAll('a[href^="/videos/tags/"]') : document.querySelectorAll('a[href^="/videos/tags/"]');
+        const tagSet = new Set();
+        tagLinks.forEach(a => {
+            const tag = a.textContent.trim();
+            if (tag && !tagSet.has(tag)) {
+                tagSet.add(tag);
+                meta.genres.push(tag);
+            }
+        });
+        const tagsContainer = tagLinks.length > 0 ? tagLinks[0].parentElement : null;
+
+        const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+        let injected = false;
+
+        if (tagsContainer && meta.genres.length > 0) {
+            if (!tagsContainer.querySelector('.emby-gaywire-genres-controls')) {
+                const type = 'genres';
+                const conf = (config && config[type]) || defaultMetadataConfigs[type];
+                if (conf && conf.enabled) {
+                    const text = renderWithTemplate(meta, conf.template, type);
+                    if (text && text.trim()) {
+                        const controls = createMetadataControls(type, meta, conf);
+                        controls.style.marginTop = '6px';
+                        controls.style.display = 'block';
+                        controls.classList.add('emby-metadata-controls', 'emby-gaywire-genres-controls');
+                        tagsContainer.appendChild(controls);
+                        injected = true;
+                    }
+                }
+            } else {
+                injected = true;
+            }
+        }
+
+        if (meta.actors.length > 0) {
+            const firstActorLink = actorScope ? actorScope.querySelector('a[href^="/model/"]') : document.querySelector('a[href^="/model/"]');
+            if (firstActorLink) {
+                const container = firstActorLink.closest('h2') || firstActorLink.parentElement;
+                if (container && container.parentElement) {
+                    if (!container.parentElement.querySelector('.emby-gaywire-actors-controls')) {
+                        const type = 'actors';
+                        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+                        if (conf && conf.enabled) {
+                            const text = renderWithTemplate(meta, conf.template, type);
+                            if (text && text.trim()) {
+                                const controls = createMetadataControls(type, meta, conf);
+                                controls.style.marginTop = '6px';
+                                controls.style.display = 'block';
+                                controls.classList.add('emby-metadata-controls', 'emby-gaywire-actors-controls');
+                                container.parentElement.insertBefore(controls, container.nextSibling);
+                                injected = true;
+                            }
+                        }
+                    } else {
+                        injected = true;
+                    }
+                }
+            }
+        }
+
+        if (descSection && meta.description) {
+            if (!descSection.querySelector('.emby-gaywire-desc-controls')) {
+                const type = 'description';
+                const conf = (config && config[type]) || defaultMetadataConfigs[type];
+                if (conf && conf.enabled) {
+                    const text = renderWithTemplate(meta, conf.template, type);
+                    if (text && text.trim()) {
+                        const controls = createMetadataControls(type, meta, conf);
+                        controls.style.marginTop = '8px';
+                        controls.style.display = 'block';
+                        controls.classList.add('emby-metadata-controls', 'emby-gaywire-desc-controls');
+                        if (descSection.parentNode) {
+                            descSection.parentNode.insertBefore(controls, descSection.nextSibling);
+                            injected = true;
+                        }
+                    }
+                }
+            } else {
+                injected = true;
+            }
+        }
+
+        return injected;
+    }
+
+    if (run()) return;
+
+    const interval = setInterval(() => {
+        try {
+            if (run()) {
+                clearInterval(interval);
+            } else {
+                retries++;
+                if (retries >= maxRetries) clearInterval(interval);
+            }
+        } catch (e) {
+            console.error('initGaywire error', e);
+        }
+    }, 1000);
+  }
+
+  function initWaybig() {
+    if (!location.host.includes('waybig.com')) return;
+
+    const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'WAYBIG',
+        actors: [],
+        description: '',
+        extra: ''
+    };
+
+    function normalizeText(text) {
+        return (text || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function addGenre(value) {
+        const v = normalizeText(value);
+        if (!v) return;
+        const key = v.toLowerCase();
+        if (!meta.genres.some(g => g.toLowerCase() === key)) {
+            meta.genres.push(v);
+        }
+    }
+
+    const titleH2 = document.querySelector('.title-col.-content h2');
+    if (titleH2) {
+        const full = normalizeText(titleH2.textContent);
+        const parts = full.split(' - ');
+        if (parts.length > 1) {
+            const maybeStudio = normalizeText(parts[parts.length - 1]);
+            if (maybeStudio) meta.studio = maybeStudio;
+            meta.title = normalizeText(parts.slice(0, -1).join(' - ')).replace(/\s*\([^)]*\)\s*$/, '');
+        } else {
+            meta.title = full.replace(/\s*\([^)]*\)\s*$/, '');
+        }
+    }
+
+    const breadcrumbStudio = document.querySelector('.breadcrumb-col a[href*="/studios/"]');
+    if (breadcrumbStudio) {
+        const name = normalizeText(breadcrumbStudio.textContent);
+        if (name) meta.studio = name;
+    }
+
+    const dateEl = Array.from(document.querySelectorAll('.content-base-info .info-elem')).find(el => el.querySelector('svg[data-icon="calendar"]'));
+    if (dateEl) {
+        const text = normalizeText(dateEl.querySelector('.sub-label') ? dateEl.querySelector('.sub-label').textContent : dateEl.textContent);
+        if (text) {
+            meta.extra += `Date: ${text}\n`;
+            const m = text.match(/^(\d{4})/);
+            if (m) meta.year = m[1];
+        }
+    }
+
+    const durEl = Array.from(document.querySelectorAll('.content-base-info .info-elem')).find(el => el.querySelector('svg[data-icon="clock"]'));
+    if (durEl) {
+        const text = normalizeText(durEl.querySelector('.sub-label') ? durEl.querySelector('.sub-label').textContent : durEl.textContent);
+        if (text) meta.duration = text;
+    }
+
+    const descInner = document.querySelector('.content-desc .expand-inner');
+    if (descInner) meta.description = normalizeText(descInner.textContent);
+
+    const modelLabels = document.querySelectorAll('.content-links.-models .models-box a .sub-label');
+    const actorSet = new Set();
+    modelLabels.forEach(span => {
+        const name = normalizeText(span.textContent);
+        if (name && !actorSet.has(name)) {
+            actorSet.add(name);
+            meta.actors.push({ name });
+        }
+    });
+
+    const categoriesDiv = document.querySelector('.content-links.-niches');
+    if (categoriesDiv) {
+        categoriesDiv.querySelectorAll('a').forEach(a => addGenre(a.textContent));
+    }
+
+    const tagsDiv = document.querySelector('.content-links.-tags');
+    if (tagsDiv) {
+        tagsDiv.querySelectorAll('a').forEach(a => addGenre(a.textContent));
+    }
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    if (tagsDiv && meta.genres.length > 0) {
+        if (!tagsDiv.querySelector('.emby-waybig-genres-controls')) {
+            const type = 'genres';
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                const text = renderWithTemplate(meta, conf.template, type);
+                if (text && text.trim()) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.style.marginTop = '6px';
+                    controls.style.display = 'block';
+                    controls.classList.add('emby-metadata-controls', 'emby-waybig-genres-controls');
+                    tagsDiv.appendChild(controls);
+                }
+            }
+        }
+    }
+
+    const modelsDiv = document.querySelector('.content-links.-models');
+    if (modelsDiv && meta.actors.length > 0) {
+        if (!modelsDiv.querySelector('.emby-waybig-actors-controls')) {
+            const type = 'actors';
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                const text = renderWithTemplate(meta, conf.template, type);
+                if (text && text.trim()) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.style.marginTop = '6px';
+                    controls.style.display = 'block';
+                    controls.classList.add('emby-metadata-controls', 'emby-waybig-actors-controls');
+                    modelsDiv.appendChild(controls);
+                }
+            }
+        }
+    }
+
+    const descWrap = document.querySelector('.content-desc');
+    if (descWrap && meta.description) {
+        if (!descWrap.parentNode.querySelector('.emby-waybig-desc-controls')) {
+            const type = 'description';
+            const conf = (config && config[type]) || defaultMetadataConfigs[type];
+            if (conf && conf.enabled) {
+                const text = renderWithTemplate(meta, conf.template, type);
+                if (text && text.trim()) {
+                    const controls = createMetadataControls(type, meta, conf);
+                    controls.style.marginTop = '6px';
+                    controls.style.display = 'block';
+                    controls.classList.add('emby-metadata-controls', 'emby-waybig-desc-controls');
+                    descWrap.parentNode.insertBefore(controls, descWrap.nextSibling);
+                }
+            }
+        }
+    }
+  }
+
+  function initKoVideo() {
+    if (!location.host.includes('ko-video.com')) return;
+
+    const normalizeActorName = (raw) => {
+      return String(raw || '')
+        .replace(/\u3000/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    };
+
+    const injectCarouselDownloadBtns = () => {
+      const requestHeaders = { Referer: location.href, Origin: location.origin };
+      const anchors = document.querySelectorAll('#main_item a.fancybox[href]');
+      if (!anchors.length) return false;
+
+      let injectedAny = false;
+      anchors.forEach(a => {
+        const container = a.closest('li') || a;
+        if (!container) return;
+        if (container.querySelector('.emby-hunkch-download-btn.emby-kovideo-carousel-download')) return;
+
+        const raw = (a.getAttribute('href') || a.href || '').trim();
+        if (!raw || /^javascript:/i.test(raw)) return;
+
+        let url = '';
+        try {
+          url = new URL(raw, location.href).href;
+        } catch (_) {
+          url = raw;
+        }
+        if (!url) return;
+
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 10, bottom: 10, zIndex: 30, size: 46 });
+        btn.classList.add('emby-kovideo-carousel-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const filename = getHunkChPosterFilenameSetting();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        container.appendChild(btn);
+        injectedAny = true;
+      });
+
+      return injectedAny;
+    };
+
+    const injectActorThumbDownloadBtns = () => {
+      const requestHeaders = { Referer: location.href, Origin: location.origin };
+      const imgs = document.querySelectorAll('.model_performance .owl-carousel .owl-item .item img[src]');
+      if (!imgs.length) return false;
+
+      const safeFilenameBase = (raw) => {
+        const s = (raw || '').replace(/\s+/g, ' ').trim();
+        return s.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim() || 'actor';
+      };
+
+      const guessExt = (url) => {
+        try {
+          const u = new URL(url, location.href);
+          const name = (u.pathname.split('/').pop() || '').trim();
+          const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+          if (m) return m[1].toLowerCase();
+        } catch (_) {}
+        return 'jpg';
+      };
+
+      let injectedAny = false;
+      imgs.forEach(img => {
+        const imgRect = img.getBoundingClientRect();
+        const candidates = [
+          img.closest('a'),
+          img.closest('.item'),
+          img.closest('.owl-item'),
+          img.parentElement
+        ].filter(Boolean);
+        const pick = candidates.find(el => {
+          const r = el.getBoundingClientRect();
+          if (r.width < 20 || r.height < 20) return false;
+          if (imgRect.width >= 10 && imgRect.height >= 10) {
+            if (r.width + 1 < imgRect.width) return false;
+            if (r.height + 1 < imgRect.height) return false;
+          }
+          return true;
+        }) || candidates[0];
+        const container = pick;
+        if (!container) return;
+        if (container.querySelector('.emby-hunkch-download-btn.emby-kovideo-actor-download')) return;
+
+        const raw = (img.getAttribute('src') || img.src || '').trim();
+        if (!raw || /^data:/i.test(raw) || /^javascript:/i.test(raw)) return;
+
+        let url = '';
+        try {
+          url = new URL(raw, location.href).href;
+        } catch (_) {
+          url = raw;
+        }
+        if (!url) return;
+
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 8, bottom: 34, zIndex: 30, size: 38 });
+        btn.classList.add('emby-kovideo-actor-download');
+        btn.style.setProperty('position', 'absolute', 'important');
+        btn.style.setProperty('right', '8px', 'important');
+        btn.style.setProperty('bottom', '34px', 'important');
+        btn.style.setProperty('z-index', '99999', 'important');
+        btn.style.setProperty('display', 'flex', 'important');
+        btn.style.setProperty('opacity', '1', 'important');
+        btn.style.setProperty('visibility', 'visible', 'important');
+        btn.style.setProperty('pointer-events', 'auto', 'important');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const actorName = normalizeActorName((img.getAttribute('alt') || '').trim()
+            || (img.closest('a')?.querySelector('span')?.textContent || '').trim())
+            || 'actor';
+          const filename = `${safeFilenameBase(actorName)}.${guessExt(url)}`;
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        container.appendChild(btn);
+        injectedAny = true;
+      });
+
+      return injectedAny;
+    };
+
+    injectCarouselDownloadBtns();
+    injectActorThumbDownloadBtns();
+    {
+      let tries = 0;
+      const maxTries = 20;
+      const interval = setInterval(() => {
+        tries++;
+        try {
+          injectCarouselDownloadBtns();
+          injectActorThumbDownloadBtns();
+        } catch (_) {}
+        if (tries >= maxTries) clearInterval(interval);
+      }, 1000);
+    }
+
+    const meta = {
+      title: '',
+      year: '',
+      country: 'JP',
+      genres: [],
+      duration: '',
+      director: '',
+      studio: '',
+      actors: [],
+      description: '',
+      extra: ''
+    };
+
+    function normalizeText(text) {
+      return (text || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function cleanDdText(dd) {
+      const raw = normalizeText(dd ? dd.textContent : '');
+      return raw.replace(/^[：:]\s*/, '').trim();
+    }
+
+    const titleEl = document.querySelector('.title_bar h2');
+    if (titleEl) {
+      meta.title = normalizeText(titleEl.textContent);
+      if (meta.title.includes('×')) {
+        const parts = meta.title.split('×').map(s => normalizeText(s)).filter(Boolean);
+        const set = new Set();
+        parts.forEach(name => {
+          if (!set.has(name)) {
+            set.add(name);
+            meta.actors.push(name);
+          }
+        });
+      }
+    }
+
+    {
+      const root = document.querySelector('.model_performance');
+      if (root) {
+        const anchors = root.querySelectorAll('.owl-carousel .owl-item .item a');
+        if (anchors.length) {
+          const existed = new Set();
+          const merged = [];
+          normalizeNameList(meta.actors).forEach(n => {
+            if (!existed.has(n)) {
+              existed.add(n);
+              merged.push(n);
+            }
+          });
+          anchors.forEach(a => {
+            const img = a.querySelector('img');
+            const raw = normalizeActorName((img?.getAttribute('alt') || '') || (a.querySelector('span')?.textContent || ''));
+            if (!raw) return;
+            if (existed.has(raw)) return;
+            existed.add(raw);
+            merged.push(raw);
+          });
+          meta.actors = merged;
+        }
+      }
+    }
+
+    const dl = document.querySelector('.detail_product dl');
+    if (dl) {
+      const genreSet = new Set();
+      const dts = Array.from(dl.querySelectorAll('dt'));
+      dts.forEach(dt => {
+        const dd = dt.nextElementSibling;
+        if (!dd || dd.tagName !== 'DD') return;
+        const key = normalizeText(dt.textContent);
+
+        if (key.includes('商品発売日')) {
+          const v = cleanDdText(dd);
+          if (v) {
+            meta.extra += `Release Date: ${v}\n`;
+            const m = v.match(/(\d{4})/);
+            if (m) meta.year = m[1];
+          }
+          return;
+        }
+
+        if (key.includes('収録時間')) {
+          const v = cleanDdText(dd);
+          if (v) meta.duration = v;
+          return;
+        }
+
+        if (key.includes('メーカー') || key.includes('レーベル')) {
+          const makerLink = dd.querySelector('a[href*="maker="]') || dd.querySelector('a');
+          const labelLink = dd.querySelector('a[href*="label="]');
+          const maker = normalizeText(makerLink ? makerLink.textContent : '');
+          const label = normalizeText(labelLink ? labelLink.textContent : '');
+          if (maker) {
+            meta.studio = maker;
+            genreSet.add(maker);
+          }
+          if (label) {
+            meta.extra += `Label: ${label}\n`;
+            genreSet.add(label);
+          }
+          return;
+        }
+
+        if (key.includes('シリーズ') || key.includes('ジャンル')) {
+          dd.querySelectorAll('a[href*="series="], a[href*="genre="]').forEach(a => {
+            const v = normalizeText(a.textContent);
+            if (v) genreSet.add(v);
+          });
+          return;
+        }
+
+        if (key.includes('モデル')) {
+          dd.querySelectorAll('a[href*="mgenre="]').forEach(a => {
+            const v = normalizeText(a.textContent);
+            if (v) genreSet.add(v);
+          });
+        }
+      });
+
+      meta.genres = Array.from(genreSet);
+    }
+
+    const descP = document.querySelector('p.deitail_txt');
+    if (descP) {
+      let text = descP.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+      text = text.replace(/<[^>]+>/g, '');
+      const lines = text.split('\n').map(s => s.trim()).filter(Boolean);
+      meta.description = lines.join('\n');
+    }
+
+    const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+    const detailProduct = document.querySelector('.detail_product');
+    if (detailProduct && meta.genres.length > 0) {
+      if (!detailProduct.querySelector('.emby-ko-video-genres-controls')) {
+        const type = 'genres';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+          const text = renderWithTemplate(meta, conf.template, type);
+          if (text && text.trim()) {
+            const controls = createMetadataControls(type, meta, conf);
+            controls.style.marginTop = '8px';
+            controls.style.display = 'block';
+            controls.classList.add('emby-metadata-controls', 'emby-ko-video-genres-controls');
+            detailProduct.appendChild(controls);
+          }
+        }
+      }
+    }
+
+    const actorRoot = document.querySelector('.model_performance');
+    if (actorRoot && meta.actors.length > 0) {
+      if (!actorRoot.querySelector('.emby-ko-video-actors-controls')) {
+        const type = 'actors';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+          const text = renderWithTemplate(meta, conf.template, type);
+          if (text && text.trim()) {
+            const controls = createMetadataControls(type, meta, conf);
+            controls.style.marginTop = '8px';
+            controls.style.display = 'block';
+            controls.classList.add('emby-metadata-controls', 'emby-ko-video-actors-controls');
+            const actorTitle = actorRoot.querySelector('h3');
+            if (actorTitle && actorTitle.parentNode) {
+              actorTitle.parentNode.insertBefore(controls, actorTitle.nextSibling);
+            } else {
+              actorRoot.insertBefore(controls, actorRoot.firstChild);
+            }
+          }
+        }
+      }
+    }
+
+    if (descP && meta.description) {
+      const parent = descP.parentNode;
+      if (parent && !parent.querySelector('.emby-ko-video-desc-controls')) {
+        const type = 'description';
+        const conf = (config && config[type]) || defaultMetadataConfigs[type];
+        if (conf && conf.enabled) {
+          const text = renderWithTemplate(meta, conf.template, type);
+          if (text && text.trim()) {
+            const controls = createMetadataControls(type, meta, conf);
+            controls.style.marginTop = '8px';
+            controls.style.display = 'block';
+            controls.classList.add('emby-metadata-controls', 'emby-ko-video-desc-controls');
+            parent.insertBefore(controls, descP.nextSibling);
+          }
+        }
+      }
+    }
   }
 
   function initHelixStudios() {
@@ -3571,7 +7076,16 @@
   }
 
   initCkDownload();
+  initKoVideo();
+  initAdultContentsFc2();
   initMenCom();
+  initMensRushTv();
+  initSeanCody();
+  initCockyBoysStore();
+  initCockyBoysCom();
+  initGayDvdEmpire();
+  initGaywire();
+  initWaybig();
   initSketchySex();
   initClips4Sale();
   initHelixStudios();
@@ -3584,6 +7098,7 @@
   initBoyStudio();
   initJgvData();
   initHunkCh();
+  init4HorLover();
   initGamesVideo();
   initFratx();
   initDaiichisouko();
@@ -3591,6 +7106,8 @@
   initPornolab();
   initIafd();
   initEmbyItem();
+
+  enableUniversalCopyUnlock();
 
   if (location.host.includes('lustfulboy.com') && location.pathname.includes('/web/index.html')) {
     window.addEventListener('hashchange', () => {

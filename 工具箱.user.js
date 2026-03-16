@@ -25,6 +25,42 @@
   };
 
   const host = location.hostname;
+  const SCROLL_EXCLUDE_KEY = "nogiruka_scroll_btn_excludes";
+
+  const normalizeHost = (h) => String(h || "").trim().toLowerCase();
+  const getScrollExcludedHosts = () => {
+    try {
+      const raw = localStorage.getItem(SCROLL_EXCLUDE_KEY);
+      const arr = JSON.parse(raw || "[]");
+      if (!Array.isArray(arr)) return [];
+      const out = [];
+      arr.forEach(v => {
+        const h = normalizeHost(v);
+        if (h && !out.includes(h)) out.push(h);
+      });
+      return out;
+    } catch (_) {
+      return [];
+    }
+  };
+  const setScrollExcludedHosts = (hosts) => {
+    const arr = Array.isArray(hosts) ? hosts.map(normalizeHost).filter(Boolean) : [];
+    const uniq = [];
+    arr.forEach(h => {
+      if (!uniq.includes(h)) uniq.push(h);
+    });
+    localStorage.setItem(SCROLL_EXCLUDE_KEY, JSON.stringify(uniq));
+  };
+  const addScrollExcludedHost = (h) => {
+    const hostKey = normalizeHost(h);
+    if (!hostKey) return false;
+    const list = getScrollExcludedHosts();
+    if (list.includes(hostKey)) return false;
+    list.push(hostKey);
+    setScrollExcludedHosts(list);
+    return true;
+  };
+  const isScrollExcludedHost = (h) => getScrollExcludedHosts().includes(normalizeHost(h));
 
   /** ====== 样式 ====== */
   GM_addStyle(`
@@ -67,11 +103,114 @@
     .nogiruka-scroll-btn svg path {
       fill: #fff;
     }
+
+    .nogiruka-context-menu {
+      position: fixed;
+      z-index: 10000;
+      min-width: 240px;
+      padding: 6px;
+      border-radius: 10px;
+      background: rgba(20, 20, 24, 0.92);
+      border: 1px solid rgba(165,183,255,.35);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      color: #fff;
+      font-size: 13px;
+      display: none;
+      backdrop-filter: blur(8px);
+    }
+    .nogiruka-context-menu .nogiruka-menu-title {
+      padding: 6px 10px;
+      opacity: .85;
+      font-size: 12px;
+    }
+    .nogiruka-context-menu .nogiruka-menu-item {
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .nogiruka-context-menu .nogiruka-menu-item:hover {
+      background: rgba(165,183,255,.18);
+    }
   `);
 
   /** ====== 滚动按钮功能 ====== */
   function scrollBtns() {
+    if (isScrollExcludedHost(location.hostname)) {
+      log(`已在排除名单：${location.hostname}`, "Scroll");
+      return;
+    }
+
     const scrollTo = top => window.scrollTo({ top, behavior: "smooth" });
+    const hideMenu = () => {
+      const menu = document.getElementById("nogiruka-scroll-menu");
+      if (!menu) return;
+      menu.style.display = "none";
+    };
+    const showMenu = (x, y, container, onMouseMove) => {
+      let menu = document.getElementById("nogiruka-scroll-menu");
+      if (!menu) {
+        menu = document.createElement("div");
+        menu.id = "nogiruka-scroll-menu";
+        menu.className = "nogiruka-context-menu";
+        menu.innerHTML = `
+          <div class="nogiruka-menu-title"></div>
+          <div class="nogiruka-menu-item" data-action="exclude">将当前域名加入排除名单</div>
+          <div class="nogiruka-menu-item" data-action="cancel">取消</div>
+        `;
+        document.body.appendChild(menu);
+
+        document.addEventListener("click", (e) => {
+          const t = e.target;
+          if (!(t instanceof Element)) return;
+          if (menu.contains(t)) return;
+          hideMenu();
+        }, true);
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") hideMenu();
+        }, true);
+        window.addEventListener("scroll", () => hideMenu(), true);
+      }
+
+      const title = menu.querySelector(".nogiruka-menu-title");
+      if (title) title.textContent = `域名：${location.hostname}`;
+
+      menu.onclick = (e) => {
+        const t = e.target;
+        if (!(t instanceof Element)) return;
+        const action = t.getAttribute("data-action");
+        if (!action) return;
+        if (action === "exclude") {
+          const added = addScrollExcludedHost(location.hostname);
+          hideMenu();
+          if (added) {
+            try {
+              if (typeof document.removeEventListener === "function" && onMouseMove) {
+                document.removeEventListener("mousemove", onMouseMove);
+              }
+            } catch (_) {}
+            try {
+              if (container && container.parentNode) container.parentNode.removeChild(container);
+            } catch (_) {}
+            log(`已加入排除名单：${location.hostname}`, "Scroll");
+          } else {
+            log(`已在排除名单：${location.hostname}`, "Scroll");
+          }
+          return;
+        }
+        if (action === "cancel") {
+          hideMenu();
+        }
+      };
+
+      const padding = 8;
+      menu.style.display = "block";
+      const rect = menu.getBoundingClientRect();
+      const maxX = Math.max(padding, window.innerWidth - rect.width - padding);
+      const maxY = Math.max(padding, window.innerHeight - rect.height - padding);
+      menu.style.left = `${Math.min(x, maxX)}px`;
+      menu.style.top = `${Math.min(y, maxY)}px`;
+    };
 
     const makeBtn = (dir, fn) => {
       const b = document.createElement("button");
@@ -96,7 +235,7 @@
     document.body.appendChild(container);
 
     // 右下角触发显示
-    document.addEventListener("mousemove", e => {
+    const onMouseMove = e => {
       const fromRight = window.innerWidth - e.clientX;
       const fromBottom = window.innerHeight - e.clientY;
       
@@ -107,6 +246,15 @@
       // 只有在主页面且鼠标在右下角时才显示
       const shouldShow = !isInModal && !isInFixedElement && fromRight < 300 && fromBottom < 300;
       container.classList.toggle("active", shouldShow);
+    };
+    document.addEventListener("mousemove", onMouseMove);
+
+    container.querySelectorAll(".nogiruka-scroll-btn").forEach(btn => {
+      btn.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        showMenu(e.clientX, e.clientY, container, onMouseMove);
+      }, true);
     });
 
     log("右下角触发显示滚动按钮已启用", "Scroll");
@@ -117,6 +265,12 @@
     const update = () => {
       let count = 0;
       document.querySelectorAll("a:not([data-nogiruka-fixed])").forEach(a => {
+        if (host.includes("4horlover.com")) {
+          if (a.closest("#masthead") || a.closest("nav.navigation.pagination")) {
+            a.dataset.nogirukaFixed = "true";
+            return;
+          }
+        }
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         a.dataset.nogirukaFixed = "true";
@@ -370,145 +524,14 @@
     observeSearchInput();
   }
 
-  /** ====== KO-VIDEO 解锁文字选择 ====== */
-  function unlockKoVideoSelection() {
-    if (host !== "ko-video.com") return;
-
-    GM_addStyle(`
-      * {
-        -webkit-user-select: text !important;
-        -moz-user-select: text !important;
-        -ms-user-select: text !important;
-        user-select: text !important;
-      }
-    `);
-
-    const events = ["copy", "cut", "paste", "contextmenu", "selectstart", "dragstart"];
-    events.forEach(type => {
-      document.addEventListener(
-        type,
-        e => {
-          e.stopPropagation();
-        },
-        true
-      );
-    });
-
-    const clearInlineBlockers = () => {
-      const targets = [document, document.body];
-      targets.forEach(t => {
-        if (!t) return;
-        t.oncopy =
-          t.oncut =
-          t.onpaste =
-          t.oncontextmenu =
-          t.onselectstart =
-          t.ondragstart =
-            null;
-      });
-    };
-
-    clearInlineBlockers();
-    new MutationObserver(clearInlineBlockers).observe(document.documentElement, {
-      childList: true,
-      subtree: true,
-    });
-
-    log("KO-VIDEO 文字选择已解锁", "KO-VIDEO");
-  }
-
-  /** ====== KO-VIDEO 商品简介复制 ====== */
-  function initKoVideoCopy() {
-    if (!location.pathname.startsWith("/products/detail.php")) {
-      return;
-    }
-
-    const detail = document.querySelector("p.deitail_txt");
-    if (!detail) {
-      log("未找到商品简介元素 .deitail_txt", "KO-VIDEO");
-      return;
-    }
-
-    detail.style.userSelect = "text";
-    detail.style.webkitUserSelect = "text";
-    detail.style.msUserSelect = "text";
-
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.textContent = "复制商品简介";
-    btn.style.cssText = [
-      "margin-top: 8px",
-      "padding: 6px 10px",
-      "font-size: 12px",
-      "border-radius: 4px",
-      "border: none",
-      "background: #a5b7ff",
-      "color: #fff",
-      "cursor: pointer"
-    ].join(";");
-
-    btn.addEventListener("click", () => {
-      const text = detail.innerText.replace(/\r?\n/g, "\n").trim();
-      if (!text) {
-        alert("未获取到商品简介内容");
-        return;
-      }
-
-      const doCopy = () => {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          return navigator.clipboard.writeText(text);
-        }
-
-        return new Promise((resolve, reject) => {
-          try {
-            const ta = document.createElement("textarea");
-            ta.value = text;
-            ta.style.position = "fixed";
-            ta.style.left = "-9999px";
-            document.body.appendChild(ta);
-            ta.focus();
-            ta.select();
-            const ok = document.execCommand("copy");
-            document.body.removeChild(ta);
-            if (!ok) {
-              reject(new Error("execCommand 复制失败"));
-            } else {
-              resolve();
-            }
-          } catch (e) {
-            reject(e);
-          }
-        });
-      };
-
-      doCopy()
-        .then(() => {
-          alert("商品简介已复制到剪贴板");
-        })
-        .catch(err => {
-          console.error(err);
-          alert("复制失败，可以尝试手动选中后复制");
-        });
-    });
-
-    detail.parentNode.insertBefore(btn, detail.nextSibling);
-
-    log("KO-VIDEO 商品简介复制按钮已注入", "KO-VIDEO");
-  }
-
   /** ====== 主入口 ====== */
   // 特定网站功能
-  if (host.includes("google.com") || host.includes("gaytor.rent")) {
+  if (host.includes("google.com") || host.includes("gaytor.rent") || host.includes("4horlover.com")) {
     fixLinks();
   }
 
   if (host === "member.bilibili.com") {
     initBilibiliSearchHistory();
-  }
-
-  if (host === "ko-video.com") {
-    unlockKoVideoSelection();
-    initKoVideoCopy();
   }
 
   // 通用功能（所有网站适用）
