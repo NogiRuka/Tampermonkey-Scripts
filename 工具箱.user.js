@@ -60,48 +60,132 @@
     setScrollExcludedHosts(list);
     return true;
   };
+  const removeScrollExcludedHost = (h) => {
+    const hostKey = normalizeHost(h);
+    if (!hostKey) return false;
+    const list = getScrollExcludedHosts();
+    if (!list.includes(hostKey)) return false;
+    setScrollExcludedHosts(list.filter(x => x !== hostKey));
+    return true;
+  };
   const isScrollExcludedHost = (h) => getScrollExcludedHosts().includes(normalizeHost(h));
+
+  GM_registerMenuCommand("滚动按钮：解除当前域名排除", () => {
+    const removed = removeScrollExcludedHost(location.hostname);
+    if (removed) {
+      log(`已解除排除：${location.hostname}`, "Scroll");
+    } else {
+      log(`当前未被排除：${location.hostname}`, "Scroll");
+    }
+  });
+
+  /** ====== 随机颜色生成 ====== */
+  const getRandomSoftColor = () => {
+    // 使用 HSL 保证颜色柔和且明亮，适合玻璃拟态和渐变
+    const hue = Math.floor(Math.random() * 360);
+    // 饱和度 70-90%，亮度 70-85% 保证颜色柔和不刺眼
+    const saturation = Math.floor(Math.random() * 20) + 70;
+    const lightness1 = Math.floor(Math.random() * 10) + 70;
+    const lightness2 = lightness1 + 10; // 第二个颜色更亮一些产生渐变
+
+    // 将主色调稍微偏移产生自然渐变
+    const hue2 = (hue + 20) % 360;
+
+    return {
+      color1: `hsl(${hue}, ${saturation}%, ${lightness1}%)`,
+      color2: `hsl(${hue2}, ${saturation}%, ${lightness2}%)`,
+      shadowColor: `hsla(${hue}, ${saturation}%, ${lightness1 - 10}%, 0.4)`,
+      shadowHoverColor: `hsla(${hue}, ${saturation}%, ${lightness1 - 10}%, 0.6)`,
+      shadowActiveColor: `hsla(${hue}, ${saturation}%, ${lightness1 - 10}%, 0.4)`,
+      menuBorderColor: `hsla(${hue}, ${saturation}%, ${lightness1}%, 0.35)`,
+      menuHoverColor: `hsla(${hue}, ${saturation}%, ${lightness1}%, 0.18)`
+    };
+  };
+
+  const themeColors = getRandomSoftColor();
 
   /** ====== 样式 ====== */
   GM_addStyle(`
+    :root {
+      --nogiruka-color-1: ${themeColors.color1};
+      --nogiruka-color-2: ${themeColors.color2};
+      --nogiruka-shadow-color: ${themeColors.shadowColor};
+      --nogiruka-shadow-hover: ${themeColors.shadowHoverColor};
+      --nogiruka-shadow-active: ${themeColors.shadowActiveColor};
+      --nogiruka-menu-border: ${themeColors.menuBorderColor};
+      --nogiruka-menu-hover: ${themeColors.menuHoverColor};
+    }
+
     .nogiruka-btn-container {
       position: fixed;
-      right: 20px;
-      bottom: 20px;
+      right: 24px;
+      bottom: 24px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
       z-index: 9999;
       opacity: 0;
       pointer-events: none;
-      transition: opacity .3s ease;
+      transform: translateY(20px);
+      transition: opacity 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .nogiruka-btn-container.active {
       opacity: 1;
       pointer-events: auto;
+      transform: translateY(0);
     }
     .nogiruka-scroll-btn {
-      width: 50px;
-      height: 50px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      background: #a5b7ff;
-      border: none;
+      background: linear-gradient(135deg, var(--nogiruka-color-1), var(--nogiruka-color-2));
+      border: 2px solid rgba(255, 255, 255, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 0 4px rgba(180,160,255,.25);
+      box-shadow: 0 4px 15px var(--nogiruka-shadow-color), inset 0 2px 4px rgba(255,255,255,0.6);
       cursor: pointer;
-      transition: transform .25s ease, box-shadow .25s ease;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .nogiruka-scroll-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: 50%;
     }
     .nogiruka-scroll-btn:hover {
-      transform: scale(1.15) rotate(3deg);
-      box-shadow: 0 0 14px 5px rgba(165,183,255,.65);
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 0 8px 25px var(--nogiruka-shadow-hover), inset 0 2px 4px rgba(255,255,255,0.8);
+      border-color: rgba(255, 255, 255, 0.8);
+    }
+    .nogiruka-scroll-btn:hover::before {
+      opacity: 0.3;
+    }
+    .nogiruka-scroll-btn:active {
+      transform: translateY(2px) scale(0.95);
+      box-shadow: 0 2px 8px var(--nogiruka-shadow-active), inset 0 4px 8px rgba(0,0,0,0.1);
+      transition: all 0.1s;
     }
     .nogiruka-scroll-btn svg {
-      width: 12px;
+      width: 16px;
+      position: relative;
+      z-index: 1;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
     }
     .nogiruka-scroll-btn svg path {
       fill: #fff;
+    }
+    .nogiruka-scroll-btn[data-direction="up"]:hover svg {
+      transform: translateY(-3px);
+    }
+    .nogiruka-scroll-btn[data-direction="down"]:hover svg {
+      transform: translateY(3px);
     }
 
     .nogiruka-context-menu {
@@ -111,7 +195,7 @@
       padding: 6px;
       border-radius: 10px;
       background: rgba(20, 20, 24, 0.92);
-      border: 1px solid rgba(165,183,255,.35);
+      border: 1px solid var(--nogiruka-menu-border);
       box-shadow: 0 10px 30px rgba(0,0,0,.35);
       color: #fff;
       font-size: 13px;
@@ -130,7 +214,7 @@
       user-select: none;
     }
     .nogiruka-context-menu .nogiruka-menu-item:hover {
-      background: rgba(165,183,255,.18);
+      background: var(--nogiruka-menu-hover);
     }
   `);
 
@@ -155,7 +239,7 @@
         menu.className = "nogiruka-context-menu";
         menu.innerHTML = `
           <div class="nogiruka-menu-title"></div>
-          <div class="nogiruka-menu-item" data-action="exclude">将当前域名加入排除名单</div>
+          <div class="nogiruka-menu-item" data-action="toggle-exclude"></div>
           <div class="nogiruka-menu-item" data-action="cancel">取消</div>
         `;
         document.body.appendChild(menu);
@@ -174,28 +258,26 @@
 
       const title = menu.querySelector(".nogiruka-menu-title");
       if (title) title.textContent = `域名：${location.hostname}`;
+      const toggle = menu.querySelector('[data-action="toggle-exclude"]');
+      if (toggle) {
+        toggle.textContent = isScrollExcludedHost(location.hostname)
+          ? "解除当前域名排除"
+          : "将当前域名加入排除名单";
+      }
 
       menu.onclick = (e) => {
         const t = e.target;
         if (!(t instanceof Element)) return;
         const action = t.getAttribute("data-action");
         if (!action) return;
-        if (action === "exclude") {
-          const added = addScrollExcludedHost(location.hostname);
+        if (action === "toggle-exclude") {
+          const excluded = isScrollExcludedHost(location.hostname);
+          const ok = excluded
+            ? removeScrollExcludedHost(location.hostname)
+            : addScrollExcludedHost(location.hostname);
           hideMenu();
-          if (added) {
-            try {
-              if (typeof document.removeEventListener === "function" && onMouseMove) {
-                document.removeEventListener("mousemove", onMouseMove);
-              }
-            } catch (_) {}
-            try {
-              if (container && container.parentNode) container.parentNode.removeChild(container);
-            } catch (_) {}
-            log(`已加入排除名单：${location.hostname}`, "Scroll");
-          } else {
-            log(`已在排除名单：${location.hostname}`, "Scroll");
-          }
+          const msg = excluded ? "已解除排除" : "已加入排除名单";
+          if (ok) log(`${msg}：${location.hostname}`, "Scroll");
           return;
         }
         if (action === "cancel") {

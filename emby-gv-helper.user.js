@@ -17,6 +17,7 @@
 // @connect      ck-download.com
 // @connect      *.ck-download.com
 // @connect      self
+// @connect      *
 // @require      file://D:\Projects\Tampermonkey Scripts\emby-gv-helper.user.js
 // ==/UserScript==
 
@@ -233,13 +234,11 @@
       if (document.body) {
         document.body.oncopy = null;
         document.body.oncut = null;
-        document.body.onpaste = null;
         document.body.onselectstart = null;
         document.body.oncontextmenu = null;
       }
       document.oncopy = null;
       document.oncut = null;
-      document.onpaste = null;
       document.onselectstart = null;
       document.oncontextmenu = null;
     };
@@ -252,14 +251,84 @@
     ensureStyle();
     nullifyInlineHandlers();
 
-    const events = ['copy', 'cut', 'paste', 'selectstart', 'contextmenu', 'dragstart'];
+    const events = ['selectstart'];
     events.forEach(type => document.addEventListener(type, stop, true));
 
-    document.addEventListener('keydown', (e) => {
-      const key = String(e.key || '').toLowerCase();
-      const isCmd = !!(e.ctrlKey || e.metaKey);
-      if (isCmd && (key === 'c' || key === 'x' || key === 'v' || key === 'a')) stop(e);
+    const ctxState = {
+      down: false,
+      moved: false,
+      x: 0,
+      y: 0,
+      suppressUntil: 0
+    };
+    const ctxMoveThreshold = 6;
+
+    const isAllowedContextMenuTarget = (target) => {
+      if (!(target instanceof Element)) return false;
+      if (target.closest('[data-emby-allow-contextmenu="1"], .emby-allow-contextmenu')) return true;
+      if (target.closest('.nogiruka-scroll-btn, .nogiruka-context-menu')) return true;
+      return false;
+    };
+
+    const isEditableTarget = (target) => {
+      if (!(target instanceof Element)) return false;
+      const el = target.closest('input, textarea, [contenteditable=""], [contenteditable="true"], [role="textbox"]');
+      if (!el) return false;
+      if (el instanceof HTMLInputElement) return !el.disabled && !el.readOnly;
+      if (el instanceof HTMLTextAreaElement) return !el.disabled && !el.readOnly;
+      return true;
+    };
+
+    document.addEventListener('mousedown', (e) => {
+      if (e.button !== 2) return;
+      if (isAllowedContextMenuTarget(e.target)) return;
+      ctxState.down = true;
+      ctxState.moved = false;
+      ctxState.x = e.clientX;
+      ctxState.y = e.clientY;
     }, true);
+
+    document.addEventListener('mousemove', (e) => {
+      if (!ctxState.down) return;
+      const dx = e.clientX - ctxState.x;
+      const dy = e.clientY - ctxState.y;
+      if ((dx * dx + dy * dy) > (ctxMoveThreshold * ctxMoveThreshold)) {
+        ctxState.moved = true;
+      }
+    }, true);
+
+    document.addEventListener('mouseup', (e) => {
+      if (e.button !== 2) return;
+      if (!ctxState.down) return;
+      ctxState.down = false;
+      if (ctxState.moved) {
+        ctxState.suppressUntil = Date.now() + 600;
+      }
+    }, true);
+
+    document.addEventListener('contextmenu', (e) => {
+      if (isAllowedContextMenuTarget(e.target)) {
+        ctxState.down = false;
+        ctxState.moved = false;
+        ctxState.suppressUntil = 0;
+        return;
+      }
+      const now = Date.now();
+      const shouldSuppress = !!(ctxState.moved || (ctxState.suppressUntil && now < ctxState.suppressUntil));
+      if (shouldSuppress) {
+        try { e.preventDefault(); } catch (_) {}
+        ctxState.moved = false;
+        ctxState.suppressUntil = 0;
+      }
+      stop(e);
+    }, true);
+
+    const stopIfNotEditable = (e) => {
+      if (isEditableTarget(e.target)) return;
+      stop(e);
+    };
+    document.addEventListener('copy', stopIfNotEditable, true);
+    document.addEventListener('cut', stopIfNotEditable, true);
 
     if (!document.head || !document.body) {
       window.addEventListener('DOMContentLoaded', () => {
@@ -321,61 +390,123 @@
     }
 
     showToast(t.hunkChDownloading);
-    if (typeof GM_download === 'function') {
-      const safeOptions = (options && typeof options === 'object') ? options : {};
-      const headers = (safeOptions.headers && typeof safeOptions.headers === 'object') ? safeOptions.headers : undefined;
-      const timeout = Number.isFinite(safeOptions.timeout) ? safeOptions.timeout : undefined;
+    const safeOptions = (options && typeof options === 'object') ? options : {};
+    const headers = (safeOptions.headers && typeof safeOptions.headers === 'object') ? safeOptions.headers : undefined;
+    const timeout = Number.isFinite(safeOptions.timeout) ? safeOptions.timeout : undefined;
+    const normalizedFilename = String(filename || '').trim() || 'download';
 
-      const buildErrText = (err) => {
-        if (!err) return '';
-        if (typeof err === 'string') return err;
-        if (typeof err === 'object') {
-          const parts = [];
-          if (err.error) parts.push(String(err.error));
-          if (err.details) parts.push(String(err.details));
-          if (err.status) parts.push(String(err.status));
-          if (err.statusText) parts.push(String(err.statusText));
-          if (err.finalUrl) parts.push(String(err.finalUrl));
-          if (parts.length) return parts.join(' | ');
-          try {
-            return JSON.stringify(err).slice(0, 160);
-          } catch (_) {
-            return String(err);
-          }
+    const buildErrText = (err) => {
+      if (!err) return '';
+      if (typeof err === 'string') return err;
+      if (typeof err === 'object') {
+        const parts = [];
+        if (err.error) parts.push(String(err.error));
+        if (err.details) parts.push(String(err.details));
+        if (err.status) parts.push(String(err.status));
+        if (err.statusText) parts.push(String(err.statusText));
+        if (err.finalUrl) parts.push(String(err.finalUrl));
+        if (parts.length) return parts.join(' | ');
+        try {
+          return JSON.stringify(err).slice(0, 160);
+        } catch (_) {
+          return String(err);
         }
-        return String(err);
-      };
+      }
+      return String(err);
+    };
 
+    const anchorDownload = (href, downloadName, cleanup) => {
+      const a = document.createElement('a');
+      a.href = href;
+      a.download = downloadName;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      if (typeof cleanup === 'function') {
+        setTimeout(() => {
+          try { cleanup(); } catch (_) {}
+        }, 30000);
+      }
+      showToast(t.hunkChDownloadOk);
+    };
+
+    const directDownload = () => {
+      console.warn('[emby-gv-helper] using direct download fallback', { url, filename: normalizedFilename, saveAs });
+      if (typeof GM_download === 'function') {
+        try {
+          GM_download({
+            url,
+            name: normalizedFilename,
+            saveAs: !!saveAs,
+            headers,
+            timeout,
+            onload: () => showToast(t.hunkChDownloadOk),
+            onerror: (err) => {
+              console.error('[emby-gv-helper] download failed', { url, filename: normalizedFilename, saveAs, err });
+              const extra = buildErrText(err);
+              showToast(extra ? (t.hunkChDownloadFailed + ': ' + extra) : t.hunkChDownloadFailed);
+            }
+          });
+          return true;
+        } catch (err) {
+          console.error('[emby-gv-helper] GM_download threw', { url, filename: normalizedFilename, saveAs, err });
+          const extra = (err && err.message) ? err.message : String(err || '');
+          showToast(extra ? (t.hunkChDownloadFailed + ': ' + extra) : t.hunkChDownloadFailed);
+          return true;
+        }
+      }
+
+      anchorDownload(url, normalizedFilename);
+      return true;
+    };
+
+    const blobDownload = (blob) => {
+      if (!(blob instanceof Blob) || blob.size === 0) {
+        return directDownload();
+      }
+
+      console.info('[emby-gv-helper] using blob download', { url, filename: normalizedFilename, size: blob.size, type: blob.type || '' });
+      const blobUrl = URL.createObjectURL(blob);
+      const revoke = () => URL.revokeObjectURL(blobUrl);
+      anchorDownload(blobUrl, normalizedFilename, revoke);
+      return true;
+    };
+
+    if (typeof GM_xmlhttpRequest === 'function') {
       try {
-        GM_download({
+        GM_xmlhttpRequest({
+          method: 'GET',
           url,
-          name: filename,
-          saveAs: !!saveAs,
           headers,
           timeout,
-          onload: () => showToast(t.hunkChDownloadOk),
+          responseType: 'blob',
+          onload: (resp) => {
+            const okStatus = resp && resp.status >= 200 && resp.status < 300;
+            const blob = resp ? resp.response : null;
+            if (okStatus && blob) {
+              blobDownload(blob);
+              return;
+            }
+            console.warn('[emby-gv-helper] blob request fallback to direct download', { url, filename: normalizedFilename, resp });
+            directDownload();
+          },
           onerror: (err) => {
-            console.error('[emby-gv-helper] download failed', { url, filename, saveAs, err });
-            const extra = buildErrText(err);
-            showToast(extra ? (t.hunkChDownloadFailed + ': ' + extra) : t.hunkChDownloadFailed);
+            console.warn('[emby-gv-helper] blob request error, fallback to direct download', { url, filename: normalizedFilename, err });
+            directDownload();
+          },
+          ontimeout: () => {
+            console.warn('[emby-gv-helper] blob request timeout, fallback to direct download', { url, filename: normalizedFilename });
+            directDownload();
           }
         });
+        return;
       } catch (err) {
-        console.error('[emby-gv-helper] GM_download threw', { url, filename, saveAs, err });
-        const extra = (err && err.message) ? err.message : String(err || '');
-        showToast(extra ? (t.hunkChDownloadFailed + ': ' + extra) : t.hunkChDownloadFailed);
+        console.warn('[emby-gv-helper] GM_xmlhttpRequest threw, fallback to direct download', { url, filename: normalizedFilename, saveAs, err });
       }
-      return;
     }
 
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.rel = 'noopener';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    showToast(t.hunkChDownloadOk);
+    directDownload();
   }
 
   function copyToClipboard(text) {
@@ -2010,59 +2141,212 @@
   function initTranceVideo() {
     if (!location.host.includes('trance-video.com')) return;
 
-    // 1. Description
-    const descDiv = document.querySelector('div.intro_text');
-    if (descDiv) {
-        // Replace <br> with newlines and remove HTML tags
-        let text = descDiv.innerHTML.replace(/<br\s*\/?>/gi, '\n');
-        text = text.replace(/<[^>]+>/g, '').trim();
+    const requestHeaders = { Referer: location.href, Origin: location.origin };
 
-        const meta = { description: text };
-        const conf = (metadataConfigs && metadataConfigs.description) || defaultMetadataConfigs.description;
-        
-        if (conf && conf.enabled && text) {
-            const controls = createMetadataControls('description', meta, conf);
-            descDiv.parentNode.insertBefore(controls, descDiv.nextSibling);
-            controls.style.marginBottom = '10px';
-            controls.style.display = 'block';
+    const reportOnce = (() => {
+      let done = false;
+      return (title, err) => {
+        if (done) return;
+        done = true;
+        try {
+          const extra = err ? `: ${String(err && (err.message || err)).slice(0, 200)}` : '';
+          showToast(`TranceVideo 未初始化${extra}`);
+        } catch (_) {}
+        try {
+          console.error('[emby-gv-helper] TranceVideo init failed:', title, err);
+        } catch (_) {}
+      };
+    })();
+
+    const safeCall = (title, fn) => {
+      try {
+        return fn();
+      } catch (e) {
+        reportOnce(title, e);
+        return undefined;
+      }
+    };
+
+    const toAbsUrlLocal = (raw, baseHref = location.href) => {
+      const s = String(raw || '').trim();
+      if (!s) return '';
+      try {
+        return new URL(s, baseHref).href;
+      } catch (_) {
+        return '';
+      }
+    };
+
+    const normalizeTranceImageUrl = (raw) => {
+      const abs = toAbsUrlLocal(raw, location.href);
+      if (!abs) return '';
+      try {
+        const u = new URL(abs);
+        u.pathname = u.pathname.replace(/_5(\.(?:jpe?g|png|webp))$/i, '_1$1');
+        return u.href;
+      } catch (_) {
+        return abs.replace(/_5(\.(?:jpe?g|png|webp))$/i, '_1$1');
+      }
+    };
+
+    const buildIndexedFilename = (idx) => {
+      const base = getHunkChPosterFilenameSetting();
+      const n = String(idx).padStart(2, '0');
+      const m = String(base || '').trim().match(/^(.*?)(\.[a-z0-9]+)$/i);
+      if (m) return `${m[1]}-${n}${m[2]}`;
+      return `poster-${n}.jpg`;
+    };
+
+    const ensureTranceStyle = () => {
+      if (!document.head) return;
+      if (document.getElementById('emby-trancevideo-style')) return;
+      const style = document.createElement('style');
+      style.id = 'emby-trancevideo-style';
+      style.textContent = `
+        .title_photo .photo_flexslider .slides img { cursor: zoom-in !important; }
+        .title_photo .photo_flexslider .flex-control-thumbs img { cursor: zoom-in !important; }
+
+        .emby-trancevideo-lightbox { position: fixed !important; inset: 0 !important; display: none !important; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,.92) !important; z-index: 2147483647 !important; cursor: zoom-out !important; padding: 0 !important; margin: 0 !important; }
+        .emby-trancevideo-lightbox[aria-hidden="false"] { display: flex !important; }
+        .emby-trancevideo-lightbox img { max-width: 96vw !important; max-height: 96vh !important; width: auto !important; height: auto !important; object-fit: contain !important; display: block !important; }
+        body.emby-trancevideo-lightbox-open { overflow: hidden !important; }
+      `;
+      document.head.appendChild(style);
+    };
+
+    const ensureTranceLightbox = () => {
+      if (!document.body || document.body.dataset.embyTranceLightboxReady === '1') return;
+      document.body.dataset.embyTranceLightboxReady = '1';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'emby-trancevideo-lightbox';
+      overlay.setAttribute('aria-hidden', 'true');
+      const viewerImg = document.createElement('img');
+      viewerImg.alt = '';
+      overlay.appendChild(viewerImg);
+      document.body.appendChild(overlay);
+
+      const close = () => {
+        overlay.setAttribute('aria-hidden', 'true');
+        viewerImg.removeAttribute('src');
+        document.body.classList.remove('emby-trancevideo-lightbox-open');
+      };
+
+      const open = (url) => {
+        if (!url) return;
+        viewerImg.src = url;
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('emby-trancevideo-lightbox-open');
+      };
+
+      window.__embyTranceVideoLightboxOpen = open;
+      window.__embyTranceVideoLightboxClose = close;
+
+      overlay.addEventListener('click', () => close(), true);
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); }, true);
+
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        if (target.closest('.emby-hunkch-download-btn')) return;
+        if (overlay.getAttribute('aria-hidden') === 'false' && overlay.contains(target)) return;
+
+        const img = target.closest('.title_photo .photo_flexslider .slides img, .title_photo .photo_flexslider .flex-control-thumbs img');
+        if (!img) return;
+        const url = normalizeTranceImageUrl(img.currentSrc || img.src);
+        if (!url) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (overlay.getAttribute('aria-hidden') === 'false') {
+          close();
+          return;
         }
-    }
+        open(url);
+      }, true);
+    };
 
-    // 2. Genres (Label + Category)
-    const genreSet = new Set();
-    // Locate the product category list
-    const prodCat = document.querySelector('div.prod_category ul');
-    if (prodCat) {
-        const lis = prodCat.querySelectorAll('li');
-        lis.forEach(li => {
-            const strong = li.querySelector('strong');
-            if (!strong) return;
-            const label = strong.textContent.trim();
-            // Check for "レーベル" (Label) or "カテゴリ" (Category)
-            if (label === 'レーベル' || label === 'カテゴリ') {
-                const items = li.querySelectorAll('div.item a');
-                items.forEach(a => {
-                    genreSet.add(a.textContent.trim());
-                });
-            }
+    const injectGalleryButtons = () => {
+      const lis = Array.from(document.querySelectorAll('.title_photo .photo_flexslider .slides > li:not(.clone)'));
+      if (lis.length === 0) return;
+
+      lis.forEach((li, i) => {
+        if (!(li instanceof HTMLElement)) return;
+        if (li.dataset.embyTranceGalleryReady === '1') return;
+        const img = li.querySelector('img');
+        if (!img) return;
+        const url = normalizeTranceImageUrl(img.currentSrc || img.src);
+        if (!url) return;
+
+        if (getComputedStyle(li).position === 'static') li.style.position = 'relative';
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 10, bottom: 10, zIndex: 30, size: 42 });
+        btn.classList.add('emby-trancevideo-gallery-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, buildIndexedFilename(i + 1), saveAs, { headers: requestHeaders });
         });
-    }
+        li.appendChild(btn);
+        li.dataset.embyTranceGalleryReady = '1';
+      });
+    };
 
-    if (genreSet.size > 0) {
-        const meta = { genres: Array.from(genreSet) };
-        const conf = (metadataConfigs && metadataConfigs.genres) || defaultMetadataConfigs.genres;
-        
-        if (conf && conf.enabled) {
-            const controls = createMetadataControls('genres', meta, conf);
-            // Append after the prod_category div
-            const prodCatDiv = document.querySelector('div.prod_category');
-            if (prodCatDiv) {
-                prodCatDiv.parentNode.insertBefore(controls, prodCatDiv.nextSibling);
-                controls.style.marginTop = '10px';
-                controls.style.display = 'block';
-            }
-        }
-    }
+    ensureTranceStyle();
+    safeCall('ensureTranceLightbox', () => ensureTranceLightbox());
+    safeCall('injectGalleryButtons', () => injectGalleryButtons());
+    setInterval(() => safeCall('injectGalleryButtons', () => injectGalleryButtons()), 1000);
+
+    safeCall('injectDescriptionAndGenres', () => {
+      const descDiv = document.querySelector('div.intro_text');
+      if (descDiv) {
+          let text = descDiv.innerHTML.replace(/<br\s*\/?>/gi, '\n');
+          text = text.replace(/<[^>]+>/g, '').trim();
+
+          const meta = { description: text };
+          const conf = ((typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs).description || defaultMetadataConfigs.description;
+
+          if (conf && conf.enabled && text) {
+              const controls = createMetadataControls('description', meta, conf);
+              descDiv.parentNode.insertBefore(controls, descDiv.nextSibling);
+              controls.style.marginBottom = '10px';
+              controls.style.display = 'block';
+          }
+      }
+
+      const genreSet = new Set();
+      const prodCat = document.querySelector('div.prod_category ul');
+      if (prodCat) {
+          const lis = prodCat.querySelectorAll('li');
+          lis.forEach(li => {
+              const strong = li.querySelector('strong');
+              if (!strong) return;
+              const label = strong.textContent.trim();
+              if (label === 'レーベル' || label === 'カテゴリ') {
+                  const items = li.querySelectorAll('div.item a');
+                  items.forEach(a => {
+                      genreSet.add(a.textContent.trim());
+                  });
+              }
+          });
+      }
+
+      if (genreSet.size > 0) {
+          const meta = { genres: Array.from(genreSet) };
+          const conf = ((typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs).genres || defaultMetadataConfigs.genres;
+
+          if (conf && conf.enabled) {
+              const controls = createMetadataControls('genres', meta, conf);
+              const prodCatDiv = document.querySelector('div.prod_category');
+              if (prodCatDiv) {
+                  prodCatDiv.parentNode.insertBefore(controls, prodCatDiv.nextSibling);
+                  controls.style.marginTop = '10px';
+                  controls.style.display = 'block';
+              }
+          }
+      }
+    });
   }
 
   function initLatinBoyz() {
@@ -2364,7 +2648,92 @@
 
     function initHunkCh() {
     if (!location.host.includes('hunk-ch.com')) return;
+    
+    const setupSearchDock = () => {
+      const searchBox = document.querySelector('#search_box');
+      const searchForm = searchBox ? searchBox.closest('form') : null;
+      if (!searchBox || !searchForm || !document.body) return;
+
+      if (!document.getElementById('emby-hunkch-search-sticky-style')) {
+        const style = document.createElement('style');
+        style.id = 'emby-hunkch-search-sticky-style';
+        style.textContent = `
+          .emby-hunkch-search-dock {
+            display: block !important;
+          }
+          .emby-hunkch-search-dock-fixed {
+            position: fixed !important;
+            top: 10px !important;
+            right: auto !important;
+            z-index: 9999 !important;
+            margin: 0 !important;
+          }
+          .emby-hunkch-search-dock-placeholder {
+            display: none;
+          }
+          .emby-hunkch-search-dock-placeholder.is-active {
+            display: block;
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      let placeholder = searchForm.previousElementSibling;
+      if (!(placeholder instanceof HTMLElement) || !placeholder.classList.contains('emby-hunkch-search-dock-placeholder')) {
+        placeholder = document.createElement('div');
+        placeholder.className = 'emby-hunkch-search-dock-placeholder';
+        searchForm.parentNode.insertBefore(placeholder, searchForm);
+      }
+
+      searchForm.classList.add('emby-hunkch-search-dock');
+
+      if (searchForm.dataset.embyHunkChSearchDockReady === '1') {
+        if (typeof window.__embyHunkChSearchDockUpdate === 'function') {
+          window.__embyHunkChSearchDockUpdate();
+        }
+        return;
+      }
+      searchForm.dataset.embyHunkChSearchDockReady = '1';
+
+      const topOffset = 10;
+      const updatePosition = () => {
+        const wasFixed = searchForm.classList.contains('emby-hunkch-search-dock-fixed');
+        if (wasFixed) {
+          searchForm.classList.remove('emby-hunkch-search-dock-fixed');
+          searchForm.style.left = '';
+          searchForm.style.width = '';
+        }
+
+        placeholder.classList.remove('is-active');
+        placeholder.style.height = '0px';
+
+        const naturalRect = searchForm.getBoundingClientRect();
+        const naturalTop = naturalRect.top + window.scrollY;
+        const naturalLeft = Math.round(naturalRect.left);
+        const naturalWidth = Math.max(1, Math.round(naturalRect.width));
+        const naturalHeight = Math.max(1, Math.round(naturalRect.height));
+        placeholder.style.width = `${naturalWidth}px`;
+
+        const shouldFix = window.scrollY > naturalTop - topOffset;
+        if (!shouldFix) return;
+
+        searchForm.classList.add('emby-hunkch-search-dock-fixed');
+        searchForm.style.left = `${naturalLeft}px`;
+        searchForm.style.width = `${naturalWidth}px`;
+        placeholder.style.height = `${naturalHeight}px`;
+        placeholder.classList.add('is-active');
+      };
+
+      window.__embyHunkChSearchDockUpdate = updatePosition;
+      window.addEventListener('scroll', updatePosition, { passive: true });
+      window.addEventListener('resize', updatePosition);
+      updatePosition();
+    };
+
+    setupSearchDock();
+
     if (location.pathname.includes('search.php')) {
+
       const anchors = document.querySelectorAll('a[href*="movie_detail.php?code="]');
       if (anchors.length === 0) return;
 
@@ -4804,6 +5173,47 @@
             }
         }
 
+        const attachPosterDownloadBtn = () => {
+            const playBtn = document.querySelector('button[aria-label="Play"]');
+            let container = playBtn ? playBtn.parentElement : null;
+            let img = container ? container.querySelector('img') : null;
+
+            if (!img) {
+                img = document.querySelector('img[alt*="Scene Poster"], img[src*="/poster/"]');
+                container = img ? (img.parentElement || null) : null;
+            }
+            if (!img || !container) return false;
+
+            if (container.querySelector('.emby-hunkch-download-btn.emby-mencom-poster-download')) return true;
+
+            if (getComputedStyle(container).position === 'static') {
+                container.style.position = 'relative';
+            }
+
+            const resolvePosterUrl = () => {
+                const direct = (img.currentSrc || img.getAttribute('src') || img.src || '').trim();
+                if (direct) return direct;
+                const srcset = (img.getAttribute('srcset') || '').trim();
+                if (!srcset) return '';
+                const last = srcset.split(',').map(s => s.trim()).filter(Boolean).pop() || '';
+                return (last.split(/\s+/)[0] || '').trim();
+            };
+
+            const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 60, size: 50 });
+            btn.classList.add('emby-mencom-poster-download');
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = resolvePosterUrl();
+                const filename = getHunkChPosterFilenameSetting();
+                const saveAs = getHunkChSaveAsSetting();
+                downloadByUrl(url, filename, saveAs, { headers: { Referer: location.href, Origin: location.origin } });
+            });
+            container.appendChild(btn);
+            return true;
+        };
+        if (attachPosterDownloadBtn()) injected = true;
+
         return injected;
     }
 
@@ -4827,6 +5237,240 @@
             console.error('initMenCom error', e);
         }
     }, 1000);
+  }
+
+  function initVoyrCom() {
+    if (!location.host.includes('voyr.com')) return;
+
+    const requestHeaders = { Referer: location.href, Origin: location.origin };
+    const normalizeText = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+
+    const extractBgImageUrl = (bg) => {
+      const s = String(bg || '').trim();
+      if (!s) return '';
+      const m = s.match(/url\((['"]?)(.*?)\1\)/i);
+      return m ? String(m[2] || '').trim() : '';
+    };
+
+    const resolvePosterUrl = () => {
+      const posterDiv = document.querySelector('.vjs-poster') || null;
+      if (!posterDiv) return '';
+      const fromAttr = extractBgImageUrl(posterDiv.getAttribute('style') || '');
+      if (fromAttr) return fromAttr;
+      const fromComputed = extractBgImageUrl(getComputedStyle(posterDiv).backgroundImage || '');
+      return fromComputed;
+    };
+
+    const attachCoverDownloadBtn = () => {
+      const posterDiv = document.querySelector('.vjs-poster') || null;
+      if (!posterDiv) return false;
+      if (posterDiv.querySelector('.emby-hunkch-download-btn.emby-voyr-cover-download')) return true;
+      const url = resolvePosterUrl();
+      if (!url) return false;
+
+      if (getComputedStyle(posterDiv).position === 'static') posterDiv.style.position = 'relative';
+      const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 60, size: 50 });
+      btn.classList.add('emby-voyr-cover-download');
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const posterUrl = resolvePosterUrl();
+        const filename = getHunkChPosterFilenameSetting();
+        const saveAs = getHunkChSaveAsSetting();
+        downloadByUrl(posterUrl, filename, saveAs, { headers: requestHeaders });
+      });
+      posterDiv.appendChild(btn);
+      return true;
+    };
+
+    const expandInformation = () => {
+      const infoHeader = Array.from(document.querySelectorAll('h2')).find(h2 => normalizeText(h2.textContent) === 'Information');
+      if (!infoHeader || !infoHeader.parentElement) return false;
+      const headerRow = infoHeader.parentElement;
+      const toggleBtn = headerRow.querySelector('button');
+      const content = headerRow.nextElementSibling;
+      if (!toggleBtn || !content) return false;
+
+      const cs = getComputedStyle(content);
+      const collapsed = cs.visibility === 'hidden' || cs.height === '0px' || content.clientHeight === 0;
+      if (collapsed) {
+        try { toggleBtn.click(); } catch (_) {}
+      }
+      return true;
+    };
+
+    const injectGenresControls = () => {
+      const infoHeader = Array.from(document.querySelectorAll('h2')).find(h2 => normalizeText(h2.textContent) === 'Information');
+      if (!infoHeader || !infoHeader.parentElement) return false;
+      const content = infoHeader.parentElement.nextElementSibling;
+      if (!(content instanceof HTMLElement)) return false;
+
+      const tagLabel = Array.from(content.querySelectorAll('div')).find(d => normalizeText(d.textContent) === 'Tags') || null;
+      const tagWrap = tagLabel ? tagLabel.nextElementSibling : null;
+      if (!(tagWrap instanceof HTMLElement)) return false;
+      if (tagWrap.querySelector('.emby-metadata-controls.emby-voyr-genres-controls')) return true;
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'Voyr',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      const titleEl = document.querySelector('meta[property="og:title"]') || document.querySelector('title');
+      meta.title = normalizeText(titleEl ? (titleEl.content || titleEl.textContent || '') : '');
+
+      tagWrap.querySelectorAll('a').forEach(a => {
+        const t0 = normalizeText(a.textContent);
+        if (t0) meta.genres.push(t0);
+      });
+      meta.genres = Array.from(new Set(normalizeNameList(meta.genres)));
+      if (meta.genres.length === 0) return false;
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+      const type = 'genres';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (!conf || !conf.enabled) return false;
+
+      const text = renderWithTemplate(meta, conf.template, type);
+      if (!text || !text.trim()) return false;
+
+      const controls = createMetadataControls(type, meta, conf);
+      controls.style.marginTop = '10px';
+      controls.style.display = 'block';
+      controls.classList.add('emby-metadata-controls', 'emby-voyr-genres-controls');
+      tagWrap.appendChild(controls);
+      return true;
+    };
+
+    const run = () => {
+      let ok = false;
+      if (attachCoverDownloadBtn()) ok = true;
+      if (expandInformation()) ok = true;
+      if (injectGenresControls()) ok = true;
+      return ok;
+    };
+
+    run();
+    setInterval(run, 1000);
+  }
+
+  function initTwinkPop() {
+    if (!location.host.includes('twinkpop.com')) return;
+
+    const requestHeaders = { Referer: location.href, Origin: location.origin };
+    const normalizeText = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+
+    const attachCoverDownloadBtn = () => {
+      const playBtn = document.querySelector('button[aria-label="Play"]');
+      let container = playBtn ? playBtn.parentElement : null;
+      let img = container ? container.querySelector('img') : null;
+
+      if (!img) {
+        img = document.querySelector('img[alt*="Scene Poster"], img[src*="/poster/"]');
+        container = img ? (img.parentElement || null) : null;
+      }
+      if (!img || !container) return false;
+
+      if (container.querySelector('.emby-hunkch-download-btn.emby-twinkpop-cover-download')) return true;
+
+      if (getComputedStyle(container).position === 'static') {
+        container.style.position = 'relative';
+      }
+
+      const resolvePosterUrl = () => {
+        const direct = (img.currentSrc || img.getAttribute('src') || img.src || '').trim();
+        if (direct) return direct;
+        const srcset = (img.getAttribute('srcset') || '').trim();
+        if (!srcset) return '';
+        const last = srcset.split(',').map(s => s.trim()).filter(Boolean).pop() || '';
+        return (last.split(/\s+/)[0] || '').trim();
+      };
+
+      const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 60, size: 50 });
+      btn.classList.add('emby-twinkpop-cover-download');
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const url = resolvePosterUrl();
+        const filename = getHunkChPosterFilenameSetting();
+        const saveAs = getHunkChSaveAsSetting();
+        downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+      });
+      container.appendChild(btn);
+      return true;
+    };
+
+    const injectGenresControls = () => {
+      const categoriesH2 = Array.from(document.querySelectorAll('h2')).find(h2 => {
+        const t0 = normalizeText(h2.textContent);
+        return t0 === 'Categories:' || t0 === 'Categories';
+      }) || null;
+      if (!categoriesH2 || !categoriesH2.parentElement) return false;
+
+      const tagsRoot = categoriesH2.parentElement.nextElementSibling;
+      if (!(tagsRoot instanceof HTMLElement)) return false;
+
+      const tagLabel = Array.from(tagsRoot.children).find(d => normalizeText(d.textContent) === 'Tags') || null;
+      const tagWrap = tagLabel ? tagLabel.nextElementSibling : null;
+      if (!(tagWrap instanceof HTMLElement)) return false;
+
+      if (tagWrap.querySelector('.emby-metadata-controls.emby-twinkpop-genres-controls')) return true;
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'TwinkPop',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      const titleH1 = document.querySelector('h1');
+      meta.title = normalizeText(titleH1 ? titleH1.textContent : '') || normalizeText(document.querySelector('meta[property="og:title"]')?.content || '');
+
+      tagWrap.querySelectorAll('a').forEach(a => {
+        const t0 = normalizeText(a.textContent);
+        if (t0) meta.genres.push(t0);
+      });
+      meta.genres = Array.from(new Set(normalizeNameList(meta.genres)));
+      if (meta.genres.length === 0) return false;
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+      const type = 'genres';
+      const conf = (config && config[type]) || defaultMetadataConfigs[type];
+      if (!conf || !conf.enabled) return false;
+
+      const text = renderWithTemplate(meta, conf.template, type);
+      if (!text || !text.trim()) return false;
+
+      const controls = createMetadataControls(type, meta, conf);
+      controls.style.marginTop = '10px';
+      controls.style.display = 'block';
+      controls.classList.add('emby-metadata-controls', 'emby-twinkpop-genres-controls');
+      tagWrap.appendChild(controls);
+      return true;
+    };
+
+    const run = () => {
+      let ok = false;
+      if (attachCoverDownloadBtn()) ok = true;
+      if (injectGenresControls()) ok = true;
+      return ok;
+    };
+
+    run();
+    setInterval(run, 1000);
   }
 
   function initSeanCody() {
@@ -5684,6 +6328,94 @@
     const run = () => {
       const requestHeaders = { Referer: location.href, Origin: location.origin };
 
+      const safeFilenameBase = (raw) => {
+        const s = (raw || '').replace(/\s+/g, ' ').trim();
+        return s.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim() || 'image';
+      };
+
+      const guessExt = (url) => {
+        try {
+          const u = new URL(url, location.origin);
+          const name = (u.pathname.split('/').pop() || '').trim();
+          const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+          if (m) return m[1].toLowerCase();
+        } catch (_) {}
+        return 'jpg';
+      };
+
+      const ensurePerformerStyle = () => {
+        if (!document.head) return;
+        if (document.getElementById('emby-gaydvdempire-performer-style')) return;
+        const style = document.createElement('style');
+        style.id = 'emby-gaydvdempire-performer-style';
+        style.textContent = `
+          .movie-page__content-tags__performers a { vertical-align: middle; }
+          .movie-page__content-tags__performers .hover-popover { display: none !important; }
+          .movie-page__content-tags__performers .hover-popover-container { display: inline-flex !important; align-items: center !important; gap: 10px !important; }
+          .movie-page__content-tags__performers .emby-gde-performer-thumb { width: auto !important; height: var(--emby-gde-thumb-h, 120px) !important; border-radius: 10px !important; display: block !important; cursor: zoom-in !important; }
+          .movie-page__content-tags__performers .emby-gde-performer-list { --emby-gde-thumb-h: 120px; --emby-gde-row-gap: 10px; max-height: calc(var(--emby-gde-thumb-h) * 3 + var(--emby-gde-row-gap) * 2) !important; overflow-y: auto !important; padding-right: 10px !important; margin-top: 8px !important; display: flex !important; flex-direction: column !important; gap: var(--emby-gde-row-gap) !important; }
+          .movie-page__content-tags__performers .emby-gde-performer-list a { display: block !important; }
+          .movie-page__content-tags__performers .emby-gde-performer-list .hover-popover-container { width: 100% !important; display: inline-flex !important; }
+          .emby-gde-lightbox { position: fixed !important; inset: 0 !important; display: none !important; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,.92) !important; z-index: 2147483647 !important; cursor: zoom-out !important; padding: 0 !important; margin: 0 !important; }
+          .emby-gde-lightbox[aria-hidden="false"] { display: flex !important; }
+          .emby-gde-lightbox img { max-width: 96vw !important; max-height: 96vh !important; width: auto !important; height: auto !important; object-fit: contain !important; display: block !important; }
+          body.emby-gde-lightbox-open { overflow: hidden !important; }
+        `;
+        document.head.appendChild(style);
+      };
+
+      const ensurePerformerList = (performers) => {
+        if (!performers) return null;
+        const existing = performers.querySelector(':scope > .emby-gde-performer-list');
+        if (existing) return existing;
+
+        const list = document.createElement('div');
+        list.className = 'emby-gde-performer-list';
+
+        const strong = performers.querySelector(':scope > strong');
+        if (strong && strong.nextSibling) performers.insertBefore(list, strong.nextSibling);
+        else performers.appendChild(list);
+
+        Array.from(performers.childNodes).forEach(n => {
+          if (n.nodeType !== Node.TEXT_NODE) return;
+          const t = String(n.textContent || '');
+          if (/^[\s,]+$/.test(t)) n.remove();
+        });
+
+        Array.from(performers.children).forEach(ch => {
+          if (ch && ch.tagName === 'A') list.appendChild(ch);
+        });
+
+        return list;
+      };
+
+      const ensureLightbox = () => {
+        if (!document.body || document.body.dataset.embyGdeLightboxReady === '1') return;
+        document.body.dataset.embyGdeLightboxReady = '1';
+        const overlay = document.createElement('div');
+        overlay.className = 'emby-gde-lightbox';
+        overlay.setAttribute('aria-hidden', 'true');
+        const viewerImg = document.createElement('img');
+        viewerImg.alt = '';
+        overlay.appendChild(viewerImg);
+        document.body.appendChild(overlay);
+        const close = () => {
+          overlay.setAttribute('aria-hidden', 'true');
+          viewerImg.removeAttribute('src');
+          document.body.classList.remove('emby-gde-lightbox-open');
+        };
+        const open = (url) => {
+          if (!url) return;
+          viewerImg.src = url;
+          overlay.setAttribute('aria-hidden', 'false');
+          document.body.classList.add('emby-gde-lightbox-open');
+        };
+        window.__embyGdeLightboxOpen = open;
+        window.__embyGdeLightboxClose = close;
+        overlay.addEventListener('click', () => close(), true);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); }, true);
+      };
+
       const boxcover = document.querySelector('#Boxcover');
       if (boxcover && !boxcover.querySelector('.emby-hunkch-download-btn.emby-gaydvdempire-boxcover-download')) {
         if (getComputedStyle(boxcover).position === 'static') boxcover.style.position = 'relative';
@@ -5735,11 +6467,74 @@
 
       const performers = document.querySelector('.movie-page__content-tags__performers');
       if (performers) {
-        performers.querySelectorAll('a').forEach(a => {
+        ensurePerformerStyle();
+        ensureLightbox();
+        const performerList = ensurePerformerList(performers);
+
+        (performerList || performers).querySelectorAll('a').forEach(a => {
           const hover = a.querySelector('.hover-popover-container');
-          const raw = hover && hover.childNodes && hover.childNodes[0] && hover.childNodes[0].textContent
-            ? hover.childNodes[0].textContent
-            : a.textContent;
+          if (!hover) return;
+          if (hover.dataset.embyGdeInlineReady === '1') return;
+
+          const popImg = hover.querySelector('.hover-popover-detail img') || hover.querySelector('.hover-popover img') || null;
+          const imgUrl = popImg ? (popImg.currentSrc || popImg.src || '') : '';
+          const actorName = normalizeNameList([popImg ? (popImg.getAttribute('title') || popImg.title || popImg.getAttribute('alt') || popImg.alt || '') : ''])[0] || '';
+          if (!imgUrl || !actorName) return;
+
+          const oldText = (hover.childNodes && hover.childNodes[0] && hover.childNodes[0].textContent) ? hover.childNodes[0].textContent : '';
+          if (oldText && oldText.trim()) {
+            try { hover.childNodes[0].textContent = ''; } catch (_) {}
+          }
+
+          const imgWrap = document.createElement('span');
+          imgWrap.className = 'emby-gde-performer-imgwrap';
+          imgWrap.style.cssText = 'position:relative;display:inline-block;flex:0 0 auto;';
+
+          const thumb = document.createElement('img');
+          thumb.className = 'img-responsive emby-gde-performer-thumb';
+          thumb.alt = actorName;
+          thumb.title = actorName;
+          thumb.src = imgUrl;
+          thumb.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const url = (thumb.currentSrc || thumb.src || '').trim();
+            if (!url) return;
+            if (typeof window.__embyGdeLightboxOpen === 'function') window.__embyGdeLightboxOpen(url);
+          }, true);
+          imgWrap.appendChild(thumb);
+
+          const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 4, bottom: 4, zIndex: 10, size: 36 });
+          btn.classList.add('emby-gaydvdempire-performer-download');
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const url = (thumb.currentSrc || thumb.src || '').trim();
+            const ext = guessExt(url);
+            const filename = `${safeFilenameBase(actorName)}.${ext}`;
+            const saveAs = getHunkChSaveAsSetting();
+            downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+          });
+          imgWrap.appendChild(btn);
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'emby-gde-performer-name';
+          nameSpan.textContent = actorName;
+
+          hover.insertBefore(imgWrap, hover.firstChild);
+          hover.appendChild(nameSpan);
+
+          hover.dataset.embyGdeInlineReady = '1';
+        });
+
+        (performerList || performers).querySelectorAll('a').forEach(a => {
+          const hover = a.querySelector('.hover-popover-container');
+          const inlineName = hover ? hover.querySelector('.emby-gde-performer-name') : null;
+          const popImg = hover ? (hover.querySelector('.hover-popover-detail img') || hover.querySelector('.hover-popover img')) : null;
+          const raw = (inlineName && inlineName.textContent)
+            || (popImg && (popImg.getAttribute('title') || popImg.title || popImg.getAttribute('alt') || popImg.alt))
+            || (hover && hover.childNodes && hover.childNodes[0] && hover.childNodes[0].textContent ? hover.childNodes[0].textContent : '')
+            || a.textContent;
           const name = (raw || '').replace(/\s+/g, ' ').trim();
           if (name) meta.actors.push(name);
         });
@@ -6523,8 +7318,764 @@
     }
   }
 
+  function initFalconStudios() {
+    if (!location.host.includes('falconstudios.com')) return;
+
+    const requestHeaders = { Referer: location.href, Origin: location.origin };
+    const normalizeText = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+
+    const run = () => {
+      const titleEl = document.querySelector('h1.DvdInfo-Title');
+      if (!titleEl) return;
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'Falcon Studios',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      meta.title = normalizeText(titleEl.textContent);
+
+      const publishedEl = document.querySelector('.DvdInfo-PublishedDate-Text');
+      const published = publishedEl ? normalizeText(publishedEl.textContent) : '';
+      if (published) {
+        meta.extra += `Date: ${published}\n`;
+        const m = published.match(/(\d{4})/);
+        if (m) meta.year = m[1];
+      }
+
+      const lenRoot = document.querySelector('.DvdInfo-TotalLength');
+      if (lenRoot) {
+        const parts = Array.from(lenRoot.querySelectorAll('.Text')).map(el => normalizeText(el.textContent)).filter(Boolean);
+        if (parts.length) meta.duration = parts[parts.length - 1];
+      }
+
+      const actorSet = new Set();
+      document.querySelectorAll('.DvdInfo-ActorsList button').forEach(btn => {
+        const n = normalizeText(btn.textContent);
+        if (n && !actorSet.has(n)) {
+          actorSet.add(n);
+          meta.actors.push(n);
+        }
+      });
+
+      const genreSet = new Set();
+      document.querySelectorAll('.DvdInfo-CategoriesList button').forEach(btn => {
+        const g = normalizeText(btn.textContent);
+        if (g) genreSet.add(g);
+      });
+      meta.genres = Array.from(genreSet);
+
+      const descEl = document.querySelector('.DvdInfo-DecriptionWrapper-Paragraph');
+      if (descEl) meta.description = normalizeText(descEl.textContent);
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+      const coverWrapper = document.querySelector('.DvdInfo-CoverWrapper');
+      if (coverWrapper) {
+        const img = coverWrapper.querySelector('img');
+        if (img && !coverWrapper.querySelector('.emby-hunkch-download-btn.emby-falcon-cover-download')) {
+          if (getComputedStyle(coverWrapper).position === 'static') {
+            coverWrapper.style.position = 'relative';
+          }
+          const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+          btn.classList.add('emby-falcon-cover-download');
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const url = normalizeText(img.currentSrc || img.src);
+            const filename = getHunkChPosterFilenameSetting();
+            const saveAs = getHunkChSaveAsSetting();
+            downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+          });
+          coverWrapper.appendChild(btn);
+        }
+      }
+
+      const actorsList = document.querySelector('.DvdInfo-ActorsList');
+      if (actorsList && meta.actors.length > 0) {
+        const root = actorsList.parentElement || actorsList;
+        if (!root.querySelector('.emby-metadata-controls.emby-falcon-actors-controls')) {
+          const type = 'actors';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-falcon-actors-controls');
+              actorsList.parentNode.insertBefore(controls, actorsList.nextSibling);
+            }
+          }
+        }
+      }
+
+      const categoriesList = document.querySelector('.DvdInfo-CategoriesList');
+      if (categoriesList && meta.genres.length > 0) {
+        const root = categoriesList.parentElement || categoriesList;
+        if (!root.querySelector('.emby-metadata-controls.emby-falcon-genres-controls')) {
+          const type = 'genres';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-falcon-genres-controls');
+              categoriesList.parentNode.insertBefore(controls, categoriesList.nextSibling);
+            }
+          }
+        }
+      }
+
+      if (descEl && meta.description) {
+        const root = descEl.parentElement || descEl;
+        if (!root.querySelector('.emby-metadata-controls.emby-falcon-desc-controls')) {
+          const type = 'description';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-falcon-desc-controls');
+              descEl.parentNode.insertBefore(controls, descEl.nextSibling);
+            }
+          }
+        }
+      }
+    };
+
+    run();
+    setInterval(run, 1000);
+  }
+
+  function initCatholicBoys() {
+    if (!location.host.includes('catholicboys.com')) return;
+
+    const requestHeaders = { Referer: location.href, Origin: location.origin };
+    const normalizeText = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+
+    const safeFilenameBase = (raw) => {
+      const s = (raw || '').replace(/\s+/g, ' ').trim();
+      return s.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim() || 'image';
+    };
+
+    const guessExt = (url) => {
+      try {
+        const u = new URL(url, location.origin);
+        const name = (u.pathname.split('/').pop() || '').trim();
+        const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+        if (m) return m[1].toLowerCase();
+      } catch (_) {}
+      return 'jpg';
+    };
+
+    const parseFirstSrcsetUrl = (srcset) => {
+      const s = String(srcset || '').trim();
+      if (!s) return '';
+      const first = s.split(',')[0] || '';
+      return normalizeText(first.split(/\s+/)[0] || '');
+    };
+
+    const ensureLightboxStyle = () => {
+      if (!document.head) return;
+      if (document.getElementById('emby-catholicboys-style')) return;
+      const style = document.createElement('style');
+      style.id = 'emby-catholicboys-style';
+      style.textContent = `
+        #myGallery img { cursor: zoom-in !important; }
+        .emby-catholicboys-lightbox { position: fixed !important; inset: 0 !important; display: none !important; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,.92) !important; z-index: 2147483647 !important; cursor: zoom-out !important; padding: 0 !important; margin: 0 !important; }
+        .emby-catholicboys-lightbox[aria-hidden="false"] { display: flex !important; }
+        .emby-catholicboys-lightbox img { max-width: 96vw !important; max-height: 96vh !important; width: auto !important; height: auto !important; object-fit: contain !important; display: block !important; }
+        body.emby-catholicboys-lightbox-open { overflow: hidden !important; }
+      `;
+      document.head.appendChild(style);
+    };
+
+    const setupImageLightbox = () => {
+      if (!document.body || document.body.dataset.embyCatholicBoysLightboxReady === '1') return;
+      document.body.dataset.embyCatholicBoysLightboxReady = '1';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'emby-catholicboys-lightbox';
+      overlay.setAttribute('aria-hidden', 'true');
+      const viewerImg = document.createElement('img');
+      viewerImg.alt = '';
+      overlay.appendChild(viewerImg);
+      document.body.appendChild(overlay);
+
+      const close = () => {
+        overlay.setAttribute('aria-hidden', 'true');
+        viewerImg.removeAttribute('src');
+        document.body.classList.remove('emby-catholicboys-lightbox-open');
+      };
+
+      const open = (url) => {
+        if (!url) return;
+        viewerImg.src = url;
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('emby-catholicboys-lightbox-open');
+      };
+
+      overlay.addEventListener('click', () => close(), true);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close();
+      }, true);
+
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        if (overlay.getAttribute('aria-hidden') === 'false' && overlay.contains(target)) return;
+
+        const img = target.closest('#myGallery a.jg-entry img');
+        if (!img) return;
+        const url = normalizeText(img.currentSrc || img.src);
+        if (!url) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (overlay.getAttribute('aria-hidden') === 'false') {
+          close();
+          return;
+        }
+        open(url);
+      }, true);
+    };
+
+    const run = () => {
+      const title1 = normalizeText(document.querySelector('.dvdTitleScene')?.textContent || '');
+      const title2 = normalizeText(document.querySelector('.sceneTitle')?.textContent || '');
+      const pageTitle = normalizeText(document.querySelector('h1')?.textContent || '');
+
+      const meta = {
+        title: '',
+        year: '',
+        country: 'USA',
+        genres: [],
+        duration: '',
+        director: '',
+        studio: 'CatholicBoys',
+        actors: [],
+        description: '',
+        extra: ''
+      };
+
+      meta.title = normalizeText([title1, title2].filter(Boolean).join(' - ')) || pageTitle;
+
+      const genreSet = new Set();
+      document.querySelectorAll('#catMovie a.singleCategory').forEach(a => {
+        const g = normalizeText(a.textContent);
+        if (g) genreSet.add(g);
+      });
+      meta.genres = Array.from(genreSet);
+
+      const actorSet = new Set();
+      document.querySelectorAll('.modelProfile img[alt]').forEach(img => {
+        const n = normalizeText(img.getAttribute('alt'));
+        if (n && !actorSet.has(n)) {
+          actorSet.add(n);
+          meta.actors.push(n);
+        }
+      });
+
+      const descRoot = document.querySelector('.textDescription');
+      const fullTxt = descRoot ? descRoot.querySelector('.full-txt') : null;
+      if (fullTxt) {
+        const desc = normalizeText(fullTxt.textContent);
+        if (desc) meta.description = desc;
+      }
+
+      const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+
+      const catMovie = document.querySelector('#catMovie');
+      if (catMovie && meta.genres.length > 0) {
+        if (!catMovie.parentElement?.querySelector('.emby-metadata-controls.emby-catholicboys-genres-controls')) {
+          const type = 'genres';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-catholicboys-genres-controls');
+              catMovie.parentNode.insertBefore(controls, catMovie.nextSibling);
+            }
+          }
+        }
+      }
+
+      const modelSection = document.querySelector('.row.videosTour.margin-bootstrap-16');
+      if (modelSection && meta.actors.length > 0) {
+        if (!modelSection.querySelector('.emby-metadata-controls.emby-catholicboys-actors-controls')) {
+          const type = 'actors';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-catholicboys-actors-controls');
+              modelSection.appendChild(controls);
+            }
+          }
+        }
+      }
+
+      if (descRoot && meta.description) {
+        if (!descRoot.querySelector('.emby-metadata-controls.emby-catholicboys-desc-controls')) {
+          const type = 'description';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-catholicboys-desc-controls');
+              descRoot.appendChild(controls);
+            }
+          }
+        }
+      }
+
+      const firstHalf = document.querySelector('.textDescription .first-half');
+      const full = document.querySelector('.textDescription .full-txt');
+      const firstWords = document.getElementById('firstWords');
+      const readmore = document.getElementById('readmore');
+      if (firstHalf) firstHalf.style.display = 'none';
+      if (full) full.style.display = 'block';
+      if (firstWords) firstWords.style.display = 'none';
+      if (readmore) readmore.style.display = 'none';
+
+      const video = document.querySelector('video[poster]');
+      const posterUrl = video ? normalizeText(video.getAttribute('poster') || video.poster) : '';
+      if (video && posterUrl) {
+        const wrap = video.closest('.movie_wrapper') || video.parentElement;
+        if (wrap && !wrap.querySelector('.emby-hunkch-download-btn.emby-catholicboys-poster-download')) {
+          if (getComputedStyle(wrap).position === 'static') {
+            wrap.style.position = 'relative';
+          }
+          const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 30, size: 50 });
+          btn.classList.add('emby-catholicboys-poster-download');
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const filename = getHunkChPosterFilenameSetting();
+            const saveAs = getHunkChSaveAsSetting();
+            downloadByUrl(posterUrl, filename, saveAs, { headers: requestHeaders });
+          });
+          wrap.appendChild(btn);
+        }
+      }
+
+      document.querySelectorAll('#myGallery a.jg-entry').forEach(a => {
+        const img = a.querySelector('img');
+        if (!img) return;
+        if (a.querySelector('.emby-hunkch-download-btn.emby-catholicboys-gallery-download')) return;
+        if (getComputedStyle(a).position === 'static') {
+          a.style.position = 'relative';
+        }
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 6, bottom: 6, zIndex: 10, size: 36 });
+        btn.classList.add('emby-catholicboys-gallery-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const url = normalizeText(img.currentSrc || img.src);
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, 'fanart.jpg', saveAs, { headers: requestHeaders });
+        });
+        a.appendChild(btn);
+      });
+
+      document.querySelectorAll('.modelProfile picture').forEach(picture => {
+        const img = picture.querySelector('img');
+        if (!img) return;
+        const name = normalizeText(img.getAttribute('alt'));
+        if (!name) return;
+        const container = picture.parentElement;
+        if (!container) return;
+        if (container.querySelector('.emby-hunkch-download-btn.emby-catholicboys-model-download')) return;
+
+        const url = normalizeText(
+          picture.getAttribute('data-iesrc')
+          || picture.dataset.iesrc
+          || parseFirstSrcsetUrl(picture.querySelector('source')?.getAttribute('srcset') || '')
+          || img.currentSrc
+          || img.getAttribute('src')
+          || img.src
+        );
+        if (!url || url === 'undefined') return;
+
+        if (getComputedStyle(container).position === 'static') {
+          container.style.position = 'relative';
+        }
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 6, bottom: 6, zIndex: 10, size: 36 });
+        btn.classList.add('emby-catholicboys-model-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const ext = guessExt(url);
+          const filename = `${safeFilenameBase(name)}.${ext}`;
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        container.appendChild(btn);
+      });
+    };
+
+    ensureLightboxStyle();
+    setupImageLightbox();
+    run();
+    setInterval(run, 1000);
+  }
+
+  function initCarnalPlus() {
+    if (!location.host.includes('carnalplus.com')) return;
+
+    const requestHeaders = { Referer: location.href, Origin: location.origin };
+    const normalizeText = (s) => String(s || '').replace(/\s+/g, ' ').trim();
+
+    const toAbsUrlLocal = (raw, baseHref = location.href) => {
+      const s = String(raw || '').trim();
+      if (!s) return '';
+      try {
+        return new URL(s, baseHref).href;
+      } catch (_) {
+        return '';
+      }
+    };
+
+    const safeFilenameBase = (raw) => {
+      const s = (raw || '').replace(/\s+/g, ' ').trim();
+      return s.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim() || 'image';
+    };
+
+    const guessExt = (url) => {
+      try {
+        const u = new URL(url, location.origin);
+        const name = (u.pathname.split('/').pop() || '').trim();
+        const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+        if (m) return m[1].toLowerCase();
+      } catch (_) {}
+      return 'jpg';
+    };
+
+    const parseFirstSrcsetUrl = (srcset) => {
+      const s = String(srcset || '').trim();
+      if (!s) return '';
+      const first = s.split(',')[0] || '';
+      return normalizeText(first.split(/\s+/)[0] || '');
+    };
+
+    const ensureLightboxStyle = () => {
+      if (!document.head) return;
+      if (document.getElementById('emby-carnalplus-style')) return;
+      const style = document.createElement('style');
+      style.id = 'emby-carnalplus-style';
+      style.textContent = `
+        #myGallery img { cursor: zoom-in !important; }
+        .emby-carnalplus-lightbox { position: fixed !important; inset: 0 !important; display: none !important; align-items: center !important; justify-content: center !important; background: rgba(0,0,0,.92) !important; z-index: 2147483647 !important; cursor: zoom-out !important; padding: 0 !important; margin: 0 !important; }
+        .emby-carnalplus-lightbox[aria-hidden="false"] { display: flex !important; }
+        .emby-carnalplus-lightbox img { max-width: 96vw !important; max-height: 96vh !important; width: auto !important; height: auto !important; object-fit: contain !important; display: block !important; }
+        body.emby-carnalplus-lightbox-open { overflow: hidden !important; }
+      `;
+      document.head.appendChild(style);
+    };
+
+    const setupImageLightbox = () => {
+      if (!document.body || document.body.dataset.embyCarnalPlusLightboxReady === '1') return;
+      document.body.dataset.embyCarnalPlusLightboxReady = '1';
+
+      const overlay = document.createElement('div');
+      overlay.className = 'emby-carnalplus-lightbox';
+      overlay.setAttribute('aria-hidden', 'true');
+      const viewerImg = document.createElement('img');
+      viewerImg.alt = '';
+      overlay.appendChild(viewerImg);
+      document.body.appendChild(overlay);
+
+      const close = () => {
+        overlay.setAttribute('aria-hidden', 'true');
+        viewerImg.removeAttribute('src');
+        document.body.classList.remove('emby-carnalplus-lightbox-open');
+      };
+
+      const open = (url) => {
+        if (!url) return;
+        viewerImg.src = url;
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('emby-carnalplus-lightbox-open');
+      };
+
+      overlay.addEventListener('click', () => close(), true);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') close();
+      }, true);
+
+      document.addEventListener('click', (e) => {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        if (target.closest('.emby-hunkch-download-btn')) return;
+        if (overlay.getAttribute('aria-hidden') === 'false' && overlay.contains(target)) return;
+
+        const img = target.closest('#myGallery .jg-entry img');
+        if (!img) return;
+        const url = toAbsUrlLocal(normalizeText(img.currentSrc || img.src), location.href);
+        if (!url) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (overlay.getAttribute('aria-hidden') === 'false') {
+          close();
+          return;
+        }
+        open(url);
+      }, true);
+    };
+
+    const run = () => {
+      const player = document.querySelector('#video-bb');
+      if (player && !player.querySelector('.emby-hunkch-download-btn.emby-carnalplus-cover-download')) {
+        const video = player.querySelector('video');
+        const rawPoster = normalizeText(
+          (video && (video.getAttribute('poster') || video.poster))
+          || player.getAttribute('poster')
+          || ''
+        );
+        const posterUrl = toAbsUrlLocal(rawPoster, location.href);
+        if (posterUrl) {
+          if (getComputedStyle(player).position === 'static') player.style.position = 'relative';
+          const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 86, zIndex: 60, size: 50 });
+          btn.classList.add('emby-carnalplus-cover-download');
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const filename = getHunkChPosterFilenameSetting();
+            const saveAs = getHunkChSaveAsSetting();
+            downloadByUrl(posterUrl, filename, saveAs, { headers: requestHeaders });
+          });
+          player.appendChild(btn);
+        }
+      }
+
+      document.querySelectorAll('.grid-latest .swiper-slide').forEach((slide, idx) => {
+        if (!(slide instanceof HTMLElement)) return;
+        if (slide.querySelector('.emby-hunkch-download-btn.emby-carnalplus-chapter-cover-download')) return;
+        const a = slide.querySelector('a.control_thumb');
+        if (!a) return;
+        const picture = a.querySelector('picture');
+        const img = a.querySelector('img');
+
+        const rawUrl = normalizeText(
+          (picture && (picture.getAttribute('data-iesrc') || picture.dataset.iesrc))
+          || (picture && parseFirstSrcsetUrl(picture.querySelector('source')?.getAttribute('srcset') || ''))
+          || (img && (img.getAttribute('data-src') || img.dataset.src || img.currentSrc || img.src))
+          || ''
+        );
+        const url = toAbsUrlLocal(rawUrl, location.href);
+        if (!url) return;
+
+        const title = normalizeText(
+          a.getAttribute('title')
+          || slide.querySelector('.updateInfos .update-title')?.textContent
+          || ''
+        );
+
+        if (getComputedStyle(a).position === 'static') a.style.position = 'relative';
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 12, bottom: 12, zIndex: 60, size: 42 });
+        btn.classList.add('emby-carnalplus-chapter-cover-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const ext = guessExt(url);
+          const filename = `${safeFilenameBase(title || `poster-${idx + 1}`)}.${ext}`;
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        a.appendChild(btn);
+      });
+
+      const titleEl = document.querySelector('h1.video-detail-h2');
+      const tagWrap = document.querySelector('.update_tags');
+      if (titleEl && tagWrap) {
+        const meta = {
+          title: normalizeText(titleEl.textContent),
+          year: '',
+          country: 'USA',
+          genres: [],
+          duration: '',
+          director: '',
+          studio: '',
+          actors: [],
+          description: '',
+          extra: ''
+        };
+
+        tagWrap.querySelectorAll('a.chip-tag, a.chip-tag span.txt-tags').forEach(el => {
+          const a = el.closest('a');
+          const t0 = normalizeText(a ? a.textContent : el.textContent);
+          if (t0) meta.genres.push(t0);
+        });
+        meta.genres = Array.from(new Set(normalizeNameList(meta.genres)));
+
+        if (meta.genres.length > 0 && !tagWrap.querySelector('.emby-metadata-controls.emby-carnalplus-genres-controls')) {
+          const config = (typeof metadataConfigs !== 'undefined' && metadataConfigs) ? metadataConfigs : defaultMetadataConfigs;
+          const type = 'genres';
+          const conf = (config && config[type]) || defaultMetadataConfigs[type];
+          if (conf && conf.enabled) {
+            const text = renderWithTemplate(meta, conf.template, type);
+            if (text && text.trim()) {
+              const controls = createMetadataControls(type, meta, conf);
+              controls.style.marginTop = '10px';
+              controls.style.display = 'block';
+              controls.classList.add('emby-metadata-controls', 'emby-carnalplus-genres-controls');
+              tagWrap.appendChild(controls);
+            }
+          }
+        }
+      }
+
+      const readmore = document.getElementById('readmore');
+      const firstWords = document.getElementById('firstWords');
+      const hidden = document.querySelector('.textDescription .hiddenDescription') || document.querySelector('.hiddenDescription');
+      const showless = document.getElementById('showless');
+
+      const isVisible = (el) => {
+        if (!el) return false;
+        const style = getComputedStyle(el);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+        return el.getClientRects().length > 0;
+      };
+
+      if (hidden) {
+        const hiddenDisplay = getComputedStyle(hidden).display;
+        if ((hiddenDisplay === 'none' || hiddenDisplay === '') && isVisible(readmore)) {
+          try { readmore.click(); } catch (_) {}
+        }
+        hidden.style.display = 'block';
+      }
+      if (readmore) readmore.style.display = 'none';
+      if (firstWords) firstWords.style.display = 'none';
+      if (showless) showless.style.display = 'inline';
+
+      document.querySelectorAll('.characters-model-list .grid-item-character .control_thumb_model').forEach(wrap => {
+        if (!(wrap instanceof HTMLElement)) return;
+        if (wrap.querySelector('.emby-hunkch-download-btn.emby-carnalplus-actor-download')) return;
+        const card = wrap.closest('.grid-item-character');
+        const picture = wrap.querySelector('picture');
+        const img = wrap.querySelector('img');
+
+        const actorName = normalizeText(
+          (img && (img.getAttribute('title') || img.title || img.getAttribute('alt') || img.alt))
+          || (card && card.querySelector('.characters-infos h6') && card.querySelector('.characters-infos h6').textContent)
+          || ''
+        );
+        if (!actorName) return;
+
+        const rawUrl = normalizeText(
+          (picture && (picture.getAttribute('data-iesrc') || picture.dataset.iesrc))
+          || (picture && parseFirstSrcsetUrl(picture.querySelector('source')?.getAttribute('srcset') || ''))
+          || (img && (img.getAttribute('data-src') || img.dataset.src || img.currentSrc || img.src))
+          || ''
+        );
+        const url = toAbsUrlLocal(rawUrl, location.href);
+        if (!url) return;
+
+        if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 10, bottom: 10, zIndex: 30, size: 42 });
+        btn.classList.add('emby-carnalplus-actor-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const ext = guessExt(url);
+          const filename = `${safeFilenameBase(actorName)}.${ext}`;
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        wrap.appendChild(btn);
+      });
+    };
+
+    ensureLightboxStyle();
+    setupImageLightbox();
+    run();
+    setInterval(run, 1000);
+  }
+
   function initHelixStudios() {
     if (!location.host.includes('helixstudios.com')) return;
+
+    const requestHeaders = { Referer: location.href, Origin: location.origin };
+
+    const safeFilenameBase = (raw) => {
+      const s = (raw || '').replace(/\s+/g, ' ').trim();
+      return s.replace(/[<>:"/\\|?*\x00-\x1F]/g, '_').trim() || 'image';
+    };
+
+    const guessExt = (url) => {
+      try {
+        const u = new URL(url, location.origin);
+        const name = (u.pathname.split('/').pop() || '').trim();
+        const m = name.match(/\.(jpg|jpeg|png|webp)(?:$|\?)/i);
+        if (m) return m[1].toLowerCase();
+      } catch (_) {}
+      return 'jpg';
+    };
+
+    const attachPerformerDownloadBtns = () => {
+      const performers = document.querySelectorAll('.video-performer');
+      performers.forEach(card => {
+        const a = card.querySelector('a');
+        if (!a) return;
+        if (a.querySelector('.emby-hunkch-download-btn.emby-helix-performer-download')) return;
+
+        const name = (card.querySelector('.performer-name')?.textContent || a.getAttribute('title') || '').trim();
+        if (!name) return;
+
+        const img = a.querySelector('img');
+        const fromData = img ? (img.getAttribute('data-bgsrc') || img.dataset.bgsrc || '') : '';
+        const styleVal = img ? (img.style.backgroundImage || '') : '';
+        const fromStyle = (() => {
+          const m = styleVal.match(/url\((['"]?)(.*?)\1\)/i);
+          return m ? m[2] : '';
+        })();
+        const url = (fromData || fromStyle || '').trim();
+        if (!url) return;
+
+        if (getComputedStyle(a).position === 'static') {
+          a.style.position = 'relative';
+        }
+
+        const btn = createDownloadFabButton({ title: t.hunkChDownloadImage, right: 6, bottom: 6, zIndex: 10, size: 36 });
+        btn.classList.add('emby-helix-performer-download');
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const ext = guessExt(url);
+          const filename = `${safeFilenameBase(name)}.${ext}`;
+          const saveAs = getHunkChSaveAsSetting();
+          downloadByUrl(url, filename, saveAs, { headers: requestHeaders });
+        });
+        a.appendChild(btn);
+      });
+    };
+
+    attachPerformerDownloadBtns();
 
     const meta = {
       title: '',
@@ -6640,8 +8191,14 @@
                 const controls = createMetadataControls(type, meta, conf);
                 controls.style.marginTop = '10px';
                 controls.style.display = 'block';
-                if (descP.parentNode) {
-                    descP.parentNode.insertBefore(controls, descP.nextSibling);
+                controls.classList.add('emby-metadata-controls', 'emby-helix-desc-controls');
+                const synopsis = descP.closest('.synopsis');
+                if (synopsis) {
+                  if (!synopsis.querySelector('.emby-metadata-controls.emby-helix-desc-controls')) {
+                    synopsis.appendChild(controls);
+                  }
+                } else if (descP.parentNode && !descP.parentNode.querySelector('.emby-metadata-controls.emby-helix-desc-controls')) {
+                  descP.parentNode.insertBefore(controls, descP.nextSibling);
                 }
             }
         }
@@ -7079,6 +8636,8 @@
   initKoVideo();
   initAdultContentsFc2();
   initMenCom();
+  initVoyrCom();
+  initTwinkPop();
   initMensRushTv();
   initSeanCody();
   initCockyBoysStore();
@@ -7088,6 +8647,9 @@
   initWaybig();
   initSketchySex();
   initClips4Sale();
+  initFalconStudios();
+  initCatholicBoys();
+  initCarnalPlus();
   initHelixStudios();
   initEnglishLads();
   initLatinBoyz();
