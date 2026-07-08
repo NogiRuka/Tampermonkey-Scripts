@@ -225,7 +225,102 @@
       return;
     }
 
-    const scrollTo = top => window.scrollTo({ top, behavior: "smooth" });
+    const isVisibleScrollable = (el) => {
+      if (!(el instanceof HTMLElement)) return false;
+      const rect = el.getBoundingClientRect();
+      if (rect.width <= 0 || rect.height <= 0) return false;
+      const style = window.getComputedStyle(el);
+      if (style.display === "none" || style.visibility === "hidden") return false;
+      const overflowY = style.overflowY || style.overflow || "";
+      const scrollableByStyle = /(auto|scroll|overlay)/.test(overflowY);
+      const scrollableByClass =
+        el.classList.contains("overflowYScroll") ||
+        el.classList.contains("scrollFrameY") ||
+        el.classList.contains("simplebar-content-wrapper");
+      return (scrollableByStyle || scrollableByClass) && el.scrollHeight - el.clientHeight > 8;
+    };
+    const isLikelySidebar = (el, rect) => {
+      const className = (el.className || "").toString();
+      if (/(drawer|sidebar|sider|nav|menu|aside)/i.test(className)) return true;
+      if (rect.left < window.innerWidth * 0.2 && rect.width < Math.min(420, window.innerWidth * 0.35)) return true;
+      return false;
+    };
+    const scoreScrollable = (el) => {
+      const rect = el.getBoundingClientRect();
+      let score = rect.height * rect.width;
+      if (el.classList.contains("overflowYScroll")) score += 1e7;
+      if (el.classList.contains("scrollFrameY")) score += 5e6;
+      if (el.classList.contains("simplebar-content-wrapper")) score += 8e6;
+      if (el.matches('[role="region"][aria-label*="scrollable"]')) score += 3e6;
+      const centerX = rect.left + rect.width / 2;
+      const distanceToCenter = Math.abs(centerX - window.innerWidth / 2);
+      score -= distanceToCenter * 2000;
+      if (rect.width > window.innerWidth * 0.45) score += 2e6;
+      if (rect.height > window.innerHeight * 0.45) score += 2e6;
+      if (isLikelySidebar(el, rect)) score -= 1e7;
+      if (el.classList.contains("mainDrawer")) score -= 1e7;
+      return score;
+    };
+    const findScrollableFrom = (start) => {
+      let current = start;
+      while (current && current !== document.body) {
+        if (isVisibleScrollable(current) && !current.classList.contains("mainDrawer")) {
+          return current;
+        }
+        current = current.parentElement;
+      }
+      return null;
+    };
+    const getScrollTarget = () => {
+      const root = document.scrollingElement || document.documentElement;
+      if (root && root.scrollHeight - root.clientHeight > 8) {
+        return root;
+      }
+
+      const probePoints = [
+        [Math.floor(window.innerWidth * 0.5), Math.floor(window.innerHeight * 0.5)],
+        [Math.floor(window.innerWidth * 0.75), Math.floor(window.innerHeight * 0.5)],
+        [Math.floor(window.innerWidth * 0.5), Math.floor(window.innerHeight * 0.25)]
+      ];
+
+      for (const [x, y] of probePoints) {
+        const el = document.elementFromPoint(x, y);
+        const target = findScrollableFrom(el);
+        if (target) return target;
+      }
+
+      const candidates = Array.from(document.querySelectorAll(
+        ".overflowYScroll, .scrollFrameY, .simplebar-content-wrapper, [role='region'][aria-label*='scrollable'], main, section, div"
+      ))
+        .filter(isVisibleScrollable)
+        .filter(el => !el.classList.contains("mainDrawer"));
+
+      if (candidates.length) {
+        candidates.sort((a, b) => scoreScrollable(b) - scoreScrollable(a));
+        return candidates[0];
+      }
+
+      return root;
+    };
+    const scrollTo = (top) => {
+      const target = getScrollTarget();
+      if (target === document.scrollingElement || target === document.documentElement || target === document.body) {
+        window.scrollTo({ top, behavior: "smooth" });
+        return;
+      }
+
+      target.scrollTo({ top, behavior: "smooth" });
+    };
+    const scrollToBottom = () => {
+      const target = getScrollTarget();
+      if (target === document.scrollingElement || target === document.documentElement || target === document.body) {
+        const root = document.scrollingElement || document.documentElement;
+        window.scrollTo({ top: root.scrollHeight, behavior: "smooth" });
+        return;
+      }
+
+      target.scrollTo({ top: target.scrollHeight, behavior: "smooth" });
+    };
     const hideMenu = () => {
       const menu = document.getElementById("nogiruka-scroll-menu");
       if (!menu) return;
@@ -313,7 +408,7 @@
     const container = document.createElement("div");
     container.className = "nogiruka-btn-container";
     container.appendChild(makeBtn("up", () => scrollTo(0)));
-    container.appendChild(makeBtn("down", () => scrollTo(document.documentElement.scrollHeight)));
+    container.appendChild(makeBtn("down", scrollToBottom));
     document.body.appendChild(container);
 
     // 右下角触发显示

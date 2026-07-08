@@ -29,6 +29,7 @@
   const lang = savedLang === 'auto' ? browserLang : savedLang;
   let shortcut = GM_getValue('shortcut', 'ctrl+shift+m');
   let themeColor = GM_getValue('themeColor', '#ff69b4');
+  let enableConsoleLogs = GM_getValue('enableConsoleLogs', true);
   let hunkChPosterFilename = GM_getValue('hunkChPosterFilename', 'poster.jpg');
   let hunkChDownloadMode = GM_getValue('hunkChDownloadMode', 'direct');
   let fourHorLoverImgWidth = parseInt(GM_getValue('fourHorLoverImgWidth', 200), 10);
@@ -59,6 +60,17 @@
   const resourceBaseUrl = GM_getValue('resourceBaseUrl', '');
   const embyApiUrl = GM_getValue('embyApiUrl', 'https://lustfulboy.com/emby');
   const embyApiToken = GM_getValue('embyApiToken', '');
+  const nativeConsole = globalThis.console;
+  const console = ['log', 'info', 'warn', 'error', 'debug'].reduce((acc, method) => {
+    acc[method] = (...args) => {
+      if (!enableConsoleLogs) return;
+      const fn = nativeConsole && typeof nativeConsole[method] === 'function'
+        ? nativeConsole[method].bind(nativeConsole)
+        : null;
+      if (fn) fn(...args);
+    };
+    return acc;
+  }, {});
 
   const t = {
     zh: {
@@ -66,6 +78,8 @@
       language: '语言 / Language',
       shortcutSettings: '快捷键设置',
       themeColorSection: '主题色 / Theme Color',
+      consoleLogSection: '控制台日志',
+      consoleLogLabel: '启用脚本控制台日志输出',
       metadataSettings: '元数据复制模板',
       metadataHelp: '支持 {{title}}, {{genres}}, {{description}} 等，占位符；数组字段使用 {{#actors}}...{{/actors}} 或 {{#genres}}...{{/genres}}，内部用 {{name}}。',
       metadataActorsTitle: '演员模板',
@@ -123,6 +137,8 @@
       language: 'Language / 语言',
       shortcutSettings: 'Shortcut Settings',
       themeColorSection: 'Theme Color / 主题色',
+      consoleLogSection: 'Console Logs',
+      consoleLogLabel: 'Enable script console logging',
       metadataSettings: 'Metadata Templates',
       metadataHelp: 'Supports {{title}}, {{genres}}, {{description}} etc; for arrays use {{#actors}}...{{/actors}} or {{#genres}}...{{/genres}} with {{name}} inside.',
       metadataActorsTitle: 'Actors Template',
@@ -599,6 +615,21 @@
     themeSection.appendChild(themeInputRow);
     content.appendChild(themeSection);
 
+    const consoleSection = createSection(t.consoleLogSection);
+    const consoleToggleLabel = document.createElement('label');
+    consoleToggleLabel.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;background:#1f1f1f;border-radius:8px;border:1px solid #333;cursor:pointer;';
+    const consoleToggleText = document.createElement('span');
+    consoleToggleText.textContent = t.consoleLogLabel;
+    consoleToggleText.style.cssText = 'font-size:12px;color:#eee;';
+    const consoleToggleInput = document.createElement('input');
+    consoleToggleInput.type = 'checkbox';
+    consoleToggleInput.checked = !!enableConsoleLogs;
+    consoleToggleInput.style.accentColor = themeColor;
+    consoleToggleLabel.appendChild(consoleToggleText);
+    consoleToggleLabel.appendChild(consoleToggleInput);
+    consoleSection.appendChild(consoleToggleLabel);
+    content.appendChild(consoleSection);
+
     const langSection = createSection(t.language);
     const langOptions = [
       { label: '🇨🇳 中文', value: 'zh' },
@@ -896,6 +927,8 @@
       if (/^#[0-9a-fA-F]{6}$/.test(nextTheme)) {
         GM_setValue('themeColor', nextTheme);
       }
+      GM_setValue('enableConsoleLogs', !!consoleToggleInput.checked);
+      enableConsoleLogs = !!consoleToggleInput.checked;
       location.reload();
     };
 
