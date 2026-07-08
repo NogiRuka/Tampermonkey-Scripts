@@ -680,8 +680,9 @@
              historyContainer.classList.remove('active');
           });
           
-          // 滚动时隐藏
-          window.addEventListener('scroll', () => {
+          // 页面主文档滚动时隐藏；历史面板自己滚动不隐藏
+          window.addEventListener('scroll', (e) => {
+             if (e.target === historyContainer) return;
              historyContainer.classList.remove('active');
           }, true);
           window.addEventListener('resize', () => {
