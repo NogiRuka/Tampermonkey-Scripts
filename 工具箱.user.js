@@ -480,6 +480,8 @@
         z-index: 9999;
         max-height: 300px;
         overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
         display: none;
       }
       .nogiruka-search-history.active {
@@ -650,6 +652,23 @@
           const historyContainer = document.createElement('div');
           historyContainer.className = 'nogiruka-search-history';
           document.body.appendChild(historyContainer);
+
+          historyContainer.addEventListener('wheel', (e) => {
+            const { scrollTop, scrollHeight, clientHeight } = historyContainer;
+            if (scrollHeight <= clientHeight) return;
+
+            const deltaY = e.deltaY;
+            const atTop = scrollTop <= 0;
+            const atBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+            const canScrollUp = deltaY < 0 && !atTop;
+            const canScrollDown = deltaY > 0 && !atBottom;
+
+            if (canScrollUp || canScrollDown) {
+              e.preventDefault();
+              e.stopPropagation();
+              historyContainer.scrollTop += deltaY;
+            }
+          }, { passive: false });
 
           // 监听输入框事件
           input.addEventListener('focus', () => {
